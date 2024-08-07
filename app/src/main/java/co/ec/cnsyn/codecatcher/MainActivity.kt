@@ -26,7 +26,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import co.ec.cnsyn.codecatcher.main.Dashboard
+import co.ec.cnsyn.codecatcher.database.DB
+import co.ec.cnsyn.codecatcher.pages.dashboard.Dashboard
 import co.ec.cnsyn.codecatcher.ui.theme.CodeCatcherTheme
 
 
@@ -43,7 +44,7 @@ class MainActivity : ComponentActivity() {
 }
 
 
-
+val LocalDB = compositionLocalOf { DB.get() }
 val LocalNavigation = compositionLocalOf<NavHostController> { error("No NavController provided") }
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -53,6 +54,7 @@ fun CodeCatcherApp() {
     val navController = rememberNavController()
     CompositionLocalProvider(
         LocalNavigation provides navController,
+        LocalDB provides DB.get(),
     ) {
         Scaffold(
             modifier = Modifier

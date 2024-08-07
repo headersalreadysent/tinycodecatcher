@@ -1,4 +1,4 @@
-package co.ec.cnsyn.codecatcher.main
+package co.ec.cnsyn.codecatcher.pages.dashboard
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -59,7 +59,7 @@ fun Dashboard(model: DashboardViewModel = viewModel()) {
                 .map { (index, offset) -> index * 100 + offset }
                 .collect { position -> scrollPosition = position }
         }
-        SkewSquare(modifier = Modifier.zIndex(3F)) {
+        SkewSquare(modifier = Modifier.zIndex(3F), skew = 30) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()

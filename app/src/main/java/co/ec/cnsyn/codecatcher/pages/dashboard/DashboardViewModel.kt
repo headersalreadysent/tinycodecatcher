@@ -1,4 +1,4 @@
-package co.ec.cnsyn.codecatcher.main
+package co.ec.cnsyn.codecatcher.pages.dashboard
 
 import androidx.lifecycle.ViewModel
 

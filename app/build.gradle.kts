@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -69,9 +71,14 @@ dependencies {
 
     implementation(libs.androidx.lifecycle.viewmodel.compose)
 
-    val nav_version = "2.7.7"
+    implementation(libs.androidx.navigation.compose)
 
-    implementation("androidx.navigation:navigation-compose:$nav_version")
+    implementation(libs.androidx.room.runtime)
+    ksp(libs.androidx.room.compiler)
+    implementation(libs.androidx.runtime.livedata)
+
+    implementation(libs.androidx.material.icons.extended)
+
 
 
 }
