@@ -12,13 +12,18 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DataObject
+import androidx.compose.material.icons.filled.Phishing
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -27,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -50,6 +56,8 @@ fun Dashboard(model: DashboardViewModel = viewModel()) {
         var scrollPosition by remember { mutableIntStateOf(0) }
         var titleHeight by remember { mutableIntStateOf(0) }
 
+        val stat by model.stats.observeAsState(mapOf())
+
         LaunchedEffect(listState) {
             //listen scroll
             snapshotFlow {
@@ -70,9 +78,19 @@ fun Dashboard(model: DashboardViewModel = viewModel()) {
                 val cardModifier = Modifier
                     .aspectRatio(1F)
                     .weight(1F)
-                StatCard(modifier = cardModifier, title = "catcher count", value = "50")
+                StatCard(
+                    modifier = cardModifier,
+                    title = "catcher count",
+                    icon = Icons.Default.Phishing,
+                    value = (stat["catcher"] ?: 0).toString()
+                )
                 Spacer(modifier = Modifier.width(16.dp))
-                StatCard(modifier = cardModifier, title = "catcher count", value = "50")
+                StatCard(
+                    modifier = cardModifier,
+                    title = "code count",
+                    icon = Icons.Default.DataObject,
+                    value = (stat["code"] ?: 0).toString()
+                )
             }
         }
 
@@ -87,26 +105,40 @@ fun Dashboard(model: DashboardViewModel = viewModel()) {
                         (if (scrollPosition < titleHeight) scrollPosition * -1 else titleHeight * -1).toFloat()
                 }
         ) {
+            val codes by model.codes.collectAsState(listOf())
             //calculate space for translate
-            val extraSpace = with(LocalDensity.current) { 30.dp.toPx() }.toInt()
-            Text(text = "Last Codes", modifier = Modifier.onGloballyPositioned {
-                titleHeight = it.size.height + extraSpace
-            })
+            val extraSpace = with(LocalDensity.current) { 50.dp.toPx() }.toInt()
+            Text(
+                text = "Last Codes", modifier = Modifier
+                    .fillMaxWidth()
+                    .onGloballyPositioned {
+                        titleHeight = it.size.height + extraSpace
+                    },
+                style = MaterialTheme.typography.titleMedium.copy(
+                    textAlign = TextAlign.End
+                )
+            )
             LazyColumn(
-                state = listState
+                state = listState,
+                modifier = Modifier.padding(bottom=20.dp)
             ) {
-                items(13) { i ->
+                items(codes.size) { i ->
+                    val code = codes[i]
                     ListItem(
                         modifier = Modifier.padding(vertical = 8.dp),
                         colors = ListItemDefaults.colors(
                             containerColor = MaterialTheme.colorScheme.secondaryContainer
                         ),
                         headlineContent = {
-                            Text(text = "$i-322")
-
+                            Text(text = code.code.code)
+                        },
+                        overlineContent = {
+                            if (code.catcher.sender != "") {
+                                Text(text = code.catcher.sender)
+                            }
                         },
                         supportingContent = {
-                            Text(text = "google")
+                            Text(text = code.code.sms)
                         })
                 }
             }

@@ -1,6 +1,7 @@
 package co.ec.cnsyn.codecatcher
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -26,6 +27,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import co.ec.cnsyn.codecatcher.database.AppDatabase
 import co.ec.cnsyn.codecatcher.database.DB
 import co.ec.cnsyn.codecatcher.pages.dashboard.Dashboard
 import co.ec.cnsyn.codecatcher.ui.theme.CodeCatcherTheme
@@ -34,27 +36,29 @@ import co.ec.cnsyn.codecatcher.ui.theme.CodeCatcherTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        DB.getDatabase(applicationContext)
         enableEdgeToEdge()
         setContent {
             CodeCatcherTheme {
-                CodeCatcherApp()
+                CodeCatcherApp(applicationContext)
             }
         }
     }
 }
 
 
-val LocalDB = compositionLocalOf { DB.get() }
+val LocalDB = compositionLocalOf<AppDatabase> { error("No NavController provided") }
 val LocalNavigation = compositionLocalOf<NavHostController> { error("No NavController provided") }
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun CodeCatcherApp() {
+fun CodeCatcherApp(context: Context) {
 
     val navController = rememberNavController()
+    val db = DB.getDatabase(context)
     CompositionLocalProvider(
         LocalNavigation provides navController,
-        LocalDB provides DB.get(),
+        LocalDB provides db
     ) {
         Scaffold(
             modifier = Modifier
@@ -91,8 +95,8 @@ fun CodeCatcherApp() {
 
 @Preview(showBackground = true)
 @Composable
-fun GreetingPreview() {
+fun AppPreview() {
     CodeCatcherTheme {
-        CodeCatcherApp()
+        CodeCatcherApp(App.context())
     }
 }

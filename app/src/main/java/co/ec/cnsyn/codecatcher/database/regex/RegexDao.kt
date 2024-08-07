@@ -11,6 +11,6 @@ import kotlinx.coroutines.flow.Flow
 interface RegexDao : BaseDao<Regex> {
 
     @Query("SELECT * FROM regex")
-    fun getAllItems(): Flow<List<Regex>>
+    fun getAllItems(): List<Regex>
 
 }
