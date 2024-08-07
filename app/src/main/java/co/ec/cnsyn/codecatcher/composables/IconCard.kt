@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.QuestionMark
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -36,7 +38,7 @@ import co.ec.cnsyn.codecatcher.ui.theme.CodeCatcherTheme
 @Composable
 fun IconCard(
     modifier: Modifier = Modifier,
-    icon: ImageVector = Icons.Default.Add,
+    icon: ImageVector = Icons.Default.Done,
     height: Dp? = null,
     ratio: Float = 5F,
     content: @Composable () -> Unit,
@@ -44,7 +46,6 @@ fun IconCard(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .padding(top = 8.dp)
             .shadow(4.dp),
     ) {
         var boxHeight by remember { mutableIntStateOf(0) }
@@ -86,7 +87,7 @@ fun IconCard(
 fun IconCardPreview(){
     CodeCatcherTheme {
         Box(modifier = Modifier.fillMaxWidth().aspectRatio(1F)){
-            IconCard(icon = Icons.Filled.Add) {
+            IconCard(icon = Icons.Filled.QuestionMark) {
                 Text(text = "hello")
             }
         }

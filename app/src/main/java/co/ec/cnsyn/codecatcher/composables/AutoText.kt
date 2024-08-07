@@ -1,10 +1,12 @@
 package co.ec.cnsyn.codecatcher.composables
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.LocalTextStyle
@@ -12,11 +14,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
@@ -28,6 +32,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlin.math.absoluteValue
 
@@ -35,8 +40,8 @@ import kotlin.math.absoluteValue
 @Composable
 fun AutoText(
     text: String,
-    fontSize: IntProgression = 10..50,
     modifier: Modifier = Modifier,
+    fontSize: IntProgression = 10..50,
     color: Color = Color.Unspecified,
     fontStyle: FontStyle? = null,
     fontWeight: FontWeight? = null,
@@ -44,12 +49,12 @@ fun AutoText(
     letterSpacing: TextUnit = TextUnit.Unspecified,
     textDecoration: TextDecoration? = null,
     textAlign: TextAlign? = null,
-    overflow: TextOverflow = TextOverflow.Clip,
+    overflow: TextOverflow = TextOverflow.Visible,
     softWrap: Boolean = true,
-    maxLines: Int = Int.MAX_VALUE,
+    maxLines: Int = 1,
     style: TextStyle = LocalTextStyle.current,
 ) {
-    var fontSizeValue by remember { mutableFloatStateOf(fontSize.max().toFloat()) }
+    var fontSizeValue by remember { mutableIntStateOf(fontSize.max()) }
     var lineHeightValue by remember { mutableFloatStateOf(fontSize.max().toFloat() * 1.4F) }
     var readyToDraw by remember { mutableStateOf(false) }
 
@@ -75,11 +80,11 @@ fun AutoText(
                 val nextFontSizeValue = (fontSizeValue.absoluteValue - fontSize.step)
                 if (nextFontSizeValue <= fontSize.min().toFloat()) {
                     // Reached minimum, set minimum font size and it's readToDraw
-                    fontSizeValue = fontSize.min().toFloat()
+                    fontSizeValue = fontSize.min()
                     readyToDraw = true
                 } else {
                     fontSizeValue = nextFontSizeValue
-                    lineHeightValue = nextFontSizeValue * 1.5F
+                    lineHeightValue = nextFontSizeValue * 1.4F
                 }
             } else {
                 // Text fits before reaching the minimum, it's readyToDraw
@@ -98,12 +103,17 @@ fun AutoTextPreview() {
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
     ) {
-        for (i in 20..100 step 5) {
+        for (i in 1..10) {
+            var j = 10 - i
+            Box(modifier = Modifier.fillMaxWidth(j*0.1.toFloat())
+                .height(60.dp).border(1.dp,Color.Red)) {
 
-            AutoText(
-                "hello", 10..i step 2,
-                modifier = Modifier.fillMaxWidth()
-            )
+                AutoText(
+                    "$i hello this is very long text",
+                    modifier = Modifier.fillMaxWidth(),
+                    1..100 step 5,
+                )
+            }
         }
 
     }
