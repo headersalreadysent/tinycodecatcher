@@ -41,6 +41,21 @@ interface CodeDao : BaseDao<Code> {
 
     class Latest(var code: Code, var catcher: Catcher?, var actions: List<ActionDetail>)
 
+    @Query("""
+      SELECT *
+            FROM code
+            WHERE id IN (
+                SELECT id
+                FROM code AS inner_items
+                WHERE inner_items.catcherId = code.catcherId
+                ORDER BY date DESC
+                LIMIT 5
+            )
+            ORDER BY catcherId, date DESC;
+    """)
+    fun getLastItemsPerCatcher(): List<Code>
+
+
     /**
      * get latest
      */

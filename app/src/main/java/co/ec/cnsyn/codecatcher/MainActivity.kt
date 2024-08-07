@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Phishing
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -29,6 +30,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import co.ec.cnsyn.codecatcher.database.AppDatabase
 import co.ec.cnsyn.codecatcher.database.DB
+import co.ec.cnsyn.codecatcher.pages.catcher.CatcherPage
 import co.ec.cnsyn.codecatcher.pages.dashboard.Dashboard
 import co.ec.cnsyn.codecatcher.ui.theme.CodeCatcherTheme
 
@@ -67,12 +69,25 @@ fun CodeCatcherApp(context: Context) {
                 BottomAppBar(
                     actions = {
                         IconButton(
-                            onClick = { /*TODO*/ },
+                            onClick = {
+                                navController.navigate("dashboard")
+                            },
                             colors = IconButtonDefaults.iconButtonColors(
                                 containerColor = MaterialTheme.colorScheme.surface
                             )
                         ) {
                             Icon(Icons.Default.Home, contentDescription = "")
+                        }
+
+                        IconButton(
+                            onClick = {
+                                navController.navigate("catchers")
+                            },
+                            colors = IconButtonDefaults.iconButtonColors(
+                                containerColor = MaterialTheme.colorScheme.surface
+                            )
+                        ) {
+                            Icon(Icons.Default.Phishing, contentDescription = "")
                         }
                     },
                     floatingActionButton = {
@@ -84,8 +99,12 @@ fun CodeCatcherApp(context: Context) {
                 )
             }
         ) { _ ->
-            NavHost(navController = navController, startDestination = "dashboard") {
+            NavHost(navController = navController,
+                //startDestination = "dashboard"
+                startDestination = "catchers"
+                ) {
                 composable("dashboard") { Dashboard() }
+                composable("catchers") { CatcherPage() }
             }
         }
 

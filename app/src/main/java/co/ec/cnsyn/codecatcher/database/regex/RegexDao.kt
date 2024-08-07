@@ -13,4 +13,8 @@ interface RegexDao : BaseDao<Regex> {
     @Query("SELECT * FROM regex")
     fun getAllItems(): List<Regex>
 
+
+    @Query("SELECT * FROM regex WHERE id IN (:id)")
+    fun getRegexes(id:IntArray): List<Regex>
+
 }
