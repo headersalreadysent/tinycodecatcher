@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 @Entity
 data class CatcherAction(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    val catherId: Int,
+    val catcherId: Int,
     var actionId: Int,
     var paramns: String = "",
     var status: Int = 1

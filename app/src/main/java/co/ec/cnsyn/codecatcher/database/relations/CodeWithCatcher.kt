@@ -1,11 +1,10 @@
 package co.ec.cnsyn.codecatcher.database.relations
 
-import co.ec.cnsyn.codecatcher.database.catcher.Catcher
 
 
 import androidx.room.Embedded
 import androidx.room.Relation
-import co.ec.cnsyn.codecatcher.database.action.Action
+import co.ec.cnsyn.codecatcher.database.catcher.Catcher
 import co.ec.cnsyn.codecatcher.database.code.Code
 
 data class CodeWithCatcher(

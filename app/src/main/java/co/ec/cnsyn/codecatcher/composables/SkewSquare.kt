@@ -17,7 +17,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import co.ec.cnsyn.codecatcher.ui.theme.CodeCatcherTheme
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Paint
+import androidx.compose.ui.graphics.asAndroidPath
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalDensity
+import androidx.core.graphics.ColorUtils
+
 
 @Composable
 fun SkewSquare(
@@ -32,18 +38,30 @@ fun SkewSquare(
         modifier = Modifier
             .fillMaxWidth()
             .drawBehind {
-                val path = Path().apply {
-                    moveTo(0f, 0f)
-                    lineTo(size.width, 0f)
-                    lineTo(size.width, size.height - height)
-                    lineTo(0f, size.height)
-                    close()
-                }
+
                 drawPath(
-                    path = path,
+                    path = Path().apply {
+                        moveTo(0f, 0f)
+                        lineTo(size.width, 0f)
+                        lineTo(size.width, size.height - height)
+                        lineTo(0f, size.height)
+                        close()
+                    },
+                    color = Color.Gray.copy(alpha = .3F),
+                    style = Fill
+                )
+                drawPath(
+                    path = Path().apply {
+                        moveTo(0f, 0f)
+                        lineTo(size.width, 0f)
+                        lineTo(size.width, size.height - height - 3)
+                        lineTo(0f, size.height - 3)
+                        close()
+                    },
                     color = fillColor,
                     style = Fill
                 )
+
             }
             .then(modifier)
     ) {

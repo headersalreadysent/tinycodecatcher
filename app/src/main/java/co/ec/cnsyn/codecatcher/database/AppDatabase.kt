@@ -13,9 +13,11 @@ import co.ec.cnsyn.codecatcher.database.code.Code
 import co.ec.cnsyn.codecatcher.database.code.CodeDao
 import co.ec.cnsyn.codecatcher.database.regex.Regex
 import co.ec.cnsyn.codecatcher.database.regex.RegexDao
+import co.ec.cnsyn.codecatcher.database.relations.CatcherWithActions
 
 @Database(
     entities = [Action::class, Catcher::class, CatcherAction::class, Code::class, Regex::class],
+    views = [CatcherWithActions::class],
     version = 1
 )
 abstract class AppDatabase : RoomDatabase() {
