@@ -39,9 +39,24 @@ interface CodeDao : BaseDao<Code> {
     @Query("SELECT count(id) FROM code")
     fun getCount(): Int
 
+
+    class Stat(var count: Int, var catcherId: Int, var day: String, var start: Int)
+
+    @Query(
+        """
+        SELECT count(id) AS count, catcherId ,strftime('%Y-%m-%d', datetime(date, 'unixepoch')) AS day,
+         date-date%86400 as start
+        FROM code 
+        GROUP BY catcherId || "-" || strftime('%Y-%m-%d', datetime(date, 'unixepoch')) 
+        ORDER BY catcherId ASC, date DESC
+    """
+    )
+    fun getStats(): List<Stat>
+
     class Latest(var code: Code, var catcher: Catcher?, var actions: List<ActionDetail>)
 
-    @Query("""
+    @Query(
+        """
       SELECT *
             FROM code
             WHERE id IN (
@@ -52,9 +67,12 @@ interface CodeDao : BaseDao<Code> {
                 LIMIT 5
             )
             ORDER BY catcherId, date DESC;
-    """)
+    """
+    )
     fun getLastItemsPerCatcher(): List<Code>
 
+    @Query("SELECT *  FROM code WHERE catcherId = :catcherId ORDER BY date DESC LIMIT 5")
+    fun getLastItemsOfCatcher(catcherId: Int): List<Code>
 
     /**
      * get latest

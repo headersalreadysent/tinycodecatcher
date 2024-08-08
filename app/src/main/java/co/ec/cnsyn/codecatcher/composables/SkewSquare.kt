@@ -33,7 +33,7 @@ fun SkewSquare(
     fill: Color? = null,
     skew: Int = 16,
     cut: String = "BE",
-    content: @Composable () -> Unit,
+    content: @Composable () -> Unit = {},
 ) {
     val fillColor = fill ?: MaterialTheme.colorScheme.primaryContainer
     var height = with(LocalDensity.current) { skew.dp.toPx() }
@@ -42,9 +42,8 @@ fun SkewSquare(
         modifier = Modifier
             .fillMaxWidth()
             .drawBehind {
-
                 drawPath(
-                    path = generatePath(size, cutType, height,true),
+                    path = generatePath(size, cutType, height, true),
                     color = Color.Gray.copy(alpha = .3F),
                     style = Fill
                 )
@@ -118,7 +117,7 @@ fun generatePath(size: Size, cut: String, height: Float, shadow: Boolean = false
 fun SkewsSquarePreview() {
     CodeCatcherTheme {
         Column {
-            SkewSquare(skew = 30,cut="te") {
+            SkewSquare(skew = 30, cut = "te") {
                 TextButton(
                     onClick = { /*TODO*/ },
                     modifier = Modifier.height(60.dp)

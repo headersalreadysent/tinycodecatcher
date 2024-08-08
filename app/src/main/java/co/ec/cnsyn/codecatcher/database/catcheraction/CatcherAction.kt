@@ -8,6 +8,6 @@ data class CatcherAction(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val catcherId: Int,
     var actionId: Int,
-    var paramns: String = "",
+    var params: String = "",
     var status: Int = 1
 )
