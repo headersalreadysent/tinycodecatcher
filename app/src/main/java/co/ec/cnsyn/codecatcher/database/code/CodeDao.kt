@@ -31,27 +31,57 @@ interface CodeDao : BaseDao<Code> {
     fun getCodeWithCatcher(catcherId: Int): List<CodeWithCatcher>
 
 
-    @Transaction
     @Query("SELECT * FROM code ORDER BY date DESC LIMIT :limit")
     fun getLatestCodes(limit: Int = 20): List<Code>
+
+    @Query("SELECT * FROM code WHERE catcherId=:catcherId AND date >=:date AND date <= :date+86400")
+    fun getCatcherDay(catcherId: Int, date: Int): List<Code>
 
 
     @Query("SELECT count(id) FROM code")
     fun getCount(): Int
 
 
-    class Stat(var count: Int, var catcherId: Int, var day: String, var start: Int)
+    class Stat(var count: Int, var catcherId: Int, var start: Int)
 
     @Query(
         """
-        SELECT count(id) AS count, catcherId ,strftime('%Y-%m-%d', datetime(date, 'unixepoch')) AS day,
-         date-date%86400 as start
-        FROM code 
-        GROUP BY catcherId || "-" || strftime('%Y-%m-%d', datetime(date, 'unixepoch')) 
+        SELECT count(id) AS count, catcherId, date-date%86400 as start
+        FROM code
+        WHERE date >= strftime('%s', 'now', 'start of day', 'localtime')-86400*:dayCount
+        GROUP BY catcherId || '-' || strftime('%Y-%m-%d', datetime(date, 'unixepoch')) 
         ORDER BY catcherId ASC, date DESC
     """
     )
-    fun getStats(): List<Stat>
+    fun getStats(dayCount: Int = 28): List<Stat>
+
+    @Query(
+        """
+        WITH RECURSIVE date_range AS (
+    SELECT strftime('%s', 'now', 'start of day', 'localtime') AS day, 0 AS row_num
+    UNION ALL
+    SELECT day - 86400, row_num + 1
+    FROM date_range
+    WHERE row_num < :dayCount - 1
+),
+item_counts AS (SELECT 
+    dr.day,
+    strftime('%Y-%m-%d', datetime(dr.day, 'unixepoch')) ,
+    COUNT(c.id) AS item_count
+FROM 
+    date_range dr
+LEFT JOIN 
+    code c 
+    ON c.date > dr.day AND c.date < dr.day+86400 AND c.catcherId=:catcherId
+GROUP BY 
+    dr.day
+ORDER BY 
+    dr.day DESC)
+    Select avg(item_count) AS avg from item_counts
+
+    """
+    )
+    fun getAverage(catcherId: Int, dayCount: Int = 7): Float
 
     class Latest(var code: Code, var catcher: Catcher?, var actions: List<ActionDetail>)
 

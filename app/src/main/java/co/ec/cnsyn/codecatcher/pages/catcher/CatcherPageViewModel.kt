@@ -10,17 +10,24 @@ import co.ec.cnsyn.codecatcher.database.catcher.Catcher
 import co.ec.cnsyn.codecatcher.database.catcher.CatcherDao
 import co.ec.cnsyn.codecatcher.database.catcher.CatcherDao.CatcherDetail
 import co.ec.cnsyn.codecatcher.database.catcheraction.CatcherAction
+import co.ec.cnsyn.codecatcher.database.code.Code
+import co.ec.cnsyn.codecatcher.database.code.CodeDao
 import co.ec.cnsyn.codecatcher.database.relations.ActionDetail
 import co.ec.cnsyn.codecatcher.helpers.async
+import co.ec.cnsyn.codecatcher.helpers.dateString
+import co.ec.cnsyn.codecatcher.helpers.unix
 import co.ec.cnsyn.codecatcher.values.actionList
 import co.ec.cnsyn.codecatcher.values.regexList
 import kotlinx.coroutines.launch
+import kotlin.random.Random
 
 open class CatcherPageViewModel : ViewModel() {
 
     var catchers = MutableLiveData<List<CatcherDao.CatcherDetail>>(listOf())
 
     var allActions = MutableLiveData<List<Action>>(listOf())
+
+    var dayCodes = MutableLiveData<List<Code>>(listOf())
 
     init {
         start()
@@ -42,17 +49,19 @@ open class CatcherPageViewModel : ViewModel() {
 
     }
 
-    fun actionStatus(catcherDetail: CatcherDetail, action: Action, targetStatus: Boolean = true) {
-
+    /**
+     * change status action for given catcher
+     */
+    fun actionStatus(catcherId: Int, action: Action, targetStatus: Boolean = true) {
         async({
             if (!targetStatus) {
-                return@async DB.get().catcherAction().disable(catcherDetail.catcher.id, action.id)
+                return@async DB.get().catcherAction().disable(catcherId, action.id)
             } else {
                 var catcherAction =
-                    DB.get().catcherAction().getOne(catcherDetail.catcher.id, action.id)
+                    DB.get().catcherAction().getOne(catcherId, action.id)
                 if (catcherAction == null) {
                     catcherAction = CatcherAction(
-                        catcherId = catcherDetail.catcher.id,
+                        catcherId = catcherId,
                         actionId = action.id,
                         params = "",
                         status = 1
@@ -62,7 +71,7 @@ open class CatcherPageViewModel : ViewModel() {
                 return@async DB.get().catcherAction().insert(catcherAction)
             }
         }, {
-            reloadOneCatcher(catcherDetail.catcher.id)
+            reloadOneCatcher(catcherId)
         })
 
     }
@@ -72,7 +81,6 @@ open class CatcherPageViewModel : ViewModel() {
      * reload catcher details
      */
     private fun reloadOneCatcher(catcherId: Int, then: () -> Unit = { }) {
-
         DB.get().catcher().collectCatcherDetail(catcherId, { detail ->
             val map = catchers.value?.associateBy { it.catcher.id }?.toMutableMap()
                 ?: mutableMapOf()
@@ -83,6 +91,21 @@ open class CatcherPageViewModel : ViewModel() {
         }, { err ->
             println(err)
         })
+    }
+
+    /**
+     * load one day stats
+     */
+    fun loadDayStats(catcherId: Int, start: Int) {
+        async({
+            return@async DB.get().code().getCatcherDay(catcherId, start)
+        }, {
+            dayCodes.value = it
+        })
+    }
+
+    fun clearDayStat() {
+        dayCodes.value = listOf()
     }
 }
 
@@ -125,7 +148,19 @@ class MockCatcherViewModel : CatcherPageViewModel() {
 
                     ),
                 regex = regexList()[0],
-                stat = listOf()
+                stat = List(20) {
+
+                    CodeDao.Stat(
+                        count = Random.nextInt(0, 20),
+                        catcherId = it,
+                        start = unix().toInt() - it * 86400
+                    )
+                },
+                avg = mapOf(
+                    7 to Random.nextFloat(),
+                    14 to Random.nextFloat(),
+                    30 to Random.nextFloat()
+                )
             )
 
         }

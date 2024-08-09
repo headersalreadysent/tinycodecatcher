@@ -41,7 +41,8 @@ interface CatcherDao : BaseDao<Catcher> {
         var catcher: Catcher,
         var actions: List<ActionDetail>,
         val regex: Regex,
-        val stat: List<CodeDao.Stat>
+        val stat: List<CodeDao.Stat>,
+        val avg:Map<Int,Float>
     )
 
     /**
@@ -60,15 +61,21 @@ interface CatcherDao : BaseDao<Catcher> {
             val regexes = db.regex().getRegexes(catchers.map { it.regexId }.toIntArray())
                 .associateBy { it.id }
 
-            val codes = db.code().getStats()
+            val stats = db.code().getStats()
 
             return@async catchers.map { catcher ->
+
                 return@map CatcherDetail(
                     catcher = catcher,
                     actions = action.filter { it.action.catcherId == catcher.id }
                         .sortedBy { it.action.actionId },
                     regex = regexes[catcher.regexId]!!,
-                    stat = codes.filter { it.catcherId == catcher.id }
+                    stat = stats.filter { it.catcherId == catcher.id },
+                    avg = mapOf(
+                        7 to db.code().getAverage(catcher.id,7),
+                        14 to db.code().getAverage(catcher.id,14),
+                        30 to db.code().getAverage(catcher.id,30)
+                    )
                 )
             }
         }, then, err)
@@ -88,14 +95,19 @@ interface CatcherDao : BaseDao<Catcher> {
             val regexes = db.regex().getRegexes(intArrayOf(catcher.regexId))
                 .associateBy { it.id }
 
-            val codes = db.code().getLastItemsOfCatcher(id)
+
 
             return@async CatcherDetail(
                 catcher = catcher,
                 actions = action.filter { it.action.catcherId == catcher.id }
                     .sortedBy { it.action.actionId },
                 regex = regexes[catcher.regexId]!!,
-                stat = db.code().getStats().filter { it.catcherId == id }
+                stat = db.code().getStats().filter { it.catcherId == id },
+                avg = mapOf(
+                    7 to db.code().getAverage(catcher.id,7),
+                    14 to db.code().getAverage(catcher.id,14),
+                    30 to db.code().getAverage(catcher.id,30)
+                )
             )
         }, then, err)
     }

@@ -1,11 +1,13 @@
 package co.ec.cnsyn.codecatcher.pages.catcher
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -16,30 +18,40 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.GenericShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AvTimer
+import androidx.compose.material.icons.filled.Phishing
+import androidx.compose.material.icons.filled.Timeline
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -50,7 +62,6 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -59,7 +70,6 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.RoundRect
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
@@ -71,13 +81,16 @@ import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
 import co.ec.cnsyn.codecatcher.composables.AutoText
 import co.ec.cnsyn.codecatcher.composables.IconName
+import co.ec.cnsyn.codecatcher.composables.SkewBottomSheet
 import co.ec.cnsyn.codecatcher.composables.SkewSquare
+import co.ec.cnsyn.codecatcher.composables.StatCard
 import co.ec.cnsyn.codecatcher.database.action.Action
 import co.ec.cnsyn.codecatcher.database.catcher.CatcherDao
 import co.ec.cnsyn.codecatcher.database.code.CodeDao
 import co.ec.cnsyn.codecatcher.helpers.dateString
 import co.ec.cnsyn.codecatcher.ui.theme.CodeCatcherTheme
 import co.ec.cnsyn.codecatcher.values.actionList
+import java.util.Locale
 import kotlin.math.roundToInt
 
 
@@ -88,7 +101,8 @@ fun CatcherPage(model: CatcherPageViewModel = viewModel()) {
 
     // bottom sheet related
     val sheetState = rememberModalBottomSheetState()
-    var showBottomSheet by remember { mutableStateOf(false) }
+    var showAddActionSheet by remember { mutableStateOf(false) }
+    var dayDetailSheet by remember { mutableStateOf(false) }
     var selectedCatcher by remember { mutableStateOf<CatcherDao.CatcherDetail?>(null) }
     //list of all actions in app
     val actions by model.allActions.observeAsState(listOf())
@@ -175,31 +189,28 @@ fun CatcherPage(model: CatcherPageViewModel = viewModel()) {
                         isActive = it == mostVisibleItem.value,
                         addAction = { catcher ->
                             selectedCatcher = catcher
-                            showBottomSheet = true
-                        }, changeStatus = { action, status ->
-                            model.actionStatus(catchers[it], action, status)
-                        })
+                            showAddActionSheet = true
+                        },
+                        changeStatus = { action, status ->
+                            model.actionStatus(catchers[it].catcher.id, action, status)
+                        },
+                        dayDetail = { catcherId, start ->
+                            model.loadDayStats(catcherId, start)
+                            dayDetailSheet = true
+                        }
+                    )
                 }
 
             }
         }
     }
 
-    if (showBottomSheet) {
-        ModalBottomSheet(
+    if (showAddActionSheet) {
+        SkewBottomSheet(
             onDismissRequest = {
-                showBottomSheet = false
+                showAddActionSheet = false
             },
-            sheetState = sheetState,
-            shape = RoundedCornerShape(0.dp), // Fixed corner radius
-            containerColor = Color.Transparent,
-            dragHandle = {
-                SkewSquare(
-                    skew = 45,
-                    cut = "te",
-                    fill = MaterialTheme.colorScheme.surface
-                )
-            }
+            sheetState = sheetState
         ) {
             selectedCatcher?.let { catcher ->
                 //show add bottom sheet for catcher
@@ -207,12 +218,125 @@ fun CatcherPage(model: CatcherPageViewModel = viewModel()) {
                     catcherDetail = catcher,
                     actions = actions,
                     changeStatus = { action, status ->
-                        model.actionStatus(catcher, action, status)
+                        model.actionStatus(catcher.catcher.id, action, status)
                     },
                     onDismissRequest = {
-                        showBottomSheet = false
+                        showAddActionSheet = false
                     },
                 )
+            }
+        }
+    }
+    val dayCodes by model.dayCodes.observeAsState(listOf())
+    if (dayDetailSheet) {
+        SkewBottomSheet(
+            onDismissRequest = {
+                dayDetailSheet = false
+                model.clearDayStat()
+            },
+            sheetState = sheetState
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 40.dp)
+                    .verticalScroll(rememberScrollState())
+            ) {
+                var text = "Günlük Yakalananlar"
+                if (dayCodes.isNotEmpty()) {
+                    text += " (${dayCodes[0].date.dateString("dd.MM.YYYY")})"
+                }
+                Text(
+                    text = text,
+                    style = MaterialTheme.typography.titleSmall
+                )
+
+
+                if (dayCodes.isEmpty()) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(60.dp),
+                        Alignment.Center
+                    ) {
+
+                        CircularProgressIndicator(
+                            modifier = Modifier
+                                .fillMaxHeight(.8F)
+                        )
+                    }
+                }
+                if (dayCodes.isNotEmpty()) {
+                    dayCodes.forEach { code ->
+                        Surface(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp)
+                                .background(MaterialTheme.colorScheme.secondaryContainer)
+                                .padding(vertical = 12.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .background(MaterialTheme.colorScheme.secondaryContainer)
+                                    .fillMaxWidth()
+                                    .height(IntrinsicSize.Max),
+                            ) {
+                                Column(
+                                    modifier = Modifier
+                                        .weight(1F)
+                                        .padding(horizontal = 4.dp)
+                                        .fillMaxHeight(),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.Center
+                                ) {
+                                    Text(
+                                        text = code.date.dateString("dd"),
+                                        style = MaterialTheme.typography.bodySmall
+                                            .copy(
+                                                color = MaterialTheme.colorScheme.onSecondaryContainer
+                                            )
+                                    )
+                                    Text(
+                                        text = code.date.dateString("MMM"),
+                                        style = MaterialTheme.typography.bodySmall
+                                            .copy(
+                                                color = MaterialTheme.colorScheme.onSecondaryContainer
+                                            )
+                                    )
+                                }
+                                Column(
+                                    modifier = Modifier.weight(5F)
+                                ) {
+                                    if (code.sender != "") {
+                                        Text(
+                                            text = code.sender ?: "",
+                                            modifier = Modifier.padding(bottom = 1.dp),
+                                            style = MaterialTheme.typography.bodySmall.copy(
+                                                fontWeight = FontWeight.SemiBold,
+                                                fontSize = 11.sp,
+                                                color = MaterialTheme.colorScheme.onSecondaryContainer.copy(
+                                                    alpha = .6F
+                                                )
+                                            )
+                                        )
+                                    }
+
+                                    Text(
+                                        text = code.code,
+                                        modifier = Modifier.padding(bottom = 2.dp),
+                                        style = MaterialTheme.typography.bodyLarge
+                                    )
+                                    Text(
+                                        text = code.sms,
+                                        style = MaterialTheme.typography.bodyMedium.copy(
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -225,11 +349,12 @@ fun CatcherItem(
     allActions: List<Action>,
     isActive: Boolean = false,
     addAction: (catherDetail: CatcherDao.CatcherDetail) -> Unit = { _ -> },
-    changeStatus: (action: Action, status: Boolean) -> Unit
+    changeStatus: (action: Action, status: Boolean) -> Unit,
+    dayDetail: (catcherId: Int, start: Int) -> Unit
 ) {
     val animatedAlpha by animateFloatAsState(
-        targetValue = if (isActive) 1F else .5F,
-        animationSpec = tween(durationMillis = 200, easing = LinearEasing),
+        targetValue = if (isActive) 1F else .8F,
+        animationSpec = tween(durationMillis = 100, easing = LinearEasing),
         label = "alpha"
     )
     Column(
@@ -249,6 +374,7 @@ fun CatcherItem(
                 var enabled by remember(action) {
                     mutableStateOf(action.action.status == 1)
                 }
+                //show every action in list
                 ListItem(
                     modifier = Modifier.padding(bottom = 8.dp),
                     colors = ListItemDefaults.colors(
@@ -275,10 +401,9 @@ fun CatcherItem(
                 )
             }
             if (catcherDetail.actions.size < allActions.size) {
+                //if there is missing action
                 OutlinedButton(
-                    onClick = {
-                        addAction(catcherDetail)
-                    },
+                    onClick = { addAction(catcherDetail) },
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(text = "Aksiyon ekle")
@@ -286,87 +411,126 @@ fun CatcherItem(
             }
         }
         HorizontalDivider(modifier = Modifier.padding(8.dp))
-        Calendar(catcherDetail.stat)
+        Text(
+            text = "Ortalamalar",
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp),
+            style = MaterialTheme.typography.titleSmall.copy(
+                fontWeight = FontWeight.SemiBold
+            )
+        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp)
+        ) {
+            listOf(7, 14, 30).forEach {
+                StatCard(
+                    modifier = Modifier
+                        .padding(horizontal = 4.dp)
+                        .weight(1F)
+                        .aspectRatio(1.4F),
+                    title = "$it Gün",
+                    icon = Icons.Default.Timeline,
+                    value =String.format(Locale.getDefault(),"%.2f", catcherDetail.avg[it] ?: 0F)
+                )
+            }
+        }
+
+        Calendar(catcherDetail.stat, dayDetail)
 
     }
 }
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun Calendar(stats: List<CodeDao.Stat>) {
-    var maxDate = stats.first().start
-    var minDate = stats.last().start
+fun Calendar(
+    stats: List<CodeDao.Stat>,
+    dayClick: (catcherId: Int, start: Int) -> Unit
+) {
+    if (stats.isNotEmpty()) {
 
-
-    var maxValue = stats.maxByOrNull { it.count }?.count ?: 0
-
-    val density = LocalDensity.current
-    var width by remember {
-        mutableIntStateOf(0)
-    }
-    val boxWidth by remember(width) {
-        var boxWidth = with(density) { (width.toFloat() / 14F).toDp() }
-        boxWidth = (boxWidth.value - 1).dp
-        mutableStateOf(boxWidth)
-    }
-    val flowWidth by remember(boxWidth) {
-        mutableStateOf((boxWidth.value * 14 + 14).dp)
-    }
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 8.dp)
-    ) {
-        Text(text = "Yakalama Dağılımı")
-        Box(
+        val maxDate = stats.first().start
+        val minDate = stats.last().start
+        val maxValue = stats.maxByOrNull { it.count }?.count ?: 0
+        val density = LocalDensity.current
+        var width by remember { mutableIntStateOf(0) }
+        val boxWidth by remember(width) {
+            var boxWidth = with(density) { (width.toFloat() / 14F).toDp() }
+            boxWidth = (boxWidth.value - 1).dp
+            mutableStateOf(boxWidth)
+        }
+        val flowWidth by remember(boxWidth) {
+            mutableStateOf((boxWidth.value * 14 + 14).dp)
+        }
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .onGloballyPositioned {
-                    width = it.size.width
-                },
-            Alignment.Center
+                .padding(horizontal = 8.dp)
+                .padding(top=8.dp)
         ) {
-            FlowRow(
+            val dayCount = ((maxDate - minDate) / 86400) + 1
+            Text(
+                text = "Son $dayCount  Gün Dağılımı",
                 modifier = Modifier
-                    .width(flowWidth),
-                horizontalArrangement = Arrangement.Start
+                    .fillMaxWidth(),
+                style = MaterialTheme.typography.titleSmall.copy(
+                    fontWeight = FontWeight.SemiBold
+                )
+            )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp)
+                    .onGloballyPositioned {
+                        width = it.size.width
+                    },
+                Alignment.Center
             ) {
-                if (width > 0) {
-                    var date = maxDate
-                    while (date >= minDate) {
-                        var dateValue = date;
-                        var item =
-                            stats.find { it.start > dateValue && it.start <= dateValue + 86400 }
+                FlowRow(
+                    modifier = Modifier
+                        .width(flowWidth),
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    if (width > 0) {
+                        var date = maxDate
+                        while (date >= minDate) {
+                            val dateValue = date;
+                            var color = MaterialTheme.colorScheme.primary.copy(alpha = 0F)
+                            var count = 0
+                            stats
+                                .find { it.start > dateValue && it.start <= dateValue + 86400 }
+                                ?.let {
+                                    val fraction = (it.count.toFloat() / maxValue.toFloat())
+                                    color = color.copy(alpha = fraction)
+                                    count = it.count
+                                }
+                            Box(
+                                Modifier
+                                    .padding(.5.dp)
+                                    .width(boxWidth)
+                                    .aspectRatio(1F)
+                                    .background(color)
+                                    .border(
+                                        .5.dp,
+                                        MaterialTheme.colorScheme.primaryContainer.copy(alpha = .5F)
+                                    )
+                                    .clickable(enabled = count != 0) {
+                                        dayClick(stats[0].catcherId, dateValue)
+                                    },
+                                Alignment.Center
+                            ) {
+                                Text(text = if(count==0) "" else count.toString(),
+                                    modifier = Modifier.alpha(.3F))
+                            }
 
-                        var color = MaterialTheme.colorScheme.primary.copy(alpha = 0F)
-                        val fraction = 1F - ((item?.count ?: 0).toFloat() / maxValue.toFloat())
-                        if (item != null) {
-                            color = color.copy(alpha = fraction)
+
+                            date -= 86400
+
                         }
-                        Box(
-                            Modifier
-                                .padding(.5.dp)
-                                .width(boxWidth)
-                                .aspectRatio(1F)
-                                .background(color)
-                                .border(
-                                    .5.dp,
-                                    MaterialTheme.colorScheme.primaryContainer.copy(alpha = .5F)
-                                )
-                        ) {
-                            /*Text(
-                                text = (item?.count ?: "0").toString(),
-                                modifier = Modifier.fillMaxSize(),
-                                textAlign = TextAlign.Center
-                            )*/
-
-                        }
-                        date = date - 86400
-
                     }
                 }
-
-
             }
         }
     }
@@ -408,7 +572,7 @@ fun CatcherTopCard(catcherDetail: CatcherDao.CatcherDetail) {
                     Text(catcherDetail.regex.name, style = MaterialTheme.typography.bodyLarge)
                     Text(
                         catcherDetail.regex.regex,
-                        modifier=Modifier.padding(start = 8.dp),
+                        modifier = Modifier.padding(start = 8.dp),
                         style = MaterialTheme.typography.bodyLarge.copy(
                             fontWeight = FontWeight.Thin,
                             color = MaterialTheme.typography.bodyLarge.color.copy(alpha = .8F)
@@ -523,7 +687,7 @@ fun AddActionToCatcherBottomSheet(
 
 @Preview(showBackground = true)
 @Composable
-fun CatcherPagePreview(): Unit {
+fun CatcherPagePreview() {
     CodeCatcherTheme {
         CatcherPage(MockCatcherViewModel())
     }
@@ -531,7 +695,7 @@ fun CatcherPagePreview(): Unit {
 
 @Preview(showBackground = true)
 @Composable
-fun CatcherPageTopCardPreview(): Unit {
+fun CatcherPageTopCardPreview() {
 
     CodeCatcherTheme {
         val model = MockCatcherViewModel()
@@ -545,13 +709,13 @@ fun CatcherPageTopCardPreview(): Unit {
 
 @Preview(showBackground = true)
 @Composable
-fun CatcherPageAddActionPreview(): Unit {
+fun CatcherPageAddActionPreview() {
     CodeCatcherTheme {
         val model = MockCatcherViewModel()
         AddActionToCatcherBottomSheet(
-            model.catchers.value!!.get(0),
+            model.catchers.value!![0],
             actions = actionList(),
-            changeStatus = { action, status ->
+            changeStatus = { _, _ ->
             },
             onDismissRequest = {}
         )
