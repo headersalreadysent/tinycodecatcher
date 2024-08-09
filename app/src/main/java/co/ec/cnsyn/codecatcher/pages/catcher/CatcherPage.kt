@@ -42,6 +42,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AvTimer
 import androidx.compose.material.icons.filled.Phishing
 import androidx.compose.material.icons.filled.Timeline
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
@@ -53,6 +54,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -71,6 +73,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -82,14 +85,18 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import co.ec.cnsyn.codecatcher.composables.AutoText
 import co.ec.cnsyn.codecatcher.composables.IconName
 import co.ec.cnsyn.codecatcher.composables.SkewBottomSheet
+import co.ec.cnsyn.codecatcher.composables.SkewDialog
 import co.ec.cnsyn.codecatcher.composables.SkewSquare
 import co.ec.cnsyn.codecatcher.composables.StatCard
 import co.ec.cnsyn.codecatcher.database.action.Action
 import co.ec.cnsyn.codecatcher.database.catcher.CatcherDao
 import co.ec.cnsyn.codecatcher.database.code.CodeDao
+import co.ec.cnsyn.codecatcher.database.relations.ActionDetail
 import co.ec.cnsyn.codecatcher.helpers.dateString
+import co.ec.cnsyn.codecatcher.sms.ActionRunner
 import co.ec.cnsyn.codecatcher.ui.theme.CodeCatcherTheme
 import co.ec.cnsyn.codecatcher.values.actionList
+import kotlinx.serialization.json.Json.Default.configuration
 import java.util.Locale
 import kotlin.math.roundToInt
 
@@ -104,6 +111,7 @@ fun CatcherPage(model: CatcherPageViewModel = viewModel()) {
     var showAddActionSheet by remember { mutableStateOf(false) }
     var dayDetailSheet by remember { mutableStateOf(false) }
     var selectedCatcher by remember { mutableStateOf<CatcherDao.CatcherDetail?>(null) }
+    var selectedActionDetail by remember { mutableStateOf<ActionDetail?>(null) }
     //list of all actions in app
     val actions by model.allActions.observeAsState(listOf())
 
@@ -197,6 +205,9 @@ fun CatcherPage(model: CatcherPageViewModel = viewModel()) {
                         dayDetail = { catcherId, start ->
                             model.loadDayStats(catcherId, start)
                             dayDetailSheet = true
+                        },
+                        actionParams = { actionDetail ->
+                            selectedActionDetail = actionDetail
                         }
                     )
                 }
@@ -341,6 +352,33 @@ fun CatcherPage(model: CatcherPageViewModel = viewModel()) {
         }
     }
 
+    if (selectedActionDetail != null) {
+        SkewDialog(
+            modifier = Modifier,
+            onDismissRequest = {
+                selectedActionDetail = null
+            },
+        ) {
+            selectedActionDetail?.let{ action ->
+                Text(text = action.detail.name,
+                    style = MaterialTheme.typography.titleLarge)
+                Text(text = action.detail.description )
+                val instance=ActionRunner.getActionInstance(action.detail.action)
+                instance?.let {
+                    instance.Settings(action) {
+                        
+                    }
+                }
+            }
+
+
+
+        }
+
+
+    }
+
+
 }
 
 @Composable
@@ -350,7 +388,8 @@ fun CatcherItem(
     isActive: Boolean = false,
     addAction: (catherDetail: CatcherDao.CatcherDetail) -> Unit = { _ -> },
     changeStatus: (action: Action, status: Boolean) -> Unit,
-    dayDetail: (catcherId: Int, start: Int) -> Unit
+    dayDetail: (catcherId: Int, start: Int) -> Unit,
+    actionParams: (actionDetail: ActionDetail) -> Unit
 ) {
     val animatedAlpha by animateFloatAsState(
         targetValue = if (isActive) 1F else .8F,
@@ -376,17 +415,23 @@ fun CatcherItem(
                 }
                 //show every action in list
                 ListItem(
-                    modifier = Modifier.padding(bottom = 8.dp),
+                    modifier = Modifier
+                        .padding(bottom = 8.dp)
+                        .clickable(enabled) {
+                            actionParams(action)
+                        },
                     colors = ListItemDefaults.colors(
                         containerColor = MaterialTheme.colorScheme.secondaryContainer
                     ),
                     headlineContent = {
                         Column {
                             Text(text = if (action.detail.name == "") action.detail.key else action.detail.name)
-                            Text(
-                                text = if (action.detail.description == "") action.detail.key else action.detail.description,
-                                style = MaterialTheme.typography.bodySmall
-                            )
+                            if (action.detail.description != "") {
+                                Text(
+                                    text = action.detail.description,
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                            }
                         }
                     },
                     leadingContent = {
@@ -411,34 +456,9 @@ fun CatcherItem(
             }
         }
         HorizontalDivider(modifier = Modifier.padding(8.dp))
-        Text(
-            text = "Ortalamalar",
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp),
-            style = MaterialTheme.typography.titleSmall.copy(
-                fontWeight = FontWeight.SemiBold
-            )
-        )
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)
-        ) {
-            listOf(7, 14, 30).forEach {
-                StatCard(
-                    modifier = Modifier
-                        .padding(horizontal = 4.dp)
-                        .weight(1F)
-                        .aspectRatio(1.4F),
-                    title = "$it Gün",
-                    icon = Icons.Default.Timeline,
-                    value =String.format(Locale.getDefault(),"%.2f", catcherDetail.avg[it] ?: 0F)
-                )
-            }
-        }
 
-        Calendar(catcherDetail.stat, dayDetail)
+        CatcherStartArea(catcherDetail = catcherDetail, dayDetail = dayDetail)
+
 
     }
 }
@@ -468,7 +488,7 @@ fun Calendar(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 8.dp)
-                .padding(top=8.dp)
+                .padding(top = 8.dp)
         ) {
             val dayCount = ((maxDate - minDate) / 86400) + 1
             Text(
@@ -521,8 +541,10 @@ fun Calendar(
                                     },
                                 Alignment.Center
                             ) {
-                                Text(text = if(count==0) "" else count.toString(),
-                                    modifier = Modifier.alpha(.3F))
+                                Text(
+                                    text = if (count == 0) "" else count.toString(),
+                                    modifier = Modifier.alpha(.3F)
+                                )
                             }
 
 
@@ -538,6 +560,7 @@ fun Calendar(
 }
 
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun CatcherTopCard(catcherDetail: CatcherDao.CatcherDetail) {
     val infoTitleStyle = MaterialTheme.typography.bodyMedium.copy(
@@ -558,7 +581,6 @@ fun CatcherTopCard(catcherDetail: CatcherDao.CatcherDetail) {
         ) {
             Column(
                 modifier = Modifier
-                    .weight(4F)
                     .padding(16.dp)
             ) {
                 Text("Gönderen", style = infoTitleStyle)
@@ -568,7 +590,7 @@ fun CatcherTopCard(catcherDetail: CatcherDao.CatcherDetail) {
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text("İfade", style = infoTitleStyle)
-                Row {
+                FlowRow {
                     Text(catcherDetail.regex.name, style = MaterialTheme.typography.bodyLarge)
                     Text(
                         catcherDetail.regex.regex,
@@ -581,7 +603,7 @@ fun CatcherTopCard(catcherDetail: CatcherDao.CatcherDetail) {
                 }
             }
 
-            Box(modifier = Modifier.weight(3F), Alignment.TopEnd) {
+            Box(modifier = Modifier.weight(1F), Alignment.TopEnd) {
                 Column(
                     modifier = Modifier
                         .background(MaterialTheme.colorScheme.primary,
@@ -627,6 +649,43 @@ fun CatcherTopCard(catcherDetail: CatcherDao.CatcherDetail) {
             Text("Açıklama", style = infoTitleStyle)
             Text(catcherDetail.regex.description, style = MaterialTheme.typography.bodyLarge)
         }
+    }
+}
+
+@Composable
+fun CatcherStartArea(
+    catcherDetail: CatcherDao.CatcherDetail,
+    dayDetail: (catcherId: Int, start: Int) -> Unit
+) {
+    Column {
+        Text(
+            text = "Ortalamalar",
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp),
+            style = MaterialTheme.typography.titleSmall.copy(
+                fontWeight = FontWeight.SemiBold
+            )
+        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp)
+        ) {
+            listOf(7, 14, 30).forEach {
+                StatCard(
+                    modifier = Modifier
+                        .padding(horizontal = 4.dp)
+                        .weight(1F)
+                        .aspectRatio(1.4F),
+                    title = "$it Gün",
+                    icon = Icons.Default.Timeline,
+                    value = String.format(Locale.getDefault(), "%.2f", catcherDetail.avg[it] ?: 0F)
+                )
+            }
+        }
+
+        Calendar(catcherDetail.stat, dayDetail)
     }
 }
 

@@ -22,6 +22,18 @@ class ActionRunner {
 
     private var emulation: Boolean = false
 
+    companion object {
+        fun getActionInstance(className: String): BaseAction? {
+            return when (className) {
+                "NotificationAction" -> NotificationAction()
+                "SmsAction" -> SmsAction()
+                "TTSAction" -> TTSAction()
+                "ClipboardAction" -> ClipboardAction()
+                else -> null
+            }
+        }
+    }
+
     fun emulate(status: Boolean = true) {
         emulation = status
     }
@@ -127,7 +139,7 @@ class ActionRunner {
             //if there is a action
             catcher.actions.forEach { action ->
                 //generate action instance
-                val instance = getInstance(action.action)
+                val instance = getActionInstance(action.action)
                 instance?.let {
                     //if we found instance lets run it
                     instance.run(catcher, action, message)
@@ -137,15 +149,7 @@ class ActionRunner {
 
     }
 
-    fun getInstance(className: String): BaseAction? {
-        return when (className) {
-            "NotificationAction" -> NotificationAction()
-            "SmsAction" -> SmsAction()
-            "TTSAction" -> TTSAction()
-            "ClipboardAction" -> ClipboardAction()
-            else -> null
-        }
-    }
+
 
 
     private fun copyToClipboard(code: String) {

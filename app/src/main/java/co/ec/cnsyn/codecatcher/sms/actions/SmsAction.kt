@@ -8,9 +8,21 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.telephony.SmsManager
 import android.widget.Toast
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.core.app.NotificationCompat
 import co.ec.cnsyn.codecatcher.App
 import co.ec.cnsyn.codecatcher.R
+import co.ec.cnsyn.codecatcher.composables.MiniOptionBox
+import co.ec.cnsyn.codecatcher.composables.MiniUpdateBox
+import co.ec.cnsyn.codecatcher.database.relations.ActionDetail
 import co.ec.cnsyn.codecatcher.database.relations.CatcherWithActions
 import co.ec.cnsyn.codecatcher.database.relations.CatcherWithRegex
 import co.ec.cnsyn.codecatcher.helpers.async
@@ -60,6 +72,41 @@ class SmsAction : BaseAction {
         } else {
             Toast.makeText(context, "cant send sms", Toast.LENGTH_SHORT).show()
             return false
+        }
+    }
+
+    @Composable
+    override fun Settings(
+        action: ActionDetail, then: (settings: Map<String, String>) -> Unit
+    ) {
+        var params by remember { mutableStateOf(action.action.params()) }
+
+        Column {
+            //update phone number
+            MiniUpdateBox(
+                "Yönlendirilecek no",
+                params["no"] ?: "",
+                "",
+                keyboardType = KeyboardOptions(keyboardType = KeyboardType.Number),
+            ) {
+                val updatable = params.toMutableMap()
+                updatable["no"] = it
+                params = updatable.toMap()
+                then(params)
+            }
+            MiniOptionBox(
+                "Gönderim Tipi",
+                params["sendType"] ?: "sms",
+                listOf(
+                    Pair("sms", "Tüm Sms"),
+                    Pair("code", "Yakalanan")
+                )
+            ) {
+                val updatable = params.toMutableMap()
+                updatable["sendType"] = it
+                params = updatable.toMap()
+                then(params)
+            }
         }
     }
 }
