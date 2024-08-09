@@ -11,6 +11,7 @@ import co.ec.cnsyn.codecatcher.database.code.CodeDao.Latest
 import co.ec.cnsyn.codecatcher.database.regex.Regex
 import co.ec.cnsyn.codecatcher.database.relations.ActionDetail
 import co.ec.cnsyn.codecatcher.database.relations.CatcherWithActions
+import co.ec.cnsyn.codecatcher.database.relations.CatcherWithRegex
 import co.ec.cnsyn.codecatcher.helpers.async
 import co.ec.cnsyn.codecatcher.pages.catcher.CatcherPage
 import kotlinx.coroutines.flow.Flow
@@ -30,6 +31,9 @@ interface CatcherDao : BaseDao<Catcher> {
     @Query("SELECT count(id) FROM catcher WHERE status=1")
     fun getActiveCount(): Int
 
+    @Query("SELECT * FROM catcher WHERE status=1")
+    fun getActiveCatchersWithRegexes(): List<CatcherWithRegex>
+
     @Query(
         """
         UPDATE catcher SET catchCount = (SELECT count(id) AS count FROM code WHERE code.catcherId = catcher.id)
@@ -42,7 +46,7 @@ interface CatcherDao : BaseDao<Catcher> {
         var actions: List<ActionDetail>,
         val regex: Regex,
         val stat: List<CodeDao.Stat>,
-        val avg:Map<Int,Float>
+        val avg: Map<Int, Float>
     )
 
     /**
@@ -72,9 +76,9 @@ interface CatcherDao : BaseDao<Catcher> {
                     regex = regexes[catcher.regexId]!!,
                     stat = stats.filter { it.catcherId == catcher.id },
                     avg = mapOf(
-                        7 to db.code().getAverage(catcher.id,7),
-                        14 to db.code().getAverage(catcher.id,14),
-                        30 to db.code().getAverage(catcher.id,30)
+                        7 to db.code().getAverage(catcher.id, 7),
+                        14 to db.code().getAverage(catcher.id, 14),
+                        30 to db.code().getAverage(catcher.id, 30)
                     )
                 )
             }
@@ -104,9 +108,9 @@ interface CatcherDao : BaseDao<Catcher> {
                 regex = regexes[catcher.regexId]!!,
                 stat = db.code().getStats().filter { it.catcherId == id },
                 avg = mapOf(
-                    7 to db.code().getAverage(catcher.id,7),
-                    14 to db.code().getAverage(catcher.id,14),
-                    30 to db.code().getAverage(catcher.id,30)
+                    7 to db.code().getAverage(catcher.id, 7),
+                    14 to db.code().getAverage(catcher.id, 14),
+                    30 to db.code().getAverage(catcher.id, 30)
                 )
             )
         }, then, err)

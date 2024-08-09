@@ -5,9 +5,9 @@ import java.util.Locale
 
 
 private var actions = listOf(
-    Action(1, "notification", "", "", "Notification", "NotificationAction"),
+    Action(1, "notification", "", "", "Notifications", "NotificationAction"),
     Action(2, "sms", "", "", "Textsms", "SmsAction"),
-    Action(3, "copy", "", "", "ContentCopy", "CopyAction"),
+    Action(3, "copy", "", "", "ContentCopy", "ClipboardAction"),
     Action(4, "tts", "", "", "Mic", "TTSAction")
 )
 

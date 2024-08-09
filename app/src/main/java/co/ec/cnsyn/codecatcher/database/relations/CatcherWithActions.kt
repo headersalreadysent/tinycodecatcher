@@ -1,7 +1,11 @@
 package co.ec.cnsyn.codecatcher.database.relations
 
+import kotlinx.serialization.json.Json
+
+
 import androidx.room.ColumnInfo
 import androidx.room.DatabaseView
+
 @DatabaseView(
     """
     SELECT ref.catcherId,ref.actionId, c.sender, c.description, c.catchCount, a.name, a.icon, a.`action`,ref.params
@@ -20,4 +24,12 @@ data class CatcherWithActions(
     @ColumnInfo(name = "icon") val icon: String,
     @ColumnInfo(name = "action") val action: String,
     @ColumnInfo(name = "params") val params: String,
-)
+) {
+
+    fun params(): Map<String, String> {
+        val paramText = if (params == "") "{}" else params
+        val dynamicType: Map<String, String> = Json.decodeFromString(paramText)
+        // Convert dynamic type to Map<String, String>
+        return dynamicType.mapValues { it.value }
+    }
+}

@@ -1,6 +1,7 @@
 package co.ec.cnsyn.codecatcher.pages.dashboard
 
-import android.widget.GridView
+import android.Manifest
+import com.google.accompanist.permissions.rememberPermissionState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -25,6 +26,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DataObject
 import androidx.compose.material.icons.filled.Phishing
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
@@ -47,6 +49,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -64,9 +67,12 @@ import co.ec.cnsyn.codecatcher.composables.SkewSquare
 import co.ec.cnsyn.codecatcher.composables.StatCard
 import co.ec.cnsyn.codecatcher.database.code.CodeDao
 import co.ec.cnsyn.codecatcher.helpers.dateString
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun Dashboard(model: DashboardViewModel = viewModel()) {
     Column(
@@ -90,6 +96,8 @@ fun Dashboard(model: DashboardViewModel = viewModel()) {
                 .collect { position -> scrollPosition = position }
         }
         SkewSquare(modifier = Modifier.zIndex(3F), skew = 30) {
+
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -114,13 +122,16 @@ fun Dashboard(model: DashboardViewModel = viewModel()) {
                     value = (stat["code"] ?: 0).toString()
                 )
             }
+
+
         }
+
         var extraSpace = 0
-        var padding=0
+        var padding = 0
 
         with(LocalDensity.current) {
             extraSpace = 50.dp.toPx().toInt()
-            padding = 20.dp.toPx().toInt()*-1
+            padding = 20.dp.toPx().toInt() * -1
         }
         Column(
             modifier = Modifier
@@ -145,6 +156,33 @@ fun Dashboard(model: DashboardViewModel = viewModel()) {
                     textAlign = TextAlign.End
                 )
             )
+            val smsPermissionState =
+                rememberPermissionState(permission = Manifest.permission.RECEIVE_SMS)
+            Column {
+                if (smsPermissionState.status.isGranted) {
+                    Text("SMS permission granted!")
+                } else {
+                    Button(onClick = {
+                        smsPermissionState.launchPermissionRequest()
+                    }) {
+                        Text(text = "Request")
+                    }
+                }
+            }
+
+            val notificationPermissionState =
+                rememberPermissionState(permission = Manifest.permission.POST_NOTIFICATIONS)
+            Column {
+                if (notificationPermissionState.status.isGranted) {
+                    Text("SMS permission granted!")
+                } else {
+                    Button(onClick = {
+                        notificationPermissionState.launchPermissionRequest()
+                    }) {
+                        Text(text = "Request")
+                    }
+                }
+            }
             LazyColumn(
                 state = listState,
             ) {
@@ -164,7 +202,7 @@ fun Dashboard(model: DashboardViewModel = viewModel()) {
 /**
  * latest sms shower
  */
-@OptIn(ExperimentalLayoutApi::class)
+@OptIn(ExperimentalLayoutApi::class, ExperimentalPermissionsApi::class)
 @Composable
 fun LatestCode(
     latest: CodeDao.Latest,
@@ -212,6 +250,7 @@ fun LatestCode(
                         )
                 )
             }
+
             Column(
                 modifier = Modifier.weight(5F)
             ) {
@@ -240,6 +279,7 @@ fun LatestCode(
                     )
                 )
             }
+
             FlowRow(
                 modifier = Modifier
                     .weight(1F)
