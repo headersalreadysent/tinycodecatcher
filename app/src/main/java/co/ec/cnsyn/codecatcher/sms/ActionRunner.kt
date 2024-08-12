@@ -138,12 +138,15 @@ class ActionRunner {
         if (catcher.actions.isNotEmpty()) {
             //if there is a action
             catcher.actions.forEach { action ->
-                //generate action instance
-                val instance = getActionInstance(action.action)
-                instance?.let {
-                    //if we found instance lets run it
-                    instance.run(catcher, action, message)
+                if(action.status==1){
+                    //generate action instance
+                    val instance = getActionInstance(action.action)
+                    instance?.let {
+                        //if we found instance lets run it
+                        instance.run(catcher, action, message)
+                    }
                 }
+
             }
         }
 

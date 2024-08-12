@@ -1,7 +1,10 @@
 package co.ec.cnsyn.codecatcher
 
 import android.annotation.SuppressLint
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -32,6 +35,7 @@ import co.ec.cnsyn.codecatcher.database.AppDatabase
 import co.ec.cnsyn.codecatcher.database.DB
 import co.ec.cnsyn.codecatcher.pages.catcher.CatcherPage
 import co.ec.cnsyn.codecatcher.pages.dashboard.Dashboard
+import co.ec.cnsyn.codecatcher.sms.DebugSmsReceiver
 import co.ec.cnsyn.codecatcher.ui.theme.CodeCatcherTheme
 
 
@@ -45,6 +49,9 @@ class MainActivity : ComponentActivity() {
                 CodeCatcherApp(applicationContext)
             }
         }
+
+
+        registerReceiver(DebugSmsReceiver(), IntentFilter("co.ec.cnsyn.codecatcher.DEBUG_SMS"))
     }
 }
 
@@ -98,10 +105,11 @@ fun CodeCatcherApp(context: Context) {
                 )
             }
         ) { _ ->
-            NavHost(navController = navController,
+            NavHost(
+                navController = navController,
                 startDestination = "dashboard"
                 //startDestination = "catchers"
-                ) {
+            ) {
                 composable("dashboard") { Dashboard() }
                 composable("catchers") { CatcherPage() }
             }

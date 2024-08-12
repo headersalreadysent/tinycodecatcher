@@ -22,7 +22,7 @@ private var regexes = listOf(
     ),
     Regex(
         id = 4,
-        regex = """^https?://([a-zA-Z0-9_-]+\.)+[a-zA-Z]{2,}(/[a-zA-Z0-9#%&?=._-]*)?$""",
+        regex = """https?://([a-zA-Z0-9_-]+\.)+[a-zA-Z]{2,}(/[a-zA-Z0-9#%&?=._-]*)?""",
         key = "url"
     )
 )

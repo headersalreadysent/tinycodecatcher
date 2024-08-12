@@ -8,7 +8,7 @@ import androidx.room.DatabaseView
 
 @DatabaseView(
     """
-    SELECT ref.catcherId,ref.actionId, c.sender, c.description, c.catchCount, a.name, a.icon, a.`action`,ref.params
+    SELECT ref.catcherId,ref.actionId, c.sender, c.description, c.catchCount, a.name, a.icon, a.`action`,ref.params, ref.status
     FROM catcher c
     JOIN catcheraction ref ON c.id = ref.catcherId
     JOIN `action` a ON ref.actionId = a.id
@@ -24,6 +24,7 @@ data class CatcherWithActions(
     @ColumnInfo(name = "icon") val icon: String,
     @ColumnInfo(name = "action") val action: String,
     @ColumnInfo(name = "params") val params: String,
+    @ColumnInfo(name = "status") val status: Int,
 ) {
 
     fun params(): Map<String, String> {
