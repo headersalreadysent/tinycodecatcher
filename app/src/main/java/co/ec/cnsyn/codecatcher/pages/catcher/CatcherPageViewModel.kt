@@ -114,6 +114,7 @@ class MockCatcherViewModel : CatcherPageViewModel() {
     override fun start() {
         catchers.value = List(6) {
 
+            var now= unix().toInt()
             CatcherDetail(
                 catcher = Catcher(
                     id = it,
@@ -148,13 +149,9 @@ class MockCatcherViewModel : CatcherPageViewModel() {
 
                     ),
                 regex = regexList()[0],
-                stat = List(20) {
-
-                    CodeDao.Stat(
-                        count = Random.nextInt(0, 20),
-                        catcherId = it,
-                        start = unix().toInt() - it * 86400
-                    )
+                stat = List(60) {
+                    now -= (Random.nextFloat() * 86400).toInt()
+                    return@List now.toInt()
                 },
                 avg = mapOf(
                     7 to Random.nextFloat(),

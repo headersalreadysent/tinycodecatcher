@@ -72,10 +72,12 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
 import co.ec.cnsyn.codecatcher.composables.AutoText
+import co.ec.cnsyn.codecatcher.composables.Calendar
 import co.ec.cnsyn.codecatcher.composables.IconName
 import co.ec.cnsyn.codecatcher.composables.SkewBottomSheet
 import co.ec.cnsyn.codecatcher.composables.SkewDialog
 import co.ec.cnsyn.codecatcher.composables.SkewSquare
+import co.ec.cnsyn.codecatcher.composables.SkewSquareCut
 import co.ec.cnsyn.codecatcher.composables.StatCard
 import co.ec.cnsyn.codecatcher.database.action.Action
 import co.ec.cnsyn.codecatcher.database.catcher.CatcherDao
@@ -129,7 +131,7 @@ fun CatcherPage(model: CatcherPageViewModel = viewModel()) {
                 .onGloballyPositioned {
                     itemWidth = (it.size.width * .8F).toInt()
                 },
-            cut = "ts"
+            cut = SkewSquareCut.TopStart
         ) {
             Row(
                 modifier = Modifier
@@ -339,102 +341,6 @@ fun CatcherItem(
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
-@Composable
-fun Calendar(
-    stats: List<CodeDao.Stat>,
-    dayClick: (catcherId: Int, start: Int) -> Unit
-) {
-    if (stats.isNotEmpty()) {
-
-        val maxDate = stats.first().start
-        val minDate = stats.last().start
-        val maxValue = stats.maxByOrNull { it.count }?.count ?: 0
-        val density = LocalDensity.current
-        var width by remember { mutableIntStateOf(0) }
-        val boxWidth by remember(width) {
-            var boxWidth = with(density) { (width.toFloat() / 14F).toDp() }
-            boxWidth = (boxWidth.value - 1).dp
-            mutableStateOf(boxWidth)
-        }
-        val flowWidth by remember(boxWidth) {
-            mutableStateOf((boxWidth.value * 14 + 14).dp)
-        }
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp)
-                .padding(top = 8.dp)
-        ) {
-            val dayCount = ((maxDate - minDate) / 86400) + 1
-            Text(
-                text = "Son $dayCount  Gün Dağılımı",
-                modifier = Modifier
-                    .fillMaxWidth(),
-                style = MaterialTheme.typography.titleSmall.copy(
-                    fontWeight = FontWeight.SemiBold
-                )
-            )
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 8.dp)
-                    .onGloballyPositioned {
-                        width = it.size.width
-                    },
-                Alignment.Center
-            ) {
-                FlowRow(
-                    modifier = Modifier
-                        .width(flowWidth),
-                    horizontalArrangement = Arrangement.Start
-                ) {
-                    if (width > 0) {
-                        var date = maxDate
-                        while (date >= minDate) {
-                            val dateValue = date;
-                            var color = MaterialTheme.colorScheme.primary.copy(alpha = 0F)
-                            var count = 0
-                            stats
-                                .find { it.start > dateValue && it.start <= dateValue + 86400 }
-                                ?.let {
-                                    val fraction = (it.count.toFloat() / maxValue.toFloat())
-                                    color = color.copy(alpha = fraction)
-                                    count = it.count
-                                }
-                            Box(
-                                Modifier
-                                    .padding(.5.dp)
-                                    .width(boxWidth)
-                                    .aspectRatio(1F)
-                                    .background(color)
-                                    .border(
-                                        .5.dp,
-                                        MaterialTheme.colorScheme.primaryContainer.copy(alpha = .5F)
-                                    )
-                                    .clickable(enabled = count != 0) {
-                                        dayClick(stats[0].catcherId, dateValue)
-                                    },
-                                Alignment.Center
-                            ) {
-                                Text(
-                                    text = if (count == 0) "" else count.toString(),
-                                    modifier = Modifier.alpha(.3F)
-                                )
-                            }
-
-
-                            date -= 86400
-
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-}
-
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -509,7 +415,7 @@ fun CatcherTopCard(catcherDetail: CatcherDao.CatcherDetail) {
                         )
                     }
                     SkewSquare(
-                        cut = "bs",
+                        cut = SkewSquareCut.BottomStart,
                         skew = 15,
                         fill = MaterialTheme.colorScheme.primary
                     )
@@ -565,7 +471,10 @@ fun CatcherStartArea(
             }
         }
 
-        Calendar(catcherDetail.stat, dayDetail)
+        Calendar(catcherDetail.stat) {
+            dayDetail(catcherDetail.catcher.id, it)
+        }
+
     }
 }
 

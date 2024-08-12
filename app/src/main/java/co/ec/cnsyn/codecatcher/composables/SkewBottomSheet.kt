@@ -26,7 +26,7 @@ fun SkewBottomSheet(
     modifier: Modifier = Modifier,
     sheetState: SheetState = rememberModalBottomSheetState(),
     skew: Int = 45,
-    cut: String = "te",
+    cut: SkewSquareCut = SkewSquareCut.TopEnd,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     ModalBottomSheet(

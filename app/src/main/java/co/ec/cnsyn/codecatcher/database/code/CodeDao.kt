@@ -41,19 +41,10 @@ interface CodeDao : BaseDao<Code> {
     @Query("SELECT count(id) FROM code")
     fun getCount(): Int
 
+    data class CodeDate(var date: Int, var catcherId: Int)
 
-    class Stat(var count: Int, var catcherId: Int, var start: Int)
-
-    @Query(
-        """
-        SELECT count(id) AS count, catcherId, date-date%86400 as start
-        FROM code
-        WHERE date >= strftime('%s', 'now', 'start of day', 'localtime')-86400*:dayCount
-        GROUP BY catcherId || '-' || strftime('%Y-%m-%d', datetime(date, 'unixepoch')) 
-        ORDER BY catcherId ASC, date DESC
-    """
-    )
-    fun getStats(dayCount: Int = 28): List<Stat>
+    @Query("SELECT date,catcherId FROM code WHERE date > :start")
+    fun getCalendar(start: Long): List<CodeDate>
 
     @Query(
         """

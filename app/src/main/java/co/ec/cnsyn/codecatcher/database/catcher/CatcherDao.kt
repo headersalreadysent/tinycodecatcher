@@ -13,6 +13,7 @@ import co.ec.cnsyn.codecatcher.database.relations.ActionDetail
 import co.ec.cnsyn.codecatcher.database.relations.CatcherWithActions
 import co.ec.cnsyn.codecatcher.database.relations.CatcherWithRegex
 import co.ec.cnsyn.codecatcher.helpers.async
+import co.ec.cnsyn.codecatcher.helpers.unix
 import co.ec.cnsyn.codecatcher.pages.catcher.CatcherPage
 import kotlinx.coroutines.flow.Flow
 
@@ -34,18 +35,18 @@ interface CatcherDao : BaseDao<Catcher> {
     @Query("SELECT * FROM catcher WHERE status=1")
     fun getActiveCatchersWithRegexes(): List<CatcherWithRegex>
 
-    @Query(
-        """
-        UPDATE catcher SET catchCount = (SELECT count(id) AS count FROM code WHERE code.catcherId = catcher.id)
-    """
-    )
+    @Query("""
+        UPDATE catcher 
+        SET catchCount = (SELECT count(id) AS count 
+        FROM code WHERE code.catcherId = catcher.id)
+    """)
     fun fixCatchersCounts()
 
     data class CatcherDetail(
         var catcher: Catcher,
         var actions: List<ActionDetail>,
         val regex: Regex,
-        val stat: List<CodeDao.Stat>,
+        val stat: List<Int>,
         val avg: Map<Int, Float>
     )
 
@@ -64,17 +65,14 @@ interface CatcherDao : BaseDao<Catcher> {
             val action = db.catcherAction().getWithDetail(catchers.map { it.id }.toIntArray())
             val regexes = db.regex().getRegexes(catchers.map { it.regexId }.toIntArray())
                 .associateBy { it.id }
-
-            val stats = db.code().getStats()
-
+            val stats = db.code().getCalendar(unix() - 28 * 86400)
             return@async catchers.map { catcher ->
-
                 return@map CatcherDetail(
                     catcher = catcher,
                     actions = action.filter { it.action.catcherId == catcher.id }
                         .sortedBy { it.action.actionId },
                     regex = regexes[catcher.regexId]!!,
-                    stat = stats.filter { it.catcherId == catcher.id },
+                    stat = stats.filter { it.catcherId == catcher.id }.map { it.date },
                     avg = mapOf(
                         7 to db.code().getAverage(catcher.id, 7),
                         14 to db.code().getAverage(catcher.id, 14),
@@ -98,15 +96,13 @@ interface CatcherDao : BaseDao<Catcher> {
             val action = db.catcherAction().getWithDetail(intArrayOf(id))
             val regexes = db.regex().getRegexes(intArrayOf(catcher.regexId))
                 .associateBy { it.id }
-
-
-
             return@async CatcherDetail(
                 catcher = catcher,
                 actions = action.filter { it.action.catcherId == catcher.id }
                     .sortedBy { it.action.actionId },
                 regex = regexes[catcher.regexId]!!,
-                stat = db.code().getStats().filter { it.catcherId == id },
+                stat = db.code().getCalendar(unix() - 28 * 86400).filter { it.catcherId == id }
+                    .map { it.date },
                 avg = mapOf(
                     7 to db.code().getAverage(catcher.id, 7),
                     14 to db.code().getAverage(catcher.id, 14),

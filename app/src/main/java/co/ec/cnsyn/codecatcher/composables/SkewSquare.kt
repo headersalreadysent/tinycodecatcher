@@ -25,30 +25,34 @@ import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalDensity
 import androidx.core.graphics.ColorUtils
+import kotlinx.serialization.json.JsonNull.content
 
+enum class SkewSquareCut {
+    TopStart, TopEnd, BottomStart, BottomEnd
+}
 
 @Composable
 fun SkewSquare(
     modifier: Modifier = Modifier,
     fill: Color? = null,
     skew: Int = 16,
-    cut: String = "BE",
+    cut: SkewSquareCut = SkewSquareCut.BottomEnd,
     content: @Composable () -> Unit = {},
 ) {
     val fillColor = fill ?: MaterialTheme.colorScheme.primaryContainer
-    var height = with(LocalDensity.current) { skew.dp.toPx() }
-    val cutType = cut.lowercase()
+    val height = with(LocalDensity.current) { skew.dp.toPx() }
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .drawBehind {
                 drawPath(
-                    path = generatePath(size, cutType, height, true),
+                    path = generatePath(size, cut, height, true),
                     color = Color.Gray.copy(alpha = .3F),
                     style = Fill
                 )
                 drawPath(
-                    path = generatePath(size, cutType, height),
+                    path = generatePath(size, cut, height),
                     color = fillColor,
                     style = Fill
                 )
@@ -60,7 +64,9 @@ fun SkewSquare(
             modifier = Modifier
                 .fillMaxWidth()
                 .then(
-                    if (cutType.startsWith("t")) Modifier.padding(top = skew.dp) else Modifier.padding(
+                    if (cut == SkewSquareCut.TopStart || cut == SkewSquareCut.TopEnd) Modifier.padding(
+                        top = skew.dp
+                    ) else Modifier.padding(
                         bottom = skew.dp
                     )
                 )
@@ -72,11 +78,11 @@ fun SkewSquare(
 
 }
 
-fun generatePath(size: Size, cut: String, height: Float, shadow: Boolean = false): Path {
+fun generatePath(size: Size, cut: SkewSquareCut, height: Float, shadow: Boolean = false): Path {
     val shadowSize = (if (shadow) 3F else 0F)
     return Path().apply {
         when (cut) {
-            "ts" -> {
+            SkewSquareCut.TopStart -> {
                 moveTo(0f, height + shadowSize)
                 lineTo(size.width, 0f + shadowSize)
                 lineTo(size.width, size.height)
@@ -84,7 +90,7 @@ fun generatePath(size: Size, cut: String, height: Float, shadow: Boolean = false
                 close()
             }
 
-            "te" -> {
+            SkewSquareCut.TopEnd -> {
                 moveTo(0f, 0f + shadowSize)
                 lineTo(size.width, height + shadowSize)
                 lineTo(size.width, size.height)
@@ -92,7 +98,7 @@ fun generatePath(size: Size, cut: String, height: Float, shadow: Boolean = false
                 close()
             }
 
-            "bs" -> {
+            SkewSquareCut.BottomStart -> {
                 moveTo(0f, 0f)
                 lineTo(size.width, 0f)
                 lineTo(size.width, size.height - shadowSize)
@@ -117,7 +123,7 @@ fun generatePath(size: Size, cut: String, height: Float, shadow: Boolean = false
 fun SkewsSquarePreview() {
     CodeCatcherTheme {
         Column {
-            SkewSquare(skew = 30, cut = "te") {
+            SkewSquare(skew = 30, cut = SkewSquareCut.TopStart) {
                 TextButton(
                     onClick = { /*TODO*/ },
                     modifier = Modifier.height(60.dp)
@@ -127,7 +133,7 @@ fun SkewsSquarePreview() {
 
             }
 
-            SkewSquare(skew = 30, cut = "bs") {
+            SkewSquare(skew = 30, cut = SkewSquareCut.TopEnd) {
                 TextButton(
                     onClick = { /*TODO*/ },
                     modifier = Modifier.height(60.dp)
@@ -135,7 +141,7 @@ fun SkewsSquarePreview() {
                     Text(text = "hello Button")
                 }
             }
-            SkewSquare(skew = 30, cut = "ts") {
+            SkewSquare(skew = 30, cut = SkewSquareCut.BottomStart) {
                 TextButton(
                     onClick = { /*TODO*/ },
                     modifier = Modifier.height(60.dp)
@@ -144,7 +150,7 @@ fun SkewsSquarePreview() {
                 }
             }
 
-            SkewSquare(skew = 30, cut = "be") {
+            SkewSquare(skew = 30, cut = SkewSquareCut.BottomEnd) {
                 TextButton(
                     onClick = { /*TODO*/ },
                     modifier = Modifier.height(60.dp)

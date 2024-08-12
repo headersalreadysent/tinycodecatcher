@@ -17,6 +17,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import co.ec.cnsyn.codecatcher.ui.theme.CodeCatcherTheme
+import kotlinx.serialization.json.JsonNull.content
+
+enum class SkewDialogCut { Top, Bottom }
 
 @Composable
 fun SkewDialog(
@@ -24,6 +27,7 @@ fun SkewDialog(
     onDismissRequest: () -> Unit,
     containerColor: Color = MaterialTheme.colorScheme.surface,
     minHeight: Dp = 0.dp,
+    cut: SkewDialogCut = SkewDialogCut.Top,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Dialog(
@@ -39,6 +43,13 @@ fun SkewDialog(
                 .padding(bottom = 60.dp)
                 .background(Color.Transparent),
         ) {
+            if (cut == SkewDialogCut.Top){
+
+                SkewSquare(
+                    skew = 40, fill = containerColor,
+                    cut =  SkewSquareCut.TopStart
+                )
+            }
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -48,7 +59,12 @@ fun SkewDialog(
             ) {
                 content()
             }
-            SkewSquare(skew = 40, fill = containerColor)
+            if (cut == SkewDialogCut.Bottom){
+                SkewSquare(
+                    skew = 40, fill = containerColor,
+                    cut = SkewSquareCut.BottomEnd
+                )
+            }
         }
     }
 
