@@ -9,4 +9,16 @@
     <string name="dashboard_stat_catcher_count">Catcher Count</string>
     <string name="dashboard_stat_code_count">Code Count</string>
     <string name="dashboard_list_last_codes">Last Codes</string>
+
+
+    <string name="catchers_top_card_sender">Sender</string>
+    <string name="catchers_top_card_everybody">Everybody</string>
+    <string name="catchers_top_card_regex">Expression</string>
+    <string name="catchers_top_card_catch_count">Caught</string>
+    <string name="catchers_top_card_description">Description</string>
+    <string name="catchers_actions_add_action">Add Action</string>
+    <string name="catchers_stats_averages">Day Averages</string>
+    <string name="catchers_stats_day_average">%1$d Day</string>
+    <string name="catchers_daily_caught">Daily Caught</string>
+
 </resources>

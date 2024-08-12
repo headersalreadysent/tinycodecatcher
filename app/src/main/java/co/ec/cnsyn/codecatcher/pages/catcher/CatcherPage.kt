@@ -64,6 +64,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -71,6 +72,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
+import co.ec.cnsyn.codecatcher.R
 import co.ec.cnsyn.codecatcher.composables.AutoText
 import co.ec.cnsyn.codecatcher.composables.Calendar
 import co.ec.cnsyn.codecatcher.composables.IconName
@@ -329,7 +331,7 @@ fun CatcherItem(
                     onClick = { addAction(catcherDetail) },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(text = "Aksiyon ekle")
+                    Text(text = stringResource(id = R.string.catchers_actions_add_action))
                 }
             }
         }
@@ -365,13 +367,15 @@ fun CatcherTopCard(catcherDetail: CatcherDao.CatcherDetail) {
                 modifier = Modifier
                     .padding(16.dp)
             ) {
-                Text("Gönderen", style = infoTitleStyle)
+                Text(stringResource(id = R.string.catchers_top_card_sender), style = infoTitleStyle)
                 Text(
-                    if (catcherDetail.catcher.sender == "") "Herkes" else catcherDetail.catcher.sender,
+                    if (catcherDetail.catcher.sender == "")
+                        stringResource(id = R.string.catchers_top_card_everybody)
+                    else catcherDetail.catcher.sender,
                     style = MaterialTheme.typography.bodyLarge
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                Text("İfade", style = infoTitleStyle)
+                Text(stringResource(id = R.string.catchers_top_card_regex), style = infoTitleStyle)
                 FlowRow {
                     Text(catcherDetail.regex.name, style = MaterialTheme.typography.bodyLarge)
                     Text(
@@ -400,7 +404,7 @@ fun CatcherTopCard(catcherDetail: CatcherDao.CatcherDetail) {
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            "Yakalanan",
+                            stringResource(id = R.string.catchers_top_card_catch_count),
                             style = infoTitleStyle.copy(
                                 color = MaterialTheme.colorScheme.onPrimary,
                             ),
@@ -432,7 +436,7 @@ fun CatcherTopCard(catcherDetail: CatcherDao.CatcherDetail) {
                 .fillMaxWidth(),
         ) {
 
-            Text("Açıklama", style = infoTitleStyle)
+            Text(stringResource(id = R.string.catchers_top_card_description), style = infoTitleStyle)
             Text(catcherDetail.regex.description, style = MaterialTheme.typography.bodyLarge)
         }
     }
@@ -445,7 +449,7 @@ fun CatcherStartArea(
 ) {
     Column {
         Text(
-            text = "Ortalamalar",
+            text = stringResource(id = R.string.catchers_stats_averages),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 8.dp),
@@ -464,7 +468,7 @@ fun CatcherStartArea(
                         .padding(horizontal = 4.dp)
                         .weight(1F)
                         .aspectRatio(1.4F),
-                    title = "$it Gün",
+                    title = stringResource(id = R.string.catchers_stats_day_average,it),
                     icon = Icons.Default.Timeline,
                     value = String.format(Locale.getDefault(), "%.2f", catcherDetail.avg[it] ?: 0F)
                 )
@@ -580,7 +584,7 @@ fun DayModalBottom(dayCodes: List<Code>, close: () -> Unit, sheetState: SheetSta
                 .padding(bottom = 40.dp)
                 .verticalScroll(rememberScrollState())
         ) {
-            var text = "Günlük Yakalananlar"
+            var text = stringResource(id = R.string.catchers_daily_caught)
             if (dayCodes.isNotEmpty()) {
                 text += " (${dayCodes[0].date.dateString("dd.MM.YYYY")})"
             }
