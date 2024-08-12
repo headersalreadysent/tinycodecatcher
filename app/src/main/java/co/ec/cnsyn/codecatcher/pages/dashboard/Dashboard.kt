@@ -365,9 +365,8 @@ fun LatestCode(
                     .weight(1F)
                     .padding(horizontal = 4.dp)
                     .fillMaxHeight(),
-                maxItemsInEachRow = 2,
+                maxItemsInEachRow = if(latest.actions.size > 4) 3 else 2,
                 verticalArrangement = Arrangement.Center,
-                horizontalArrangement = Arrangement.Center
             ) {
                 latest.actions.forEach {
                     IconName(

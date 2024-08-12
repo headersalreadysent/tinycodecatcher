@@ -45,6 +45,7 @@ fun SkewSquare(
     Box(
         modifier = Modifier
             .fillMaxWidth()
+            .then(modifier)
             .drawBehind {
                 drawPath(
                     path = generatePath(size, cut, height, true),
@@ -58,7 +59,6 @@ fun SkewSquare(
                 )
 
             }
-            .then(modifier)
     ) {
         Box(
             modifier = Modifier

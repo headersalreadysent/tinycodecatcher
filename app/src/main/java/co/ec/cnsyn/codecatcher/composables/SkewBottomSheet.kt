@@ -39,7 +39,8 @@ fun SkewBottomSheet(
             SkewSquare(
                 skew = skew,
                 cut = cut,
-                fill = MaterialTheme.colorScheme.surface
+                fill = MaterialTheme.colorScheme.surface,
+                modifier = Modifier.padding(top=skew.dp)
             )
         }
     ) {
