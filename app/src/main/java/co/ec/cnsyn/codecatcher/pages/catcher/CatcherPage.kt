@@ -1,13 +1,11 @@
 package co.ec.cnsyn.codecatcher.pages.catcher
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -22,39 +20,35 @@ import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.GenericShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AvTimer
-import androidx.compose.material.icons.filled.Phishing
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Timeline
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -68,12 +62,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.geometry.CornerRadius
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -90,15 +79,14 @@ import co.ec.cnsyn.codecatcher.composables.SkewSquare
 import co.ec.cnsyn.codecatcher.composables.StatCard
 import co.ec.cnsyn.codecatcher.database.action.Action
 import co.ec.cnsyn.codecatcher.database.catcher.CatcherDao
+import co.ec.cnsyn.codecatcher.database.code.Code
 import co.ec.cnsyn.codecatcher.database.code.CodeDao
 import co.ec.cnsyn.codecatcher.database.relations.ActionDetail
 import co.ec.cnsyn.codecatcher.helpers.dateString
 import co.ec.cnsyn.codecatcher.sms.ActionRunner
 import co.ec.cnsyn.codecatcher.ui.theme.CodeCatcherTheme
 import co.ec.cnsyn.codecatcher.values.actionList
-import kotlinx.serialization.json.Json.Default.configuration
 import java.util.Locale
-import kotlin.math.roundToInt
 
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
@@ -240,145 +228,18 @@ fun CatcherPage(model: CatcherPageViewModel = viewModel()) {
     }
     val dayCodes by model.dayCodes.observeAsState(listOf())
     if (dayDetailSheet) {
-        SkewBottomSheet(
-            onDismissRequest = {
+        DayModalBottom(
+            dayCodes = dayCodes, close = {
                 dayDetailSheet = false
                 model.clearDayStat()
             },
             sheetState = sheetState
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 40.dp)
-                    .verticalScroll(rememberScrollState())
-            ) {
-                var text = "Günlük Yakalananlar"
-                if (dayCodes.isNotEmpty()) {
-                    text += " (${dayCodes[0].date.dateString("dd.MM.YYYY")})"
-                }
-                Text(
-                    text = text,
-                    style = MaterialTheme.typography.titleSmall
-                )
-
-
-                if (dayCodes.isEmpty()) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(60.dp),
-                        Alignment.Center
-                    ) {
-
-                        CircularProgressIndicator(
-                            modifier = Modifier
-                                .fillMaxHeight(.8F)
-                        )
-                    }
-                }
-                if (dayCodes.isNotEmpty()) {
-                    dayCodes.forEach { code ->
-                        Surface(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp)
-                                .background(MaterialTheme.colorScheme.secondaryContainer)
-                                .padding(vertical = 12.dp)
-                        ) {
-                            Row(
-                                modifier = Modifier
-                                    .background(MaterialTheme.colorScheme.secondaryContainer)
-                                    .fillMaxWidth()
-                                    .height(IntrinsicSize.Max),
-                            ) {
-                                Column(
-                                    modifier = Modifier
-                                        .weight(1F)
-                                        .padding(horizontal = 4.dp)
-                                        .fillMaxHeight(),
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    verticalArrangement = Arrangement.Center
-                                ) {
-                                    Text(
-                                        text = code.date.dateString("dd"),
-                                        style = MaterialTheme.typography.bodySmall
-                                            .copy(
-                                                color = MaterialTheme.colorScheme.onSecondaryContainer
-                                            )
-                                    )
-                                    Text(
-                                        text = code.date.dateString("MMM"),
-                                        style = MaterialTheme.typography.bodySmall
-                                            .copy(
-                                                color = MaterialTheme.colorScheme.onSecondaryContainer
-                                            )
-                                    )
-                                }
-                                Column(
-                                    modifier = Modifier.weight(5F)
-                                ) {
-                                    if (code.sender != "") {
-                                        Text(
-                                            text = code.sender ?: "",
-                                            modifier = Modifier.padding(bottom = 1.dp),
-                                            style = MaterialTheme.typography.bodySmall.copy(
-                                                fontWeight = FontWeight.SemiBold,
-                                                fontSize = 11.sp,
-                                                color = MaterialTheme.colorScheme.onSecondaryContainer.copy(
-                                                    alpha = .6F
-                                                )
-                                            )
-                                        )
-                                    }
-
-                                    Text(
-                                        text = code.code,
-                                        modifier = Modifier.padding(bottom = 2.dp),
-                                        style = MaterialTheme.typography.bodyLarge
-                                    )
-                                    Text(
-                                        text = code.sms,
-                                        style = MaterialTheme.typography.bodyMedium.copy(
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                                        )
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        )
     }
-
-    if (selectedActionDetail != null) {
-        SkewDialog(
-            modifier = Modifier,
-            onDismissRequest = {
-                selectedActionDetail = null
-            },
-        ) {
-            selectedActionDetail?.let{ action ->
-                Text(text = action.detail.name,
-                    style = MaterialTheme.typography.titleLarge)
-                Text(text = action.detail.description )
-                val instance=ActionRunner.getActionInstance(action.detail.action)
-                instance?.let {
-                    instance.Settings(action) {
-                        
-                    }
-                }
-            }
-
-
-
-        }
-
-
+    ParamsDialog(selectedActionDetail) {
+        //close action
+        selectedActionDetail = null
     }
-
-
 }
 
 @Composable
@@ -409,6 +270,7 @@ fun CatcherItem(
                 .padding(horizontal = 8.dp)
         ) {
             catcherDetail.actions.forEach { action ->
+                val isHasParams = action.detail.defaultParams != "{}"
 
                 var enabled by remember(action) {
                     mutableStateOf(action.action.status == 1)
@@ -417,7 +279,7 @@ fun CatcherItem(
                 ListItem(
                     modifier = Modifier
                         .padding(bottom = 8.dp)
-                        .clickable(enabled) {
+                        .clickable(enabled && isHasParams) {
                             actionParams(action)
                         },
                     colors = ListItemDefaults.colors(
@@ -425,7 +287,21 @@ fun CatcherItem(
                     ),
                     headlineContent = {
                         Column {
-                            Text(text = if (action.detail.name == "") action.detail.key else action.detail.name)
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(text = if (action.detail.name == "") action.detail.key else action.detail.name)
+                                if (isHasParams) {
+                                    Icon(
+                                        Icons.Filled.Settings, contentDescription = "",
+                                        modifier = Modifier
+                                            .height(16.dp)
+                                            .padding(start = 5.dp),
+                                        tint = MaterialTheme.colorScheme.secondary.copy(alpha = .8F)
+                                    )
+                                }
+                            }
                             if (action.detail.description != "") {
                                 Text(
                                     text = action.detail.description,
@@ -605,33 +481,37 @@ fun CatcherTopCard(catcherDetail: CatcherDao.CatcherDetail) {
 
             Box(modifier = Modifier.weight(1F), Alignment.TopEnd) {
                 Column(
-                    modifier = Modifier
-                        .background(MaterialTheme.colorScheme.primary,
-                            shape = GenericShape { size, _ ->
-                                addRoundRect(
-                                    RoundRect(
-                                        rect = Rect(offset = Offset(0f, 0f), size = size),
-                                        bottomLeft = CornerRadius(40F),
-                                    )
-                                )
-                            })
-                        .padding(16.dp),
+                    modifier = Modifier.width(IntrinsicSize.Min),
                     horizontalAlignment = Alignment.CenterHorizontally
 
                 ) {
-                    Text(
-                        "Yakalanan",
-                        style = infoTitleStyle.copy(
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(MaterialTheme.colorScheme.primary)
+                            .padding(horizontal = 16.dp)
+                            .padding(vertical = 8.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            "Yakalanan",
+                            style = infoTitleStyle.copy(
+                                color = MaterialTheme.colorScheme.onPrimary,
+                            ),
+                            textAlign = TextAlign.End
+                        )
+                        AutoText(
+                            text = catcherDetail.catcher.catchCount.toString(),
+                            fontSize = 10..25,
+                            textAlign = TextAlign.End,
+                            fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.onPrimary,
-                        ),
-                        textAlign = TextAlign.End
-                    )
-                    AutoText(
-                        text = catcherDetail.catcher.catchCount.toString(),
-                        fontSize = 10..25,
-                        textAlign = TextAlign.End,
-                        fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.onPrimary,
+                        )
+                    }
+                    SkewSquare(
+                        cut = "bs",
+                        skew = 15,
+                        fill = MaterialTheme.colorScheme.primary
                     )
                 }
 
@@ -744,6 +624,153 @@ fun AddActionToCatcherBottomSheet(
 
 }
 
+@Composable
+fun ParamsDialog(
+    action: ActionDetail?,
+    close: () -> Unit = { -> }
+) {
+    if (action == null || action.detail.defaultParams == "{}") {
+        return
+    }
+    SkewDialog(
+        modifier = Modifier,
+        onDismissRequest = {
+            close()
+        },
+    ) {
+        Text(
+            text = action.detail.name,
+            style = MaterialTheme.typography.titleLarge.copy(
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.SemiBold
+            )
+        )
+        Text(text = action.detail.description)
+        val instance = ActionRunner.getActionInstance(action.detail.action)
+        instance?.let {
+            instance.Settings(action) {
+
+            }
+        }
+
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DayModalBottom(dayCodes: List<Code>, close: () -> Unit, sheetState: SheetState) {
+    SkewBottomSheet(
+        onDismissRequest = {
+            close()
+        },
+        sheetState = sheetState
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 40.dp)
+                .verticalScroll(rememberScrollState())
+        ) {
+            var text = "Günlük Yakalananlar"
+            if (dayCodes.isNotEmpty()) {
+                text += " (${dayCodes[0].date.dateString("dd.MM.YYYY")})"
+            }
+            Text(
+                text = text,
+                style = MaterialTheme.typography.titleSmall
+            )
+
+
+            if (dayCodes.isEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(60.dp),
+                    Alignment.Center
+                ) {
+
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .fillMaxHeight(.8F)
+                    )
+                }
+            }
+            if (dayCodes.isNotEmpty()) {
+                dayCodes.forEach { code ->
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp)
+                            .background(MaterialTheme.colorScheme.secondaryContainer)
+                            .padding(vertical = 12.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .background(MaterialTheme.colorScheme.secondaryContainer)
+                                .fillMaxWidth()
+                                .height(IntrinsicSize.Max),
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .weight(1F)
+                                    .padding(horizontal = 4.dp)
+                                    .fillMaxHeight(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                Text(
+                                    text = code.date.dateString("dd"),
+                                    style = MaterialTheme.typography.bodySmall
+                                        .copy(
+                                            color = MaterialTheme.colorScheme.onSecondaryContainer
+                                        )
+                                )
+                                Text(
+                                    text = code.date.dateString("MMM"),
+                                    style = MaterialTheme.typography.bodySmall
+                                        .copy(
+                                            color = MaterialTheme.colorScheme.onSecondaryContainer
+                                        )
+                                )
+                            }
+                            Column(
+                                modifier = Modifier.weight(5F)
+                            ) {
+                                if (code.sender != "") {
+                                    Text(
+                                        text = code.sender,
+                                        modifier = Modifier.padding(bottom = 1.dp),
+                                        style = MaterialTheme.typography.bodySmall.copy(
+                                            fontWeight = FontWeight.SemiBold,
+                                            fontSize = 11.sp,
+                                            color = MaterialTheme.colorScheme.onSecondaryContainer.copy(
+                                                alpha = .6F
+                                            )
+                                        )
+                                    )
+                                }
+
+                                Text(
+                                    text = code.code,
+                                    modifier = Modifier.padding(bottom = 2.dp),
+                                    style = MaterialTheme.typography.bodyLarge
+                                )
+                                Text(
+                                    text = code.sms,
+                                    style = MaterialTheme.typography.bodyMedium.copy(
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+
 @Preview(showBackground = true)
 @Composable
 fun CatcherPagePreview() {
@@ -755,11 +782,9 @@ fun CatcherPagePreview() {
 @Preview(showBackground = true)
 @Composable
 fun CatcherPageTopCardPreview() {
-
     CodeCatcherTheme {
         val model = MockCatcherViewModel()
         model.catchers.value?.let {
-
             CatcherTopCard(it[0])
         }
     }

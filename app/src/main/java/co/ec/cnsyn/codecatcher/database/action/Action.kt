@@ -11,4 +11,5 @@ data class Action(
     var description: String = "",
     var icon: String = "",
     var action: String = "",
+    var defaultParams: String = "{}"
 )

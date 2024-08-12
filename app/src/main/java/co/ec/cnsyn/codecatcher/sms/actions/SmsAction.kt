@@ -2,10 +2,7 @@ package co.ec.cnsyn.codecatcher.sms.actions
 
 
 import android.Manifest
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.content.pm.PackageManager
-import android.os.Build
 import android.telephony.SmsManager
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column
@@ -15,17 +12,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.core.app.NotificationCompat
 import co.ec.cnsyn.codecatcher.App
-import co.ec.cnsyn.codecatcher.R
-import co.ec.cnsyn.codecatcher.composables.MiniOptionBox
-import co.ec.cnsyn.codecatcher.composables.MiniUpdateBox
+import co.ec.cnsyn.codecatcher.composables.ParamOptionBox
+import co.ec.cnsyn.codecatcher.composables.ParamValueBox
 import co.ec.cnsyn.codecatcher.database.relations.ActionDetail
 import co.ec.cnsyn.codecatcher.database.relations.CatcherWithActions
 import co.ec.cnsyn.codecatcher.database.relations.CatcherWithRegex
-import co.ec.cnsyn.codecatcher.helpers.async
 import co.ec.cnsyn.codecatcher.sms.SmsData
 
 
@@ -83,18 +76,17 @@ class SmsAction : BaseAction {
 
         Column {
             //update phone number
-            MiniUpdateBox(
+            ParamValueBox(
                 "Yönlendirilecek no",
                 params["no"] ?: "",
-                "",
                 keyboardType = KeyboardOptions(keyboardType = KeyboardType.Number),
             ) {
                 val updatable = params.toMutableMap()
                 updatable["no"] = it
-                params = updatable.toMap()
+                action.action.updateParam(updatable.toMap())
                 then(params)
             }
-            MiniOptionBox(
+            ParamOptionBox(
                 "Gönderim Tipi",
                 params["sendType"] ?: "sms",
                 listOf(
@@ -104,7 +96,7 @@ class SmsAction : BaseAction {
             ) {
                 val updatable = params.toMutableMap()
                 updatable["sendType"] = it
-                params = updatable.toMap()
+                action.action.updateParam(updatable.toMap())
                 then(params)
             }
         }

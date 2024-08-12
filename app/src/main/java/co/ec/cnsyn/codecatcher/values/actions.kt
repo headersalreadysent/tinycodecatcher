@@ -5,10 +5,31 @@ import java.util.Locale
 
 
 private var actions = listOf(
-    Action(1, "notification", "", "", "Notifications", "NotificationAction"),
-    Action(2, "sms", "", "", "Textsms", "SmsAction"),
-    Action(3, "copy", "", "", "ContentCopy", "ClipboardAction"),
-    Action(4, "tts", "", "", "Mic", "TTSAction")
+    Action(
+        1,
+        key = "notification",
+        icon = "Notifications",
+        action = "NotificationAction"
+    ),
+    Action(
+        2,
+        key = "sms",
+        icon = "Textsms",
+        action = "SmsAction",
+        defaultParams = "{\"no\":\"\",\"sendType\":\"code\"}"
+    ),
+    Action(
+        3,
+        key = "copy",
+        icon = "ContentCopy",
+        action = "ClipboardAction"
+    ),
+    Action(
+        4,
+        key = "tts",
+        icon = "Mic",
+        action = "TTSAction"
+    )
 )
 
 var actionLang = mapOf(

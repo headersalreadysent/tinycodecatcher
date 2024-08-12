@@ -2,6 +2,9 @@ package co.ec.cnsyn.codecatcher.database.catcheraction
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import co.ec.cnsyn.codecatcher.database.DB
+import co.ec.cnsyn.codecatcher.helpers.async
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 @Entity
@@ -20,5 +23,11 @@ data class CatcherAction(
         return dynamicType.mapValues { it.value }
     }
 
+    fun updateParam(updatedParams: Map<String, String>?) {
+        params = Json.encodeToString(updatedParams)
+        async({
+            return@async DB.get().catcherAction().updateParams(id, params = params)
+        })
+    }
 
 }

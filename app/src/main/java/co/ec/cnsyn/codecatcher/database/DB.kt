@@ -46,12 +46,9 @@ object DB {
             val list = get().action().getAllItems()
             if (list.isEmpty()) {
 
-                var regexes= regexList()
-                get().regex().insertAll(*regexes.toTypedArray());
-
-
-
-                get().action().insertAll(*actionList().toTypedArray());
+                val regexes = regexList()
+                get().regex().insertAll(*regexes.toTypedArray())
+                get().action().insertAll(*actionList().toTypedArray())
 
                 val catchers = List(3) { it ->
                     Catcher(
@@ -63,19 +60,22 @@ object DB {
                 }
                 val catchersAction = mutableListOf<CatcherAction>()
                 for (i in 1..3) {
-                    var rands = randomAction(Random.nextInt(1, 4), 1..4)
+                    val rands = randomAction(Random.nextInt(1, 4), 1..4)
                     rands.forEach { action ->
                         catchersAction.add(
                             CatcherAction(
                                 catcherId = i,
-                                actionId = action
+                                actionId = action,
+                                params = actionList()
+                                    .find { it.id == action }?.defaultParams ?: "{}"
+
                             )
                         )
                     }
                 }
 
-                get().catcher().insertAll(*catchers.toTypedArray());
-                get().catcherAction().insertAll(*catchersAction.toTypedArray());
+                get().catcher().insertAll(*catchers.toTypedArray())
+                get().catcherAction().insertAll(*catchersAction.toTypedArray())
 
                 generateFakeData()
             }
@@ -104,7 +104,7 @@ object DB {
             )
             newDate--
         }
-        get().code().insertAll(*codes.toTypedArray());
+        get().code().insertAll(*codes.toTypedArray())
         //update counts
         get().catcher().fixCatchersCounts()
     }

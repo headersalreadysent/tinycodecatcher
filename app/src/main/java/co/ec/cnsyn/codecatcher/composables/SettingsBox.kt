@@ -1,7 +1,6 @@
 package co.ec.cnsyn.codecatcher.composables
 
 import co.ec.cnsyn.codecatcher.ui.theme.CodeCatcherTheme
-
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.outlined.Lightbulb
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -31,7 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun MiniUpdateBox(
+fun ParamValueBox(
     label: String,
     value: String,
     helperText: String? = null,
@@ -42,7 +42,7 @@ fun MiniUpdateBox(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(bottom = 8.dp)
+            .padding(bottom = 12.dp)
     ) {
 
         OutlinedTextField(
@@ -62,33 +62,15 @@ fun MiniUpdateBox(
             },
             keyboardOptions = keyboardType
         )
-        helperText?.let {
-            val color = MaterialTheme.colorScheme.onSurface.copy(alpha = .8F)
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    Icons.Outlined.Lightbulb, contentDescription = "$label helper text",
-                    modifier = Modifier.size(12.dp),
-                    tint = color
-                )
-                Text(
-                    modifier = Modifier.padding(start = 4.dp),
-                    text = helperText,
-                    style = MaterialTheme.typography.bodySmall.copy(
-                        color = color
-                    )
-                )
-            }
-        }
+
+        ParamHelperArea(helperText)
     }
 }
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MiniOptionBox(
+fun ParamOptionBox(
     label: String,
     value: String,
     alternatives: List<Pair<String, String>> = listOf(),
@@ -100,7 +82,7 @@ fun MiniOptionBox(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(bottom = 8.dp)
+            .padding(bottom = 12.dp)
     ) {
 
         var dropDownExpanded by remember { mutableStateOf(false) }
@@ -128,9 +110,8 @@ fun MiniOptionBox(
                         )
                     )
                 },
-                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = dropDownExpanded) },
-
-                )
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = dropDownExpanded) }
+            )
             ExposedDropdownMenu(
                 modifier = Modifier
                     .fillMaxWidth(.88F),
@@ -150,7 +131,7 @@ fun MiniOptionBox(
                         Text(
                             alternative.second,
                             modifier = Modifier.weight(1F),
-                            style = MaterialTheme.typography.bodySmall
+                            style = MaterialTheme.typography.bodyMedium
                         )
                     }
                     if (index < alternatives.size - 1) {
@@ -159,27 +140,34 @@ fun MiniOptionBox(
                 }
             }
         }
+        ParamHelperArea(helperText)
 
-        helperText?.let {
-            val color = MaterialTheme.colorScheme.onSurface.copy(alpha = .8F)
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    Icons.Outlined.Lightbulb, contentDescription = "$label helper text",
-                    modifier = Modifier.size(12.dp),
-                    tint = color
-                )
-                Text(
-                    modifier = Modifier.padding(start = 4.dp),
-                    text = helperText,
-                    style = MaterialTheme.typography.bodySmall.copy(
-                        color = color
-                    )
-                )
-            }
-        }
+    }
+}
+
+@Composable
+fun ParamHelperArea(helperText: String? = "") {
+    if (helperText == null || helperText == "") {
+        return
+    }
+    val color = MaterialTheme.colorScheme.onSurface.copy(alpha = .8F)
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(top=4.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            Icons.Filled.Lightbulb,
+            contentDescription = "param helper text",
+            modifier = Modifier.size(12.dp),
+            tint = color,
+        )
+        Text(
+            modifier = Modifier.padding(start = 4.dp),
+            text = helperText,
+            style = MaterialTheme.typography.bodySmall.copy(
+                color = color
+            )
+        )
     }
 }
 
@@ -188,8 +176,8 @@ fun MiniOptionBox(
 fun MiniUpdateBoxPreview() {
     CodeCatcherTheme {
         Column {
-            MiniUpdateBox("label", "hello", "Must contains param info")
-            MiniOptionBox("label", "hello", listOf(Pair("hello", "HELLO"), Pair("world", "WORLD")))
+            ParamValueBox("label", "hello", "Must contains param info")
+            ParamOptionBox("label", "hello", listOf(Pair("hello", "HELLO"), Pair("world", "WORLD")))
         }
 
     }
