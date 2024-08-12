@@ -12,13 +12,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import co.ec.cnsyn.codecatcher.App
+import co.ec.cnsyn.codecatcher.R
 import co.ec.cnsyn.codecatcher.composables.ParamOptionBox
 import co.ec.cnsyn.codecatcher.composables.ParamValueBox
 import co.ec.cnsyn.codecatcher.database.relations.ActionDetail
 import co.ec.cnsyn.codecatcher.database.relations.CatcherWithActions
 import co.ec.cnsyn.codecatcher.database.relations.CatcherWithRegex
+import co.ec.cnsyn.codecatcher.helpers.translate
 import co.ec.cnsyn.codecatcher.sms.SmsData
 
 
@@ -58,12 +61,15 @@ class SmsAction : BaseAction {
                 )
             } else {
                 if (params["no"] == "0") {
-                    Toast.makeText(App.context(), "no number", Toast.LENGTH_LONG).show()
+                    val error = translate("action_SmsAction_forward_no_error")
+                    Toast.makeText(App.context(), error, Toast.LENGTH_LONG).show()
                 }
             }
             return true
         } else {
-            Toast.makeText(context, "cant send sms", Toast.LENGTH_SHORT).show()
+            val error = translate("action_SmsAction_permission_error")
+
+            Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
             return false
         }
     }
@@ -72,12 +78,12 @@ class SmsAction : BaseAction {
     override fun Settings(
         action: ActionDetail, then: (settings: Map<String, String>) -> Unit
     ) {
-        var params by remember { mutableStateOf(action.action.params()) }
+        val params by remember { mutableStateOf(action.action.params()) }
 
         Column {
             //update phone number
             ParamValueBox(
-                "Yönlendirilecek no",
+                stringResource(id = R.string.action_SmsAction_forward_number),
                 params["no"] ?: "",
                 keyboardType = KeyboardOptions(keyboardType = KeyboardType.Number),
             ) {
@@ -87,11 +93,17 @@ class SmsAction : BaseAction {
                 then(params)
             }
             ParamOptionBox(
-                "Gönderim Tipi",
+                stringResource(id = R.string.action_SmsAction_forward_send_type),
                 params["sendType"] ?: "sms",
                 listOf(
-                    Pair("sms", "Tüm Sms"),
-                    Pair("code", "Yakalanan")
+                    Pair(
+                        "sms",
+                        stringResource(id = R.string.action_SmsAction_forward_send_type_sms)
+                    ),
+                    Pair(
+                        "code",
+                        stringResource(id = R.string.action_SmsAction_forward_send_type_code)
+                    )
                 )
             ) {
                 val updatable = params.toMutableMap()

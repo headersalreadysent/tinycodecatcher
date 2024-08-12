@@ -4,11 +4,13 @@ package co.ec.cnsyn.codecatcher.sms.actions
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.os.Build
+import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import co.ec.cnsyn.codecatcher.App
 import co.ec.cnsyn.codecatcher.R
 import co.ec.cnsyn.codecatcher.database.relations.CatcherWithActions
 import co.ec.cnsyn.codecatcher.database.relations.CatcherWithRegex
+import co.ec.cnsyn.codecatcher.helpers.translate
 import co.ec.cnsyn.codecatcher.sms.SmsData
 
 
@@ -19,27 +21,38 @@ class NotificationAction : BaseAction {
         val notificationManager: NotificationManager? =
             context.getSystemService(NotificationManager::class.java)
 
-        /*   if (notificationManager?.areNotificationsEnabled() == false) {
-               val message=context.resources.getString(R.string.action_Notification_no_notification_permission)
-               Toast.makeText(context, message, Toast.LENGTH_LONG).show()
-               return false
-           }*/
+        if (notificationManager?.areNotificationsEnabled() == false) {
+            Toast.makeText(
+                context,
+                translate("action_NotificationAction_permission_error"), Toast.LENGTH_LONG
+            ).show()
+            return false
+        }
 
         //generate channel
-        val channelId = "code-catcher-${catcher.catcher.id}"
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val importance = NotificationManager.IMPORTANCE_DEFAULT
-            val channel = NotificationChannel(channelId, action.action, importance)
-            notificationManager?.createNotificationChannel(channel)
-        }
-        //extract details
-        var notificationBuilder = NotificationCompat.Builder(context, channelId)
+        try {
+            val channelId = "code-catcher-${catcher.catcher.id}"
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                val importance = NotificationManager.IMPORTANCE_DEFAULT
+                val channel = NotificationChannel(channelId, action.action, importance)
+                notificationManager?.createNotificationChannel(channel)
+            }
+            //extract details
+            var notificationBuilder = NotificationCompat.Builder(context, channelId)
 
-        notificationBuilder = setupTexts(catcher, action, sms, notificationBuilder)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-        notificationManager?.notify(456, notificationBuilder.build())
-        return true
+            notificationBuilder = setupTexts(catcher, action, sms, notificationBuilder)
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            notificationManager?.notify(456, notificationBuilder.build())
+            return true
+        } catch(e:Error) {
+            Toast.makeText(
+                context,
+                translate("action_NotificationAction_error"), Toast.LENGTH_LONG
+            ).show()
+            return false
+        }
+
     }
 
     /**

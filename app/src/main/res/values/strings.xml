@@ -3,6 +3,7 @@
 
     <string name="global_calendar_title">Last %1$s Day Graph</string>
 
+    <!-- dashboard page -->
     <string name="dashboard_permission_RECEIVE_SMS">SMS Read</string>
     <string name="dashboard_permission_POST_NOTIFICATIONS">Notification</string>
     <string name="dashboard_permission_needs_some_permission">Code Catcher need some permissions:</string>
@@ -11,6 +12,7 @@
     <string name="dashboard_list_last_codes">Last Codes</string>
 
 
+    <!-- catchers page -->
     <string name="catchers_top_card_sender">Sender</string>
     <string name="catchers_top_card_everybody">Everybody</string>
     <string name="catchers_top_card_regex">Expression</string>
@@ -20,5 +22,26 @@
     <string name="catchers_stats_averages">Day Averages</string>
     <string name="catchers_stats_day_average">%1$d Day</string>
     <string name="catchers_daily_caught">Daily Caught</string>
+
+
+
+    <!-- actions settings -->
+    <string name="action_SmsAction_permission_error">CodeCatcher sms permission missing.</string>
+    <string name="action_SmsAction_forward_no_error">Forward number is missing for sending sms.</string>
+    <string name="action_SmsAction_forward_number">Forward Number</string>
+    <string name="action_SmsAction_forward_send_type">Send Type</string>
+    <string name="action_SmsAction_forward_send_type_sms">Sms Content</string>
+    <string name="action_SmsAction_forward_send_type_code">Caught Content</string>
+
+    <string name="action_TTSAction_error">TTS failed.</string>
+    <string name="action_TTSAction_language_error">TTS language error.</string>
+
+    <string name="action_NotificationAction_permission_error">CodeCatcher notification permission missing.</string>
+    <string name="action_NotificationAction_error">CodeCatcher notification error.</string>
+
+
+
+
+
 
 </resources>
