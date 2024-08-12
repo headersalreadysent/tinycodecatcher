@@ -32,16 +32,30 @@
     <string name="action_SmsAction_forward_send_type">Send Type</string>
     <string name="action_SmsAction_forward_send_type_sms">Sms Content</string>
     <string name="action_SmsAction_forward_send_type_code">Caught Content</string>
-
     <string name="action_TTSAction_error">TTS failed.</string>
     <string name="action_TTSAction_language_error">TTS language error.</string>
-
     <string name="action_NotificationAction_permission_error">CodeCatcher notification permission missing.</string>
     <string name="action_NotificationAction_error">CodeCatcher notification error.</string>
 
 
 
+    <!-- regex values languages-->
+    <string name="regexlist_4digit">4 digit numeric</string>
+    <string name="regexlist_5digit">5 digit numeric</string>
+    <string name="regexlist_6digit">6 digit numeric</string>
+    <string name="regexlist_4digit_desc">Catches 4 digit numeric codes.</string>
+    <string name="regexlist_5digit_desc">Catches 5 digit numeric codes.</string>
+    <string name="regexlist_6digit_desc">Catches 6 digit numeric codes.</string>
 
+    <!-- action list languages -->
+    <string name="actionlist_notification">Notification</string>
+    <string name="actionlist_sms">Sms</string>
+    <string name="actionlist_copy">Copy</string>
+    <string name="actionlist_tts">TTS</string>
+    <string name="actionlist_notification_desc">Shows as a notification.</string>
+    <string name="actionlist_sms_desc">Send codes with sms message</string>
+    <string name="actionlist_copy_desc">Copy codes to clipboard.</string>
+    <string name="actionlist_tts_desc">Read codes with TTS.</string>
 
 
 </resources>

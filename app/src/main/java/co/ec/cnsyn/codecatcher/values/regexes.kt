@@ -1,7 +1,7 @@
 package co.ec.cnsyn.codecatcher.values
 
 import co.ec.cnsyn.codecatcher.database.regex.Regex
-import java.util.Locale
+import co.ec.cnsyn.codecatcher.helpers.translate
 
 
 private var regexes = listOf(
@@ -42,26 +42,13 @@ var regexLang = mapOf(
         "4digit-desc" to "4 karakterli sayısal ifadeleri yakalar.",
         "5digit-desc" to "5 karakterli sayısal ifadeleri yakalar",
         "6digit-desc" to "6 karakterli sayısal ifadeleri yakalar",
-    ),
-    "*" to mapOf(
-        "4digit" to "4 digit numeric",
-        "5digit" to "5 digit numeric",
-        "6digit" to "6 digit numeric",
-        "4digit-desc" to "Catches 4 digit numeric codes.",
-        "5digit-desc" to "Catches 5 digit numeric codes.",
-        "6digit-desc" to "Catches 6 digit numeric codes.",
-    ),
+    )
 )
 
 fun regexList(): List<Regex> {
-    val locale = Locale.getDefault().toString()
-    val regexLangDetails = regexLang[locale] ?: regexLang["*"]
-    if (regexLangDetails == null) {
-        return regexes
-    }
     return regexes.map {
-        it.name = regexLangDetails[it.key] ?: ""
-        it.description = regexLangDetails[it.key + "-desc"] ?: ""
+        it.name = translate("regexlist_${it.key}")
+        it.description = translate("regexlist_${it.key}_desc")
         return@map it
     }
 

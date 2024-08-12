@@ -1,7 +1,7 @@
 package co.ec.cnsyn.codecatcher.values
 
 import co.ec.cnsyn.codecatcher.database.action.Action
-import java.util.Locale
+import co.ec.cnsyn.codecatcher.helpers.translate
 
 
 private var actions = listOf(
@@ -44,28 +44,12 @@ var actionLang = mapOf(
         "copy-desc" to "Kodları panoya kopyalar.",
         "tts-desc" to "Kodları sesli olarak okur.",
     ),
-    "*" to mapOf(
-        "notification" to "Notification",
-        "sms" to "Sms",
-        "copy" to "Copy",
-        "tts" to "TTS",
-
-        "notification-desc" to "Shows as a notification.",
-        "sms-desc" to "Send codes with sms message",
-        "copy-desc" to "Copy codes to clipboard.",
-        "tts-desc" to "Read codes with TTS.",
-    ),
 )
 
 fun actionList(): List<Action> {
-    val locale = Locale.getDefault().toString()
-    val actionLangDetails = actionLang[locale] ?: actionLang["*"]
-    if (actionLangDetails == null) {
-        return actions
-    }
     return actions.map {
-        it.name = actionLangDetails[it.key] ?: ""
-        it.description = actionLangDetails[it.key + "-desc"] ?: ""
+        it.name = translate("actionlist_${it.key}")
+        it.description = translate("actionlist_${it.key}_desc")
         return@map it
     }
 
