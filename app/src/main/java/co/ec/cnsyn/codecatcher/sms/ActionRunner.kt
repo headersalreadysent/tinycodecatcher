@@ -1,17 +1,22 @@
 package co.ec.cnsyn.codecatcher.sms
 
 
+import android.app.Application
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.webkit.CookieSyncManager.createInstance
+import androidx.lifecycle.ViewModelProvider
 import co.ec.cnsyn.codecatcher.App
 import co.ec.cnsyn.codecatcher.database.DB
 import co.ec.cnsyn.codecatcher.database.catcher.Catcher
 import co.ec.cnsyn.codecatcher.database.code.Code
 import co.ec.cnsyn.codecatcher.database.relations.CatcherWithActions
 import co.ec.cnsyn.codecatcher.database.relations.CatcherWithRegex
+import co.ec.cnsyn.codecatcher.helpers.Event
+import co.ec.cnsyn.codecatcher.helpers.GlobalEvent
 import co.ec.cnsyn.codecatcher.helpers.async
+import co.ec.cnsyn.codecatcher.pages.dashboard.DashboardViewModel
 import co.ec.cnsyn.codecatcher.sms.actions.BaseAction
 import co.ec.cnsyn.codecatcher.sms.actions.ClipboardAction
 import co.ec.cnsyn.codecatcher.sms.actions.NotificationAction
@@ -137,22 +142,27 @@ class ActionRunner {
 
         if (catcher.actions.isNotEmpty()) {
             //if there is a action
+            var runed = false
             catcher.actions.forEach { action ->
-                if(action.status==1){
+                if (action.status == 1) {
                     //generate action instance
                     val instance = getActionInstance(action.action)
                     instance?.let {
                         //if we found instance lets run it
                         instance.run(catcher, action, message)
+                        runed = true
+
                     }
                 }
+
+            }
+            if(runed){
+                Event.emit(GlobalEvent.SmsReceived(smsData = message))
 
             }
         }
 
     }
-
-
 
 
     private fun copyToClipboard(code: String) {

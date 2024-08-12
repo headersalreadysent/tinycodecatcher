@@ -2,6 +2,7 @@ package co.ec.cnsyn.codecatcher.pages.dashboard
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.content.pm.PermissionInfo
 import android.os.Build
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Message
@@ -21,6 +22,8 @@ import co.ec.cnsyn.codecatcher.database.code.Code
 import co.ec.cnsyn.codecatcher.database.code.CodeDao
 import co.ec.cnsyn.codecatcher.database.relations.ActionDetail
 import co.ec.cnsyn.codecatcher.database.relations.CodeWithCatcher
+import co.ec.cnsyn.codecatcher.helpers.Event
+import co.ec.cnsyn.codecatcher.helpers.GlobalEvent
 import co.ec.cnsyn.codecatcher.helpers.async
 import co.ec.cnsyn.codecatcher.helpers.translate
 import co.ec.cnsyn.codecatcher.helpers.unix
@@ -47,7 +50,16 @@ open class DashboardViewModel : ViewModel() {
 
     init {
         start()
+        viewModelScope.launch {
+            Event.events.collect { event ->
+                when (event) {
+                    is GlobalEvent.SmsReceived -> loadLatest()
+                }
+            }
+        }
     }
+
+
 
     open fun start() {
 
@@ -62,11 +74,7 @@ open class DashboardViewModel : ViewModel() {
         }, {
             stats.value = it
         })
-        async({
-            return@async DB.get().code().getLatest()
-        }, {
-            codes.value = it
-        })
+        loadLatest()
         async({
             return@async DB.get().code().getCalendar(unix() - 86400 * 30)
         }, {
@@ -74,6 +82,16 @@ open class DashboardViewModel : ViewModel() {
         })
 
         calculatePermissions()
+    }
+
+    fun loadLatest() {
+
+        async({
+            return@async DB.get().code().getLatest()
+        }, {
+            codes.value = it
+
+        })
     }
 
 
@@ -84,7 +102,7 @@ open class DashboardViewModel : ViewModel() {
      */
     private fun calculatePermissions() {
         val permissions = mutableListOf<PermissionInfo>();
-        val context=App.context()
+        val context = App.context()
         if (context
                 .checkSelfPermission(Manifest.permission.RECEIVE_SMS) != PackageManager.PERMISSION_GRANTED
         ) {

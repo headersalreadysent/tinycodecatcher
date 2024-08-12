@@ -20,7 +20,7 @@ interface CatcherActionDao : BaseDao<CatcherAction> {
     @Query("SELECT * FROM catcheraction")
     fun getAllItems(): List<CatcherAction>
 
-    @Query("SELECT * FROM catcheraction WHERE catcherId IN (:catcherIds)")
+    @Query("SELECT * FROM catcheraction WHERE catcherId IN (:catcherIds) AND status=1")
     fun getWithDetail(catcherIds: IntArray): List<ActionDetail>
 
     @Query("UPDATE catcheraction SET status = 0 WHERE catcherId =:catcherIds AND actionId=:actionId")
