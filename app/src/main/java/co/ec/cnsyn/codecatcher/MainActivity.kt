@@ -95,13 +95,12 @@ fun CodeCatcherApp(context: Context) {
                             Icon(Icons.Default.AddCircle, contentDescription = "")
                         }
                     },
-                    tonalElevation = 4.dp
                 )
             }
         ) { _ ->
             NavHost(navController = navController,
-                //startDestination = "dashboard"
-                startDestination = "catchers"
+                startDestination = "dashboard"
+                //startDestination = "catchers"
                 ) {
                 composable("dashboard") { Dashboard() }
                 composable("catchers") { CatcherPage() }

@@ -25,9 +25,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import co.ec.cnsyn.codecatcher.R
 import co.ec.cnsyn.codecatcher.helpers.unix
 import co.ec.cnsyn.codecatcher.ui.theme.CodeCatcherTheme
 import kotlin.random.Random
@@ -37,7 +39,9 @@ import kotlin.random.Random
 @Composable
 fun Calendar(
     stats: List<Int>,
-    dayClick: (start: Int) -> Unit
+    numberInRow: Int = 14,
+    titleVisible: Boolean = true,
+    dayClick: (start: Int) -> Unit,
 ) {
     if (stats.isNotEmpty()) {
         val minDate = stats.min()
@@ -57,12 +61,12 @@ fun Calendar(
         val density = LocalDensity.current
         var width by remember { mutableIntStateOf(0) }
         val boxWidth by remember(width) {
-            var boxWidth = with(density) { (width.toFloat() / 14F).toDp() }
+            var boxWidth = with(density) { (width.toFloat() / numberInRow.toFloat()).toDp() }
             boxWidth = (boxWidth.value - 1).dp
             mutableStateOf(boxWidth)
         }
         val flowWidth by remember(boxWidth) {
-            mutableStateOf((boxWidth.value * 14 + 14).dp)
+            mutableStateOf((boxWidth.value * numberInRow + numberInRow).dp)
         }
         Column(
             modifier = Modifier
@@ -71,14 +75,16 @@ fun Calendar(
                 .padding(top = 8.dp)
         ) {
             val dayCount = ((unix() - minDate) / 86400) + 1
-            Text(
-                text = "Son $dayCount  Gün Dağılımı",
-                modifier = Modifier
-                    .fillMaxWidth(),
-                style = MaterialTheme.typography.titleSmall.copy(
-                    fontWeight = FontWeight.SemiBold
+            if(titleVisible){
+                Text(
+                    text = stringResource(R.string.global_calendar_title, dayCount.toString()),
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    style = MaterialTheme.typography.titleSmall.copy(
+                        fontWeight = FontWeight.SemiBold
+                    )
                 )
-            )
+            }
             Box(
                 modifier = Modifier
                     .fillMaxWidth()

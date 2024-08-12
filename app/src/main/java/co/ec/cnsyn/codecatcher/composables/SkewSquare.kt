@@ -48,7 +48,7 @@ fun SkewSquare(
             .drawBehind {
                 drawPath(
                     path = generatePath(size, cut, height, true),
-                    color = Color.Gray.copy(alpha = .3F),
+                    color = Color.Gray.copy(alpha = .5F),
                     style = Fill
                 )
                 drawPath(
@@ -79,20 +79,20 @@ fun SkewSquare(
 }
 
 fun generatePath(size: Size, cut: SkewSquareCut, height: Float, shadow: Boolean = false): Path {
-    val shadowSize = (if (shadow) 3F else 0F)
+    val shadowSize = (if (shadow) 2F else 0F)
     return Path().apply {
         when (cut) {
             SkewSquareCut.TopStart -> {
-                moveTo(0f, height + shadowSize)
-                lineTo(size.width, 0f + shadowSize)
+                moveTo(0f, height - shadowSize)
+                lineTo(size.width, 0f - shadowSize)
                 lineTo(size.width, size.height)
                 lineTo(0f, size.height)
                 close()
             }
 
             SkewSquareCut.TopEnd -> {
-                moveTo(0f, 0f + shadowSize)
-                lineTo(size.width, height + shadowSize)
+                moveTo(0f, 0f - shadowSize)
+                lineTo(size.width, height - shadowSize)
                 lineTo(size.width, size.height)
                 lineTo(0f, size.height)
                 close()
@@ -101,16 +101,16 @@ fun generatePath(size: Size, cut: SkewSquareCut, height: Float, shadow: Boolean 
             SkewSquareCut.BottomStart -> {
                 moveTo(0f, 0f)
                 lineTo(size.width, 0f)
-                lineTo(size.width, size.height - shadowSize)
-                lineTo(0f, size.height - height - shadowSize)
+                lineTo(size.width, size.height + shadowSize)
+                lineTo(0f, size.height - height + shadowSize)
                 close()
             }
 
             else -> {
                 moveTo(0f, 0f)
                 lineTo(size.width, 0f)
-                lineTo(size.width, size.height - height - shadowSize)
-                lineTo(0f, size.height - shadowSize)
+                lineTo(size.width, size.height - height + shadowSize)
+                lineTo(0f, size.height + shadowSize)
                 close()
             }
         }

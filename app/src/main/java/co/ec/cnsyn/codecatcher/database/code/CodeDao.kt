@@ -98,26 +98,21 @@ ORDER BY
     /**
      * get latest
      */
-    fun getLatest(
-        then: (res: List<Latest>) -> Unit = { _ -> },
-        err: (res: Throwable) -> Unit = { _ -> }
-    ) {
-        async({
-            val db = DB.get()
-            val codes = db.code().getLatestCodes(20)
-            val catcherIds = codes.map { it.catcherId }.toSet().toList()
+    fun getLatest(): List<Latest> {
+        val db = DB.get()
+        val codes = db.code().getLatestCodes(20)
+        val catcherIds = codes.map { it.catcherId }.toSet().toList()
 
-            val catchers = db.catcher().getCatchers(catcherIds.toIntArray()).associateBy { it.id }
-            val action = db.catcherAction().getWithDetail(catcherIds.toIntArray())
-            return@async codes.map { code ->
-                return@map Latest(
-                    code = code,
-                    catcher = catchers.get(code.catcherId),
-                    actions = action.filter { it.action.catcherId == code.catcherId }
-                        .sortedBy { it.action.actionId }
-                )
-            }
-        }, then, err)
+        val catchers = db.catcher().getCatchers(catcherIds.toIntArray()).associateBy { it.id }
+        val action = db.catcherAction().getWithDetail(catcherIds.toIntArray())
+        return codes.map { code ->
+            return@map Latest(
+                code = code,
+                catcher = catchers.get(code.catcherId),
+                actions = action.filter { it.action.catcherId == code.catcherId }
+                    .sortedBy { it.action.actionId }
+            )
+        }
     }
 
 }

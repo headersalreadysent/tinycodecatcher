@@ -5,10 +5,13 @@ import com.google.accompanist.permissions.rememberPermissionState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -16,17 +19,26 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DataObject
+import androidx.compose.material.icons.filled.Key
 import androidx.compose.material.icons.filled.Phishing
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
@@ -44,6 +56,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -51,30 +64,44 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.max
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import co.ec.cnsyn.codecatcher.ui.theme.CodeCatcherTheme
 
 
 import androidx.lifecycle.viewmodel.compose.viewModel
+import co.ec.cnsyn.codecatcher.R
+import co.ec.cnsyn.codecatcher.composables.Calendar
 import co.ec.cnsyn.codecatcher.composables.IconName
+import co.ec.cnsyn.codecatcher.composables.MiniIconStat
+import co.ec.cnsyn.codecatcher.composables.RealDevice
+import co.ec.cnsyn.codecatcher.composables.SkewBottomSheet
 import co.ec.cnsyn.codecatcher.composables.SkewSquare
+import co.ec.cnsyn.codecatcher.composables.SkewSquareCut
 import co.ec.cnsyn.codecatcher.composables.StatCard
 import co.ec.cnsyn.codecatcher.database.code.CodeDao
 import co.ec.cnsyn.codecatcher.helpers.dateString
+import co.ec.cnsyn.codecatcher.helpers.translate
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import kotlinx.serialization.json.JsonNull.content
 
-@OptIn(ExperimentalPermissionsApi::class)
+@OptIn(
+    ExperimentalLayoutApi::class,
+    ExperimentalMaterial3Api::class
+)
 @Composable
 fun Dashboard(model: DashboardViewModel = viewModel()) {
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -96,33 +123,36 @@ fun Dashboard(model: DashboardViewModel = viewModel()) {
                 .collect { position -> scrollPosition = position }
         }
         SkewSquare(modifier = Modifier.zIndex(3F), skew = 30) {
-
-
             Row(
                 modifier = Modifier
+                    .statusBarsPadding()
                     .fillMaxWidth()
-                    .padding(10.dp)
-                    .statusBarsPadding(),
-                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                val cardModifier = Modifier
-                    .aspectRatio(1F)
-                    .weight(1F)
-                StatCard(
-                    modifier = cardModifier,
-                    title = "catcher count",
-                    icon = Icons.Default.Phishing,
-                    value = (stat["catcher"] ?: 0).toString()
-                )
-                Spacer(modifier = Modifier.width(16.dp))
-                StatCard(
-                    modifier = cardModifier,
-                    title = "code count",
-                    icon = Icons.Default.DataObject,
-                    value = (stat["code"] ?: 0).toString()
-                )
-            }
+                FlowRow(
+                    modifier = Modifier
+                        .weight(1.6F)
+                        .padding(horizontal = 8.dp)
+                ) {
+                    MiniIconStat(
+                        modifier = Modifier.weight(1F),
+                        title = stringResource(R.string.dashboard_stat_catcher_count),
+                        content = (stat["catcher"] ?: 0).toString(),
+                        icon = Icons.Default.Phishing
+                    )
+                    MiniIconStat(
+                        modifier = Modifier.weight(1F),
+                        title = stringResource(R.string.dashboard_stat_code_count),
+                        icon = Icons.Default.DataObject,
+                        content = (stat["code"] ?: 0).toString()
+                    )
+                }
+                Row(modifier = Modifier.weight(2F)) {
+                    val calendar by model.calendar.observeAsState(listOf())
+                    Calendar(stats = calendar, numberInRow = 10) {
 
+                    }
+                }
+            }
 
         }
 
@@ -147,7 +177,8 @@ fun Dashboard(model: DashboardViewModel = viewModel()) {
             val codes by model.codes.observeAsState(listOf())
             //calculate space for translate
             Text(
-                text = "Last Codes", modifier = Modifier
+                text = stringResource(id = R.string.dashboard_list_last_codes),
+                modifier = Modifier
                     .fillMaxWidth()
                     .onGloballyPositioned {
                         titleHeight = it.size.height + extraSpace
@@ -156,33 +187,7 @@ fun Dashboard(model: DashboardViewModel = viewModel()) {
                     textAlign = TextAlign.End
                 )
             )
-            val smsPermissionState =
-                rememberPermissionState(permission = Manifest.permission.RECEIVE_SMS)
-            Column {
-                if (smsPermissionState.status.isGranted) {
-                    Text("SMS permission granted!")
-                } else {
-                    Button(onClick = {
-                        smsPermissionState.launchPermissionRequest()
-                    }) {
-                        Text(text = "Request")
-                    }
-                }
-            }
 
-            val notificationPermissionState =
-                rememberPermissionState(permission = Manifest.permission.POST_NOTIFICATIONS)
-            Column {
-                if (notificationPermissionState.status.isGranted) {
-                    Text("SMS permission granted!")
-                } else {
-                    Button(onClick = {
-                        notificationPermissionState.launchPermissionRequest()
-                    }) {
-                        Text(text = "Request")
-                    }
-                }
-            }
             LazyColumn(
                 state = listState,
             ) {
@@ -197,6 +202,81 @@ fun Dashboard(model: DashboardViewModel = viewModel()) {
 
         }
     }
+
+
+    val permission by model.requiredPerms.observeAsState(listOf())
+    if (permission.isNotEmpty()) {
+        SkewBottomSheet(onDismissRequest = {
+        }, cut = SkewSquareCut.TopStart) {
+            PermissionArea(permission = permission)
+        }
+    }
+}
+
+@OptIn(ExperimentalPermissionsApi::class)
+@Composable
+fun PermissionArea(permission: List<DashboardViewModel.PermissionInfo>) {
+
+    RealDevice {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 30.dp),
+            horizontalAlignment = Alignment.End
+        ) {
+            Text(
+                text = stringResource(id = R.string.dashboard_permission_needs_some_permission),
+                modifier = Modifier.padding(vertical = 8.dp),
+                style = MaterialTheme.typography.titleMedium
+            )
+            LazyRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                items(permission.size) {
+                    val perm = permission[it]
+                    val permState = rememberPermissionState(permission = perm.permission)
+                    Button(
+                        onClick = {
+                            permState.launchPermissionRequest()
+                        },
+                        contentPadding = PaddingValues(
+                            horizontal = 8.dp,
+                            vertical = 4.dp
+                        ),
+                        modifier = Modifier.padding(start = 4.dp),
+                        shape = RoundedCornerShape(5.dp)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(perm.icon, contentDescription = perm.permission,
+                                modifier = Modifier
+                                    .background(
+                                        MaterialTheme.colorScheme.primaryContainer,
+                                        CircleShape
+                                    )
+                                    .scale(.8F),
+                                tint = MaterialTheme.colorScheme.primary
+
+                            )
+                            Text(
+                                text = perm.text,
+                                modifier = Modifier.padding(start = 5.dp),
+                                maxLines = 2
+                            )
+
+                        }
+                    }
+                }
+
+
+            }
+        }
+
+    }
+
+
 }
 
 /**

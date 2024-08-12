@@ -1,5 +1,6 @@
 package co.ec.cnsyn.codecatcher.helpers
 
+import android.content.Context
 import android.os.Handler
 import co.ec.cnsyn.codecatcher.App
 import kotlin.concurrent.thread
@@ -33,3 +34,13 @@ fun <T : Any?> async(
     }
 }
 
+
+fun translate(name: String, defText: String? = null): String {
+    val context = App.context()
+    val resId: Int = context.resources.getIdentifier(name, "string", context.packageName)
+    return if (resId != 0) {
+        context.getString(resId)
+    } else {
+        defText ?: name
+    }
+}

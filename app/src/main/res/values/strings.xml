@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">CodeCatcher</string>
+
+    <string name="global_calendar_title">Last %1$s Day Graph</string>
+
+    <string name="dashboard_permission_RECEIVE_SMS">SMS Read</string>
+    <string name="dashboard_permission_POST_NOTIFICATIONS">Notification</string>
+    <string name="dashboard_permission_needs_some_permission">Code Catcher need some permissions:</string>
+    <string name="dashboard_stat_catcher_count">Catcher Count</string>
+    <string name="dashboard_stat_code_count">Code Count</string>
+    <string name="dashboard_list_last_codes">Last Codes</string>
 </resources>
