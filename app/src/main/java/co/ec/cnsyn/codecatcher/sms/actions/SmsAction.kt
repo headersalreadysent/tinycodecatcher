@@ -51,25 +51,38 @@ class SmsAction : BaseAction {
         if (context.checkSelfPermission(Manifest.permission.SEND_SMS)
             == PackageManager.PERMISSION_GRANTED
         ) {
-
-            if (params.keys.contains("no") && params["no"] != "0") {
-                // Send the SMS
-                val sendType = if (params.keys.contains("sendType")) params["sendType"] else "sms"
-                val smsBody = if (sendType == "sms") sms.body else extractCode(search, sms)
-                smsManager.sendTextMessage(
-                    params["no"], null, smsBody, null, null
-                )
-            } else {
-                if (params["no"] == "0") {
-                    val error = translate("action_SmsAction_forward_no_error")
-                    Toast.makeText(App.context(), error, Toast.LENGTH_LONG).show()
+            try {
+                if (params.keys.contains("no") && params["no"] != "0" && params["no"] != "") {
+                    // Send the SMS
+                    val sendType =
+                        if (params.keys.contains("sendType")) params["sendType"] else "sms"
+                    val smsBody = if (sendType == "sms") sms.body else extractCode(search, sms)
+                    smsManager.sendTextMessage(
+                        params["no"], null, smsBody, null, null
+                    )
+                } else {
+                    Toast.makeText(
+                        App.context(),
+                        translate("action_SmsAction_forward_no_error"),
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
-            }
-            return true
-        } else {
-            val error = translate("action_SmsAction_permission_error")
+                return true
+            } catch (err: Error) {
 
-            Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    App.context(),
+                    translate("action_SmsAction_error"),
+                    Toast.LENGTH_LONG
+                ).show()
+                return false
+            }
+        } else {
+            Toast.makeText(
+                context,
+                translate("action_SmsAction_permission_error"),
+                Toast.LENGTH_SHORT
+            ).show()
             return false
         }
     }

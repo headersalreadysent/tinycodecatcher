@@ -6,6 +6,7 @@ import android.os.Build
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Message
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Send
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
@@ -83,8 +84,8 @@ open class DashboardViewModel : ViewModel() {
      */
     private fun calculatePermissions() {
         val permissions = mutableListOf<PermissionInfo>();
-
-        if (App.context()
+        val context=App.context()
+        if (context
                 .checkSelfPermission(Manifest.permission.RECEIVE_SMS) != PackageManager.PERMISSION_GRANTED
         ) {
             permissions.add(
@@ -97,7 +98,7 @@ open class DashboardViewModel : ViewModel() {
         }
         if (
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
-            App.context()
+            context
                 .checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
         ) {
             permissions.add(
@@ -105,6 +106,17 @@ open class DashboardViewModel : ViewModel() {
                     Manifest.permission.POST_NOTIFICATIONS,
                     Icons.Default.Notifications,
                     translate("dashboard_permission_POST_NOTIFICATIONS")
+                )
+            )
+        }
+        if (context
+                .checkSelfPermission(Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED
+        ) {
+            permissions.add(
+                PermissionInfo(
+                    Manifest.permission.SEND_SMS,
+                    Icons.Filled.Send,
+                    translate("dashboard_permission_SEND_SMS")
                 )
             )
         }

@@ -50,7 +50,7 @@ object DB {
                 get().regex().insertAll(*regexes.toTypedArray())
                 get().action().insertAll(*actionList().toTypedArray())
 
-                val catchers = List(3) { it ->
+                val catchers = List(regexes.size) { it ->
                     Catcher(
                         id = it + 1,
                         sender = "",
@@ -59,7 +59,7 @@ object DB {
                     )
                 }
                 val catchersAction = mutableListOf<CatcherAction>()
-                for (i in 1..3) {
+                for (i in 1..catchers.size) {
                     val rands = randomAction(Random.nextInt(1, 4), 1..4)
                     rands.forEach { action ->
                         catchersAction.add(
@@ -85,9 +85,10 @@ object DB {
     }
 
     private fun generateFakeData() {
-        var codes = mutableListOf<Code>()
+        val codes = mutableListOf<Code>()
         var newDate = 0
         var date = unix()
+        var regexSize = regexList().size
         for (i in 1..150) {
             if (newDate == 0) {
                 newDate = Random.nextInt(2, 6)
@@ -96,7 +97,7 @@ object DB {
             codes.add(
                 Code(
                     date = date,
-                    catcherId = Random.nextInt(1, 4),
+                    catcherId = Random.nextInt(1, regexSize + 1),
                     sender = "Sender${Random.nextInt(1, 10)}",
                     sms = "Sample SMS text ${Random.nextInt(1, 100)}",
                     code = generateRandomCode(8)

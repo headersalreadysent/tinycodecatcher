@@ -9,30 +9,24 @@ private var regexes = listOf(
         id = 1,
         regex = "[0-9]{4}",
         key = "4digit",
-        name = "",
-        description = "",
-        catchCount = 1,
-        status = 1
     ),
     Regex(
         id = 2,
         regex = "[0-9]{5}",
         key = "5digit",
-        name = "",
-        description = "",
-        catchCount = 1,
-        status = 1
     ),
     Regex(
         id = 3,
         regex = "[0-9]{6}",
         key = "6digit",
-        name = "",
-        description = "",
-        catchCount = 3,
-        status = 1
+    ),
+    Regex(
+        id = 4,
+        regex = """^https?://([a-zA-Z0-9_-]+\.)+[a-zA-Z]{2,}(/[a-zA-Z0-9#%&?=._-]*)?$""",
+        key = "url"
     )
 )
+
 
 var regexLang = mapOf(
     "tr_TR" to mapOf(

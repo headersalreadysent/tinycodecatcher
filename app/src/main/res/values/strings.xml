@@ -6,6 +6,7 @@
     <!-- dashboard page -->
     <string name="dashboard_permission_RECEIVE_SMS">SMS Read</string>
     <string name="dashboard_permission_POST_NOTIFICATIONS">Notification</string>
+    <string name="dashboard_permission_SEND_SMS">SMS Send</string>
     <string name="dashboard_permission_needs_some_permission">Code Catcher need some permissions:</string>
     <string name="dashboard_stat_catcher_count">Catcher Count</string>
     <string name="dashboard_stat_code_count">Code Count</string>
@@ -32,6 +33,7 @@
     <string name="action_SmsAction_forward_send_type">Send Type</string>
     <string name="action_SmsAction_forward_send_type_sms">Sms Content</string>
     <string name="action_SmsAction_forward_send_type_code">Caught Content</string>
+    <string name="action_SmsAction_error">Sending sms failed.</string>
     <string name="action_TTSAction_error">TTS failed.</string>
     <string name="action_TTSAction_language_error">TTS language error.</string>
     <string name="action_NotificationAction_permission_error">CodeCatcher notification permission missing.</string>
@@ -41,20 +43,22 @@
 
     <!-- regex values languages-->
     <string name="regexlist_4digit">4 digit numeric</string>
-    <string name="regexlist_5digit">5 digit numeric</string>
-    <string name="regexlist_6digit">6 digit numeric</string>
     <string name="regexlist_4digit_desc">Catches 4 digit numeric codes.</string>
+    <string name="regexlist_5digit">5 digit numeric</string>
     <string name="regexlist_5digit_desc">Catches 5 digit numeric codes.</string>
+    <string name="regexlist_6digit">6 digit numeric</string>
     <string name="regexlist_6digit_desc">Catches 6 digit numeric codes.</string>
+    <string name="regexlist_url">Url</string>
+    <string name="regexlist_url_desc">Catches valid urls.</string>
 
     <!-- action list languages -->
     <string name="actionlist_notification">Notification</string>
-    <string name="actionlist_sms">Sms</string>
-    <string name="actionlist_copy">Copy</string>
-    <string name="actionlist_tts">TTS</string>
     <string name="actionlist_notification_desc">Shows as a notification.</string>
+    <string name="actionlist_sms">Sms</string>
     <string name="actionlist_sms_desc">Send codes with sms message</string>
+    <string name="actionlist_copy">Copy</string>
     <string name="actionlist_copy_desc">Copy codes to clipboard.</string>
+    <string name="actionlist_tts">TTS</string>
     <string name="actionlist_tts_desc">Read codes with TTS.</string>
 
 
