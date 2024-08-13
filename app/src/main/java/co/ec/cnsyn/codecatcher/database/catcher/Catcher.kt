@@ -12,8 +12,8 @@ import androidx.room.PrimaryKey
 )
 data class Catcher(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    val regexId: Int,
-    var sender: String,
+    var regexId: Int = 0,
+    var sender: String = "",
     var description: String = "",
     var catchCount: Int = 0,
     var status: Int = 1

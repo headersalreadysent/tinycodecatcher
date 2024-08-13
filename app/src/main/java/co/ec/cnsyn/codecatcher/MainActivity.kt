@@ -33,6 +33,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import co.ec.cnsyn.codecatcher.database.AppDatabase
 import co.ec.cnsyn.codecatcher.database.DB
+import co.ec.cnsyn.codecatcher.pages.add.Add
 import co.ec.cnsyn.codecatcher.pages.catcher.CatcherPage
 import co.ec.cnsyn.codecatcher.pages.dashboard.Dashboard
 import co.ec.cnsyn.codecatcher.sms.DebugSmsReceiver
@@ -51,7 +52,11 @@ class MainActivity : ComponentActivity() {
         }
 
 
-        registerReceiver(DebugSmsReceiver(), IntentFilter("co.ec.cnsyn.codecatcher.DEBUG_SMS"))
+        registerReceiver(
+            DebugSmsReceiver(),
+            IntentFilter("co.ec.cnsyn.codecatcher.DEBUG_SMS"),
+            RECEIVER_NOT_EXPORTED
+        )
     }
 }
 
@@ -107,11 +112,12 @@ fun CodeCatcherApp(context: Context) {
         ) { _ ->
             NavHost(
                 navController = navController,
-                startDestination = "dashboard"
-                //startDestination = "catchers"
+                //startDestination = "dashboard"
+                startDestination = "add"
             ) {
                 composable("dashboard") { Dashboard() }
                 composable("catchers") { CatcherPage() }
+                composable("add") { Add() }
             }
         }
 
