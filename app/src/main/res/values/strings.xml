@@ -15,7 +15,7 @@
 
     <!-- catchers page -->
     <string name="catchers_top_card_sender">Sender</string>
-    <string name="catchers_top_card_everybody">Everybody</string>
+    <string name="catchers_top_card_everybody">All Senders</string>
     <string name="catchers_top_card_regex">Expression</string>
     <string name="catchers_top_card_catch_count">Caught</string>
     <string name="catchers_top_card_description">Description</string>

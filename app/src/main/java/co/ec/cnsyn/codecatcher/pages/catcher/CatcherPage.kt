@@ -115,10 +115,7 @@ fun CatcherPage(model: CatcherPageViewModel = viewModel()) {
 
         val catchers by model.catchers.observeAsState(listOf())
         val scrollState = rememberLazyListState(initialFirstVisibleItemIndex = 0)
-
-        var itemWidth by remember {
-            mutableIntStateOf(1)
-        }
+        var itemWidth by remember { mutableIntStateOf(1) }
         val mostVisibleItem = remember(scrollState, itemWidth) {
             derivedStateOf {
                 return@derivedStateOf if (itemWidth <= scrollState.firstVisibleItemScrollOffset) scrollState.firstVisibleItemIndex + 1
@@ -270,8 +267,7 @@ fun CatcherItem(
     ) {
         CatcherTopCard(catcherDetail)
         Column(
-            modifier = Modifier
-                .padding(horizontal = 8.dp)
+            modifier = Modifier.padding(horizontal = 8.dp)
         ) {
             catcherDetail.actions.forEach { action ->
                 val isHasParams = action.detail.defaultParams != "{}"
@@ -376,24 +372,12 @@ fun CatcherTopCard(catcherDetail: CatcherDao.CatcherDetail) {
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(stringResource(id = R.string.catchers_top_card_regex), style = infoTitleStyle)
-                FlowRow {
-                    Text(catcherDetail.regex.name, style = MaterialTheme.typography.bodyLarge)
-                    Text(
-                        catcherDetail.regex.regex,
-                        modifier = Modifier.padding(start = 8.dp),
-                        style = MaterialTheme.typography.bodyLarge.copy(
-                            fontWeight = FontWeight.Thin,
-                            color = MaterialTheme.typography.bodyLarge.color.copy(alpha = .8F)
-                        ),
-                    )
-                }
+                Text(catcherDetail.regex.name, style = MaterialTheme.typography.bodyLarge)
             }
-
             Box(modifier = Modifier.weight(1F), Alignment.TopEnd) {
                 Column(
                     modifier = Modifier.width(IntrinsicSize.Min),
                     horizontalAlignment = Alignment.CenterHorizontally
-
                 ) {
                     Column(
                         modifier = Modifier
@@ -435,8 +419,10 @@ fun CatcherTopCard(catcherDetail: CatcherDao.CatcherDetail) {
                 .padding(bottom = 8.dp)
                 .fillMaxWidth(),
         ) {
-
-            Text(stringResource(id = R.string.catchers_top_card_description), style = infoTitleStyle)
+            Text(
+                stringResource(id = R.string.catchers_top_card_description),
+                style = infoTitleStyle
+            )
             Text(catcherDetail.regex.description, style = MaterialTheme.typography.bodyLarge)
         }
     }
@@ -468,7 +454,7 @@ fun CatcherStartArea(
                         .padding(horizontal = 4.dp)
                         .weight(1F)
                         .aspectRatio(1.4F),
-                    title = stringResource(id = R.string.catchers_stats_day_average,it),
+                    title = stringResource(id = R.string.catchers_stats_day_average, it),
                     icon = Icons.Default.Timeline,
                     value = String.format(Locale.getDefault(), "%.2f", catcherDetail.avg[it] ?: 0F)
                 )
