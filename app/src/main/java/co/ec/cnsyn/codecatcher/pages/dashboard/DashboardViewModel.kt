@@ -2,14 +2,12 @@ package co.ec.cnsyn.codecatcher.pages.dashboard
 
 import android.Manifest
 import android.content.pm.PackageManager
-import android.content.pm.PermissionInfo
 import android.os.Build
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Message
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -21,21 +19,12 @@ import co.ec.cnsyn.codecatcher.database.catcheraction.CatcherAction
 import co.ec.cnsyn.codecatcher.database.code.Code
 import co.ec.cnsyn.codecatcher.database.code.CodeDao
 import co.ec.cnsyn.codecatcher.database.relations.ActionDetail
-import co.ec.cnsyn.codecatcher.database.relations.CodeWithCatcher
-import co.ec.cnsyn.codecatcher.helpers.Event
-import co.ec.cnsyn.codecatcher.helpers.GlobalEvent
 import co.ec.cnsyn.codecatcher.helpers.async
 import co.ec.cnsyn.codecatcher.helpers.translate
 import co.ec.cnsyn.codecatcher.helpers.unix
-import com.google.accompanist.permissions.rememberPermissionState
-
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
+import co.ec.cnsyn.codecatcher.values.EventBus
+import co.ec.cnsyn.codecatcher.values.SmsCauched
 import kotlinx.coroutines.launch
-import java.security.Permission
-import java.security.Permissions
-import java.security.SecurityPermission
-import java.util.Date
 import kotlin.random.Random
 
 open class DashboardViewModel : ViewModel() {
@@ -44,26 +33,23 @@ open class DashboardViewModel : ViewModel() {
     var stats = MutableLiveData(mapOf("catcher" to 0, "code" to 0))
     var codes = MutableLiveData<List<CodeDao.Latest>>(listOf())
     var calendar = MutableLiveData<List<Int>>(listOf())
-
     var requiredPerms = MutableLiveData<List<PermissionInfo>>(listOf())
 
 
     init {
         start()
         viewModelScope.launch {
-            Event.events.collect { event ->
-                when (event) {
-                    is GlobalEvent.SmsReceived -> loadLatest()
-                }
+            EventBus.subscribe<SmsCauched> { message ->
+                loadLatest()
             }
         }
     }
 
 
-
     open fun start() {
 
         //load stats
+        loadLatest()
         async({
             val catcherCount = DB.get().catcher().getActiveCount()
             val codeCount = DB.get().code().getCount()
@@ -74,23 +60,18 @@ open class DashboardViewModel : ViewModel() {
         }, {
             stats.value = it
         })
-        loadLatest()
-        async({
-            return@async DB.get().code().getCalendar(unix() - 86400 * 30)
-        }, {
+        async({ DB.get().code().getCalendar(unix() - 86400 * 30) }, {
             calendar.value = it.map { it.date }
         })
-
         calculatePermissions()
     }
 
-    fun loadLatest() {
-
-        async({
-            return@async DB.get().code().getLatest()
-        }, {
+    /**
+     * load latest codes
+     */
+    private fun loadLatest() {
+        async({ DB.get().code().getLatest() }, {
             codes.value = it
-
         })
     }
 
@@ -100,12 +81,13 @@ open class DashboardViewModel : ViewModel() {
     /**
      * calculate permission list
      */
-    private fun calculatePermissions() {
+    fun calculatePermissions() {
         val permissions = mutableListOf<PermissionInfo>();
         val context = App.context()
-        if (context
-                .checkSelfPermission(Manifest.permission.RECEIVE_SMS) != PackageManager.PERMISSION_GRANTED
+        if (context.checkSelfPermission(Manifest.permission.RECEIVE_SMS)
+            != PackageManager.PERMISSION_GRANTED
         ) {
+            //receive sms permission
             permissions.add(
                 PermissionInfo(
                     Manifest.permission.RECEIVE_SMS,
@@ -116,9 +98,10 @@ open class DashboardViewModel : ViewModel() {
         }
         if (
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
-            context
-                .checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
+            context.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS)
+            != PackageManager.PERMISSION_GRANTED
         ) {
+            //post notification permission
             permissions.add(
                 PermissionInfo(
                     Manifest.permission.POST_NOTIFICATIONS,
@@ -127,9 +110,10 @@ open class DashboardViewModel : ViewModel() {
                 )
             )
         }
-        if (context
-                .checkSelfPermission(Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED
+        if (context.checkSelfPermission(Manifest.permission.SEND_SMS)
+            != PackageManager.PERMISSION_GRANTED
         ) {
+            //send sms permission
             permissions.add(
                 PermissionInfo(
                     Manifest.permission.SEND_SMS,

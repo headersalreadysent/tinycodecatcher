@@ -208,14 +208,19 @@ fun Dashboard(model: DashboardViewModel = viewModel()) {
     if (permission.isNotEmpty()) {
         SkewBottomSheet(onDismissRequest = {
         }, cut = SkewSquareCut.TopStart) {
-            PermissionArea(permission = permission)
+            PermissionArea(permission = permission) {
+                model.calculatePermissions()
+            }
         }
     }
 }
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun PermissionArea(permission: List<DashboardViewModel.PermissionInfo>) {
+fun PermissionArea(
+    permission: List<DashboardViewModel.PermissionInfo>,
+    then: (perm: String) -> Unit = { _ -> }
+) {
 
     RealDevice {
         Column(
@@ -235,7 +240,12 @@ fun PermissionArea(permission: List<DashboardViewModel.PermissionInfo>) {
             ) {
                 items(permission.size) {
                     val perm = permission[it]
-                    val permState = rememberPermissionState(permission = perm.permission)
+                    val permState = rememberPermissionState(
+                        permission = perm.permission,
+                        onPermissionResult = {
+                            then(perm.permission)
+                        }
+                    )
                     Button(
                         onClick = {
                             permState.launchPermissionRequest()
@@ -250,7 +260,8 @@ fun PermissionArea(permission: List<DashboardViewModel.PermissionInfo>) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Icon(perm.icon, contentDescription = perm.permission,
+                            Icon(
+                                perm.icon, contentDescription = perm.permission,
                                 modifier = Modifier
                                     .background(
                                         MaterialTheme.colorScheme.primaryContainer,
@@ -282,7 +293,7 @@ fun PermissionArea(permission: List<DashboardViewModel.PermissionInfo>) {
 /**
  * latest sms shower
  */
-@OptIn(ExperimentalLayoutApi::class, ExperimentalPermissionsApi::class)
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun LatestCode(
     latest: CodeDao.Latest,
@@ -365,7 +376,7 @@ fun LatestCode(
                     .weight(1F)
                     .padding(horizontal = 4.dp)
                     .fillMaxHeight(),
-                maxItemsInEachRow = if(latest.actions.size > 4) 3 else 2,
+                maxItemsInEachRow = if (latest.actions.size > 4) 3 else 2,
                 verticalArrangement = Arrangement.Center,
             ) {
                 latest.actions.forEach {

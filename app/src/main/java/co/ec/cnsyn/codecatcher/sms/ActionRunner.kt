@@ -1,31 +1,27 @@
 package co.ec.cnsyn.codecatcher.sms
 
-
-import android.app.Application
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
-import android.webkit.CookieSyncManager.createInstance
-import androidx.lifecycle.ViewModelProvider
 import co.ec.cnsyn.codecatcher.App
 import co.ec.cnsyn.codecatcher.database.DB
-import co.ec.cnsyn.codecatcher.database.catcher.Catcher
 import co.ec.cnsyn.codecatcher.database.code.Code
-import co.ec.cnsyn.codecatcher.database.relations.CatcherWithActions
 import co.ec.cnsyn.codecatcher.database.relations.CatcherWithRegex
-import co.ec.cnsyn.codecatcher.helpers.Event
-import co.ec.cnsyn.codecatcher.helpers.GlobalEvent
 import co.ec.cnsyn.codecatcher.helpers.async
-import co.ec.cnsyn.codecatcher.pages.dashboard.DashboardViewModel
 import co.ec.cnsyn.codecatcher.sms.actions.BaseAction
 import co.ec.cnsyn.codecatcher.sms.actions.ClipboardAction
 import co.ec.cnsyn.codecatcher.sms.actions.NotificationAction
 import co.ec.cnsyn.codecatcher.sms.actions.SmsAction
 import co.ec.cnsyn.codecatcher.sms.actions.TTSAction
+import co.ec.cnsyn.codecatcher.values.EventBus
+import co.ec.cnsyn.codecatcher.values.SmsCauched
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class ActionRunner {
 
-    private var emulation: Boolean = false
 
     companion object {
         fun getActionInstance(className: String): BaseAction? {
@@ -39,23 +35,16 @@ class ActionRunner {
         }
     }
 
-    fun emulate(status: Boolean = true) {
-        emulation = status
-    }
-
     fun runSmsList(
         messages: List<SmsData>,
         match: (sms: SmsData) -> Unit = { _ -> },
         then: () -> Unit = {}
     ) {
         //load all searchers
-        async({
-            return@async DB.get().catcher().getActiveCatchersWithRegexes()
-        }, { catchers ->
+        async({ DB.get().catcher().getActiveCatchersWithRegexes() }, { catchers ->
             messages.forEach { sms ->
                 testCatchers(sms, catchers, match)
             }
-
             then()
         })
     }
@@ -64,15 +53,16 @@ class ActionRunner {
     /**
      * test sms for searchers
      */
-    fun testCatchers(
+    private fun testCatchers(
         sms: SmsData, catchers: List<CatcherWithRegex>,
         match: (sms: SmsData) -> Unit = { }
     ) {
         //filter for senders
-        var filtered =
+        val filtered =
             catchers.filter { it.catcher.sender == "" || it.catcher.sender == sms.sender }
         var matched = false
-        filtered.filter { it.catcher.sender != "" }
+        filtered
+            .filter { it.catcher.sender != "" }
             .forEach {
                 if (!matched) {
                     matched = runOneCatcher(sms, it, match)
@@ -99,7 +89,6 @@ class ActionRunner {
 
         if (searchPattern.containsMatchIn(sms.body)) {
             match(sms)
-            println("Search matched ${catcher.regex.regex} => ${sms.body}")
             val code = try {
                 searchPattern.findAll(sms.body).toList().first().value
             } catch (e: Error) {
@@ -107,8 +96,6 @@ class ActionRunner {
             }
             catcher.catcher.catchCount++
             copyToClipboard(code)
-            //run actions if any
-            runActions(sms, catcher)
             //record to database
             async({
                 //update search count
@@ -125,7 +112,8 @@ class ActionRunner {
                 )
                 return@async inserted
             }, {
-                println("imported code $it $code")
+                //after inserted run actions
+                runActions(sms, catcher)
             }, {
                 error(it)
             })
@@ -138,41 +126,43 @@ class ActionRunner {
     /**
      * run actions for search
      */
+    @OptIn(DelicateCoroutinesApi::class)
     private fun runActions(message: SmsData, catcher: CatcherWithRegex) {
 
         if (catcher.actions.isNotEmpty()) {
             //if there is a action
-            var runed = false
-            catcher.actions.forEach { action ->
-                if (action.status == 1) {
+            catcher.actions
+                .filter { it.status == 1 } //filter actives
+                .map { Pair(it, getActionInstance(it.action)) } //try to get instance
+                .filter { it.second != null } //filter instance items
+                .map { pair ->
                     //generate action instance
-                    val instance = getActionInstance(action.action)
-                    instance?.let {
-                        //if we found instance lets run it
-                        instance.run(catcher, action, message)
-                        runed = true
-
+                    return@map pair.second?.run(catcher, pair.first, message)
+                }
+                .isNotEmpty() //test returned
+                .let {
+                    if (it) {
+                        GlobalScope.launch {
+                            //wait and send
+                            delay(2500)
+                            EventBus.publish(SmsCauched(message))
+                        }
                     }
                 }
 
-            }
-            if(runed){
-                Event.emit(GlobalEvent.SmsReceived(smsData = message))
-
-            }
         }
 
     }
 
 
+    /**
+     * copy code to clipboard
+     */
     private fun copyToClipboard(code: String) {
-        val clipboard =
-            App.context()
-                .getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val clipboard = App.context()
+            .getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val clip = ClipData.newPlainText("code-catcher", code)
         clipboard.setPrimaryClip(clip)
-
-
     }
 
 }
