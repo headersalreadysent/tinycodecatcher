@@ -1,13 +1,19 @@
 package co.ec.cnsyn.codecatcher.database.catcheraction
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import co.ec.cnsyn.codecatcher.database.DB
 import co.ec.cnsyn.codecatcher.helpers.async
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-@Entity
+@Entity(
+    indices = [
+        Index(value = ["catcherId", "actionId"]),
+        Index(value = ["status"], orders = [Index.Order.DESC])
+    ]
+)
 data class CatcherAction(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val catcherId: Int,

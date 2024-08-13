@@ -1,9 +1,15 @@
 package co.ec.cnsyn.codecatcher.database.code
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
-@Entity
+@Entity(
+    indices = [
+        Index(value = ["date"], orders = [Index.Order.DESC]),
+        Index(value = ["catcherId"])
+    ]
+)
 data class Code(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     var date: Long,
