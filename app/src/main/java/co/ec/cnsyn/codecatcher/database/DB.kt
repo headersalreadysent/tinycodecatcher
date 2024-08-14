@@ -88,7 +88,7 @@ object DB {
         val codes = mutableListOf<Code>()
         var newDate = 0
         var date = unix()
-        var regexSize = regexList().size
+        val regexSize = regexList().size
         for (i in 1..150) {
             if (newDate == 0) {
                 newDate = Random.nextInt(2, 6)
@@ -99,7 +99,7 @@ object DB {
                     date = date,
                     catcherId = Random.nextInt(1, regexSize + 1),
                     sender = "Sender${Random.nextInt(1, 10)}",
-                    sms = "Sample SMS text ${Random.nextInt(1, 100)}",
+                    sms = "Sample SMS text ${Random.nextInt(1000, 999999)}",
                     code = generateRandomCode(8)
                 )
             )

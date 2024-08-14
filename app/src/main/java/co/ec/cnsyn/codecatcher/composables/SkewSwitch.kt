@@ -11,10 +11,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.GenericShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Groups
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,14 +28,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
@@ -77,6 +79,7 @@ class RightSkew : Shape {
 @Composable
 fun SkewSwitch(
     value: List<Pair<String, Any>>,
+    icons: List<ImageVector> = listOf(),
     selectedItem: Int = 0,
     onChange: (value: Any) -> Unit = { _ -> },
     activeColor: Color = MaterialTheme.colorScheme.primary,
@@ -135,13 +138,26 @@ fun SkewSwitch(
                         onChange(value[0].second)
                     }
             ) {
-                Text(
-                    text = value[0].first,
-                    color = leftTextColor,
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(8.dp),
-                )
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    if (icons.isNotEmpty()) {
+                        Icon(
+                            icons[0], contentDescription = "",
+                            modifier = Modifier.padding(end = 8.dp),
+                            tint = leftTextColor
+                        )
+                    }
+                    Text(
+                        text = value[0].first,
+                        color = leftTextColor,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
             }
             Box(
                 modifier = Modifier
@@ -154,14 +170,29 @@ fun SkewSwitch(
                         onChange(value[1].second)
                     }
             ) {
-                Text(
-                    text = value[1].first,
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(8.dp),
-                    color = rightTextColor,
-                    textAlign = TextAlign.End
-                )
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.End
+                ) {
+
+                    Text(
+                        text = value[1].first,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        color = rightTextColor,
+                        textAlign = TextAlign.End
+                    )
+                    if (icons.size > 1) {
+                        Icon(
+                            icons[1], contentDescription = "",
+                            modifier = Modifier.padding(start = 8.dp),
+                            tint = rightTextColor
+                        )
+                    }
+                }
             }
         }
     }
@@ -177,7 +208,8 @@ fun SkewSwitchPreview() {
             value = listOf(
                 Pair("User", "user"),
                 Pair("EveryBody", "")
-            )
+            ),
+            icons = listOf(Icons.Default.Groups, Icons.Default.Person)
         )
 
     }

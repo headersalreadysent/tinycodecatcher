@@ -24,6 +24,23 @@
     <string name="catchers_stats_day_average">%1$d Day</string>
     <string name="catchers_daily_caught">Daily Caught</string>
 
+    <!-- add page -->
+    <string name="add_set_cather_title">Set Catcher</string>
+    <string name="add_select_sender_type_alert"><![CDATA[
+    To catch specific sender messages you can enter name or phone number, or you can select <b>All Senders</b> to set catcher for all messages.
+    ]]></string>
+    <string name="add_catcher_select_everybody">All Senders</string>
+    <string name="add_catcher_select_specific">Specific</string>
+    <string name="add_catcher_no_match">No matched text in previously matched sms messages!</string>
+    <string name="add_catcher_set_catcher_sender">Sender</string>
+    <string name="add_catcher_set_catcher_description">Description</string>
+    <string name="add_catcher_set_catcher_regex">Expression</string>
+    <string name="add_catcher_set_catcher_test_area_text">Test Text</string>
+
+    <string name="add_set_actions_title">Set Actions</string>
+    <string name="add_set_test_title">Test</string>
+    <string name="add_set_save_button">Save Catcher</string>
+
 
 
     <!-- actions settings -->

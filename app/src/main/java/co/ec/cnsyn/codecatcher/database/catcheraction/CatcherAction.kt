@@ -31,9 +31,11 @@ data class CatcherAction(
 
     fun updateParam(updatedParams: Map<String, String>?) {
         params = Json.encodeToString(updatedParams)
-        async({
-            return@async DB.get().catcherAction().updateParams(id, params = params)
-        })
+        if (id > 0) {
+            async({
+                return@async DB.get().catcherAction().updateParams(id, params = params)
+            })
+        }
     }
 
 }

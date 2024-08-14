@@ -7,22 +7,22 @@ import co.ec.cnsyn.codecatcher.helpers.translate
 private var regexes = listOf(
     Regex(
         id = 1,
-        regex = "[0-9]{4}",
+        regex = "\\b[0-9]{4}\\b",
         key = "4digit",
     ),
     Regex(
         id = 2,
-        regex = "[0-9]{5}",
+        regex = "\\b[0-9]{5}\\b",
         key = "5digit",
     ),
     Regex(
         id = 3,
-        regex = "[0-9]{6}",
+        regex = "\\b[0-9]{6}\\b",
         key = "6digit",
     ),
     Regex(
         id = 4,
-        regex = """https?://([a-zA-Z0-9_-]+\.)+[a-zA-Z]{2,}(/[a-zA-Z0-9#%&?=._-]*)?""",
+        regex = "\\bhttps?://([a-zA-Z0-9_-]+\\.)+[a-zA-Z]{2,}(/[a-zA-Z0-9#%&?=._-]*)?\\b",
         key = "url"
     )
 )

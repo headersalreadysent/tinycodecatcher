@@ -526,15 +526,16 @@ fun AddActionToCatcherBottomSheet(
 @Composable
 fun ParamsDialog(
     action: ActionDetail?,
-    close: () -> Unit = { -> }
+    close: (action: ActionDetail) -> Unit = { _ -> }
 ) {
     if (action == null || action.detail.defaultParams == "{}") {
         return
     }
+    var updatedAction by remember { mutableStateOf(action) }
     SkewDialog(
         modifier = Modifier,
         onDismissRequest = {
-            close()
+            close(updatedAction)
         },
     ) {
         Text(
@@ -547,8 +548,10 @@ fun ParamsDialog(
         Text(text = action.detail.description)
         val instance = ActionRunner.getActionInstance(action.detail.action)
         instance?.let {
-            instance.Settings(action) {
-
+            instance.Settings(action) { updated ->
+                val source=updatedAction.copy()
+                source.action.updateParam(updated)
+                updatedAction=source
             }
         }
 

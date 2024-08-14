@@ -103,7 +103,9 @@ fun CodeCatcherApp(context: Context) {
                         }
                     },
                     floatingActionButton = {
-                        FloatingActionButton(onClick = { /*TODO*/ }) {
+                        FloatingActionButton(onClick = {
+                            navController.navigate("add")
+                        }) {
                             Icon(Icons.Default.AddCircle, contentDescription = "")
                         }
                     },

@@ -16,6 +16,10 @@ class App : Application() {
         fun context(): Context {
             return instance.applicationContext
         }
+
+        fun contextCheck(): Context? {
+            return if (::instance.isInitialized) instance.applicationContext else null
+        }
     }
 
     val database: AppDatabase by lazy {

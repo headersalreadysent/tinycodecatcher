@@ -20,6 +20,9 @@ interface CodeDao : BaseDao<Code> {
     fun getAllItems(): List<Code>
 
 
+    @Query("SELECT sms FROM code")
+    fun getAllText(): List<String>
+
     @Transaction
     @Query(
         """

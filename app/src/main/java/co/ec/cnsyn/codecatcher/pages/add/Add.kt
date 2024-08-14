@@ -1,41 +1,47 @@
 package co.ec.cnsyn.codecatcher.pages.add
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyItemScope
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ChevronLeft
-import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Save
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -46,134 +52,184 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.zIndex
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
+import co.ec.cnsyn.codecatcher.R
 import co.ec.cnsyn.codecatcher.composables.AlertText
+import co.ec.cnsyn.codecatcher.composables.IconName
 import co.ec.cnsyn.codecatcher.composables.SkewSquare
 import co.ec.cnsyn.codecatcher.composables.SkewSquareCut
 import co.ec.cnsyn.codecatcher.composables.SkewSwitch
+import co.ec.cnsyn.codecatcher.database.action.Action
 import co.ec.cnsyn.codecatcher.database.catcher.Catcher
+import co.ec.cnsyn.codecatcher.database.catcheraction.CatcherAction
 import co.ec.cnsyn.codecatcher.database.regex.Regex
+import co.ec.cnsyn.codecatcher.database.relations.ActionDetail
+import co.ec.cnsyn.codecatcher.helpers.htmlToAnnotatedString
+import co.ec.cnsyn.codecatcher.helpers.rememberKeyboardVisibility
+import co.ec.cnsyn.codecatcher.pages.catcher.ParamsDialog
 import co.ec.cnsyn.codecatcher.ui.theme.CodeCatcherTheme
+import kotlin.math.absoluteValue
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun Add(model: AddViewModel = viewModel()) {
     Box(modifier = Modifier.fillMaxSize()) {
+        val isKeyboardVisible by rememberKeyboardVisibility()
+        val scrollState = rememberScrollState()
         Column(
             modifier = Modifier
-                .fillMaxSize(),
+                .navigationBarsPadding()
+                .then(
+                    if (isKeyboardVisible) {
+                        Modifier.padding(bottom = 150.dp)
+                    } else {
+                        Modifier.padding(bottom = 80.dp)
+                    }
+                )
+                .fillMaxSize()
+                .verticalScroll(scrollState),
         ) {
 
-            val scrollState = rememberLazyListState(initialFirstVisibleItemIndex = 0)
-            LazyRow(
+
+            val regexes by model.regexes.observeAsState(listOf())
+            var catcher by remember { mutableStateOf(Catcher()) }
+            var selectedRegex by remember { mutableStateOf<Regex?>(null) }
+            var actionsDetails by remember { mutableStateOf<List<ActionDetail>>(listOf()) }
+            Column(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .fillMaxWidth()
                     .statusBarsPadding()
-                    .navigationBarsPadding()
-                    .padding(bottom = 80.dp),
-                state = scrollState,
-                flingBehavior = rememberSnapFlingBehavior(lazyListState = scrollState),
-                verticalAlignment = Alignment.CenterVertically,
-                userScrollEnabled = false
             ) {
-                item {
-                    val regexes by model.regexes.observeAsState(listOf())
-                    StepSender(regexes)
+
+                StepSender(catcher, regexes) { catcherUpdate, regexUpdate ->
+                    catcher = catcherUpdate
+                    selectedRegex = regexUpdate
+                }
+
+                val actions by model.actions.observeAsState(listOf())
+                StepActions(actionList = actions) { details ->
+                    actionsDetails = details
+                }
+
+                val olderMessages by model.olderMessages.observeAsState(listOf())
+                StepTest(olderMessages, selectedRegex)
+
+                Button(
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp),
+                    shape = RoundedCornerShape(3.dp),
+                    onClick = { /*TODO*/ }) {
+                    Icon(
+                        Icons.Default.Save, contentDescription = "",
+                        modifier = Modifier.padding(end = 8.dp)
+                    )
+                    Text(text = stringResource(id = R.string.add_set_save_button))
+
                 }
 
             }
 
         }
         SkewSquare(
-            modifier = Modifier.align(Alignment.BottomCenter),
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .navigationBarsPadding()
+                .padding(bottom = 65.dp),
             skew = 30,
             cut = SkewSquareCut.TopEnd
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Button(onClick = { /*TODO*/ }) {
-                    Icon(Icons.Default.ChevronLeft, contentDescription = "")
-                    Text(text = "Önceki")
-                }
-                Button(onClick = { /*TODO*/ }) {
-                    Text(text = "Sonraki")
-                    Icon(Icons.Default.ChevronRight, contentDescription = "")
-                }
-            }
+
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LazyItemScope.StepSender(
-    regexes: List<Regex>
+fun StepSender(
+    catcherSource: Catcher,
+    regexes: List<Regex>,
+    update: (catcher: Catcher, regex: Regex?) -> Unit = { _, _ -> }
 ) {
     Card(
         modifier = Modifier
-            .fillParentMaxWidth(.9F)
-            .fillParentMaxHeight()
+            .fillMaxWidth()
             .padding(16.dp),
         elevation = CardDefaults.elevatedCardElevation()
     ) {
         Column(
             modifier = Modifier
-                .fillMaxSize()
                 .padding(16.dp)
         ) {
             Text(
-                text = "Set Catcher",
+                text = stringResource(id = R.string.add_set_cather_title),
                 style = MaterialTheme.typography.bodyLarge.copy(
                     fontWeight = FontWeight.SemiBold
-                )
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp)
             )
-            var catcher by remember {
-                mutableStateOf(Catcher())
+            //watch catcher and regex
+            var catcher by remember { mutableStateOf(catcherSource) }
+            var selectedRegex by remember { mutableStateOf<Regex?>(null) }
+            //watch them and sent to page
+            LaunchedEffect(catcher, selectedRegex) {
+                update(catcher, selectedRegex)
             }
-            LaunchedEffect(catcher) {
-                println(catcher.toString())
-            }
-            var senderType by remember {
-                mutableStateOf(0)
-            }
-            Text(text = "sender")
-            SkewSwitch(value = listOf(Pair("Anybody", 0), Pair("Spesific", 1)),
+            var senderType by remember { mutableStateOf(0) }
+            AlertText(
+                text = stringResource(id = R.string.add_select_sender_type_alert),
+                color = MaterialTheme.colorScheme.secondaryContainer,
+                isHtml = true,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+
+            val specificText = stringResource(R.string.add_catcher_select_specific)
+            SkewSwitch(
+                value = listOf(
+                    Pair(
+                        stringResource(R.string.add_catcher_select_everybody), 0
+                    ), Pair(
+                        stringResource(R.string.add_catcher_select_specific), 1
+                    )
+                ),
+                icons = listOf(Icons.Default.Groups, Icons.Default.Person),
                 onChange = {
                     senderType = it as Int
                 })
             AnimatedVisibility(visible = senderType == 1) {
 
+                val senderText = stringResource(id = R.string.add_catcher_set_catcher_sender)
                 OutlinedTextField(
                     modifier = Modifier.fillMaxWidth(),
                     value = catcher.sender,
                     onValueChange = {
                         catcher = catcher.copy(sender = it)
                     },
-                    label = { Text(text = "Gönderen") },
+                    label = { Text(text = senderText) },
                     trailingIcon = { Icon(Icons.Default.Person, contentDescription = "") },
-                    placeholder = { Text(text = "Gönderen") }
+                    placeholder = { Text(text = senderText) }
                 )
             }
-            AlertText(
-                text = "Tüm kullanıcılardan gelen mesajları yakalamak için gönderen alanını boş bırakabilirsiniz.",
-                color = MaterialTheme.colorScheme.secondaryContainer,
-            )
-
             var dropDownExpanded by remember { mutableStateOf(false) }
 
             ExposedDropdownMenuBox(
@@ -184,6 +240,8 @@ fun LazyItemScope.StepSender(
             ) {
                 var width by remember { mutableStateOf(0.dp) }
                 val density = LocalDensity.current
+                val regexText = stringResource(id = R.string.add_catcher_set_catcher_regex)
+
                 OutlinedTextField(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -194,7 +252,7 @@ fun LazyItemScope.StepSender(
                     readOnly = true,
                     value = regexes.find { it.id == catcher.regexId }?.name ?: "",
                     onValueChange = {},
-                    label = { Text(text = "Regex") },
+                    label = { Text(text = regexText) },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = dropDownExpanded) }
                 )
                 ExposedDropdownMenu(
@@ -216,7 +274,11 @@ fun LazyItemScope.StepSender(
                                 .width(width)
                                 .clickable {
                                     catcher = catcher.copy(regexId = regex.id)
+                                    if (catcher.description == "") {
+                                        catcher = catcher.copy(description = regex.description)
+                                    }
                                     dropDownExpanded = false
+                                    selectedRegex = regex
                                 }
                                 .padding(vertical = 8.dp, horizontal = 8.dp),
                             overflow = TextOverflow.Ellipsis,
@@ -229,6 +291,279 @@ fun LazyItemScope.StepSender(
                     }
                 }
             }
+            val descriptionText = stringResource(id = R.string.add_catcher_set_catcher_description)
+
+            OutlinedTextField(
+                modifier = Modifier.fillMaxWidth(),
+                value = catcher.description,
+                onValueChange = {
+                    catcher = catcher.copy(description = it)
+                },
+                label = { Text(text = descriptionText) },
+                placeholder = { Text(text = descriptionText) },
+                maxLines = 3,
+                minLines = 2
+            )
+
+
+        }
+    }
+}
+
+@Composable
+fun StepActions(
+    actionList: List<Action>,
+    update: (res: List<ActionDetail>) -> Unit = { _ -> }
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        elevation = CardDefaults.elevatedCardElevation()
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+        ) {
+            Text(
+                text = stringResource(id = R.string.add_set_actions_title),
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    fontWeight = FontWeight.SemiBold
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp)
+            )
+            var actionMap by remember { mutableStateOf<Map<Int, ActionDetail>>(mapOf()) }
+            //watch map to change it
+            LaunchedEffect(actionMap) {
+                update(actionMap.values.toList())
+            }
+            actionList.forEach { action ->
+                val isHasParams = action.defaultParams != "{}"
+                var enabled by remember { mutableStateOf(actionMap.keys.contains(action.id)) }
+                var selectedActionDetail by remember { mutableStateOf<ActionDetail?>(null) }
+                ParamsDialog(selectedActionDetail) { res ->
+                    //close action
+                    val mutable = actionMap.toMutableMap()
+                    mutable[action.id] = res
+                    actionMap = mutable.toMap()
+                    selectedActionDetail = null
+                    update(actionMap.values.toList())
+                }
+                ListItem(
+                    modifier = Modifier
+                        .padding(bottom = 8.dp)
+                        .clickable(enabled && isHasParams) {
+                            //  actionParams(action)
+                            selectedActionDetail = ActionDetail(
+                                action = CatcherAction(
+                                    catcherId = 0,
+                                    actionId = action.id,
+                                    params = action.defaultParams
+                                ),
+                                detail = action
+                            )
+                        },
+                    colors = ListItemDefaults.colors(
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer
+                    ),
+                    headlineContent = {
+                        Column {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(text = if (action.name == "") action.key else action.name)
+                                if (isHasParams) {
+                                    Icon(
+                                        Icons.Filled.Settings, contentDescription = "",
+                                        modifier = Modifier
+                                            .height(16.dp)
+                                            .padding(start = 5.dp),
+                                        tint = MaterialTheme.colorScheme.secondary.copy(alpha = .8F)
+                                    )
+                                }
+                            }
+                            if (action.description != "") {
+                                Text(
+                                    text = action.description,
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                            }
+                        }
+                    },
+                    leadingContent = {
+                        IconName(name = action.icon)
+                    },
+                    trailingContent = {
+                        Checkbox(checked = enabled, onCheckedChange = {
+                            val mutable = actionMap.toMutableMap()
+                            if (enabled) {
+                                mutable.remove(action.id)
+                                enabled = false
+                            } else {
+                                //lets enable it
+                                mutable[action.id] = ActionDetail(
+                                    action = CatcherAction(
+                                        catcherId = 0,
+                                        actionId = action.id,
+                                        params = action.defaultParams
+                                    ),
+                                    detail = action
+                                )
+                                enabled = true
+                                if (isHasParams) {
+                                    selectedActionDetail = mutable[action.id]
+                                }
+                            }
+                            actionMap = mutable.toMap()
+                        })
+                    }
+                )
+            }
+
+
+        }
+    }
+}
+
+@Composable
+fun StepTest(
+    olderMessages: List<String>,
+    selectedRegex: Regex? = null,
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        elevation = CardDefaults.elevatedCardElevation()
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+        ) {
+            Text(
+                text = stringResource(id = R.string.add_set_test_title),
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    fontWeight = FontWeight.SemiBold
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp)
+            )
+            var tabIndex by remember { mutableStateOf(0) }
+
+            val tabs = listOf("Older", "Test")
+            var matchedMessages by remember { mutableStateOf<List<AnnotatedString>?>(null) }
+
+            LaunchedEffect(selectedRegex) {
+                selectedRegex?.let {
+                    val searchPattern = it.regex.toPattern().toRegex()
+                    val filtered = olderMessages.filter {
+                        return@filter searchPattern.containsMatchIn(it)
+                    }.map {
+                        val matches = searchPattern.findAll(it).toList().first().value
+                        return@map htmlToAnnotatedString(it.replace(matches, "<b>$matches</b>"))
+                    }
+                    matchedMessages = filtered
+                }
+            }
+
+            TabRow(selectedTabIndex = tabIndex) {
+                tabs.forEachIndexed { index, title ->
+                    Tab(text = { Text(title) },
+                        selected = tabIndex == index,
+                        onClick = { tabIndex = index }
+                    )
+                }
+            }
+            var config = LocalConfiguration.current
+            when (tabIndex) {
+                0 -> {
+                    if (matchedMessages != null && matchedMessages!!.isEmpty()) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize(),
+                            Alignment.Center
+                        ) {
+
+                            AlertText(
+                                text = stringResource(id = R.string.add_catcher_no_match),
+                                type = "warning",
+                                modifier = Modifier.fillMaxWidth(.8F)
+                            )
+                        }
+                    }
+                    matchedMessages?.let { messages ->
+                        LazyColumn(
+                            Modifier
+                                .height((config.screenHeightDp.absoluteValue * .30F).dp)
+                                .padding(top = 8.dp)
+                                .fillMaxWidth()
+                        ) {
+                            items(messages.size) {
+                                Surface(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(bottom = 8.dp)
+                                ) {
+                                    Text(
+                                        text = messages[it],
+                                        modifier = Modifier.padding(4.dp),
+                                        style = MaterialTheme.typography.bodySmall
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                }
+
+                1 -> {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .defaultMinSize(Dp.Unspecified,(config.screenHeightDp.absoluteValue * .30F).dp)
+                    ) {
+                        val label =
+                            stringResource(id = R.string.add_catcher_set_catcher_test_area_text)
+                        var value by remember { mutableStateOf("") }
+                        OutlinedTextField(
+                            modifier = Modifier.fillMaxWidth(),
+                            value = value,
+                            onValueChange = {
+                                value = it
+                            },
+                            label = { Text(text = label) },
+                            placeholder = { Text(text = label) },
+                            maxLines = 3,
+                            minLines = 2
+                        )
+                        selectedRegex?.let {
+                            var testResponse = ""
+                            val searchPattern = it.regex.toPattern().toRegex()
+                            val matches = searchPattern.findAll(value).toList()
+                            if (matches.isNotEmpty()) {
+                                val match = matches.first().value
+                                testResponse = value.replace(match, "<b>$match</b>")
+
+                            }
+                            Text(
+                                text = htmlToAnnotatedString(testResponse),
+                                modifier = Modifier.padding(4.dp),
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
+
+
+                    }
+
+                }
+
+            }
+
+
         }
     }
 }

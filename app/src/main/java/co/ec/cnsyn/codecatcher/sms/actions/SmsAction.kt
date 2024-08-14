@@ -91,7 +91,7 @@ class SmsAction : BaseAction {
     override fun Settings(
         action: ActionDetail, then: (settings: Map<String, String>) -> Unit
     ) {
-        val params by remember { mutableStateOf(action.action.params()) }
+        var params by remember { mutableStateOf(action.action.params()) }
 
         Column {
             //update phone number
@@ -102,7 +102,8 @@ class SmsAction : BaseAction {
             ) {
                 val updatable = params.toMutableMap()
                 updatable["no"] = it
-                action.action.updateParam(updatable.toMap())
+                params=updatable.toMap()
+                action.action.updateParam(params)
                 then(params)
             }
             ParamOptionBox(
@@ -121,7 +122,8 @@ class SmsAction : BaseAction {
             ) {
                 val updatable = params.toMutableMap()
                 updatable["sendType"] = it
-                action.action.updateParam(updatable.toMap())
+                params=updatable.toMap()
+                action.action.updateParam(params)
                 then(params)
             }
         }
