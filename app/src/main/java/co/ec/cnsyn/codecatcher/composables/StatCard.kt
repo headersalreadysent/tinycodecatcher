@@ -94,6 +94,7 @@ fun StatCard(
                 Box(modifier = Modifier.fillMaxSize(), Alignment.Center) {
 
                     AutoText(
+                        key = "$title-$value",
                         text = value,
                         fontSize = 10..100 step 3,
                         style = MaterialTheme.typography.titleLarge.copy(

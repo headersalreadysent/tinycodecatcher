@@ -22,8 +22,8 @@ import co.ec.cnsyn.codecatcher.database.relations.ActionDetail
 import co.ec.cnsyn.codecatcher.helpers.async
 import co.ec.cnsyn.codecatcher.helpers.translate
 import co.ec.cnsyn.codecatcher.helpers.unix
-import co.ec.cnsyn.codecatcher.values.EventBus
-import co.ec.cnsyn.codecatcher.values.SmsCauched
+import co.ec.cnsyn.codecatcher.helpers.EventBus
+import co.ec.cnsyn.codecatcher.helpers.SmsCaught
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
@@ -39,7 +39,7 @@ open class DashboardViewModel : ViewModel() {
     init {
         start()
         viewModelScope.launch {
-            EventBus.subscribe<SmsCauched> { message ->
+            EventBus.subscribe<SmsCaught> { message ->
                 loadLatest()
             }
         }

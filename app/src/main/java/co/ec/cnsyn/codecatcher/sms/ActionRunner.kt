@@ -13,8 +13,8 @@ import co.ec.cnsyn.codecatcher.sms.actions.ClipboardAction
 import co.ec.cnsyn.codecatcher.sms.actions.NotificationAction
 import co.ec.cnsyn.codecatcher.sms.actions.SmsAction
 import co.ec.cnsyn.codecatcher.sms.actions.TTSAction
-import co.ec.cnsyn.codecatcher.values.EventBus
-import co.ec.cnsyn.codecatcher.values.SmsCauched
+import co.ec.cnsyn.codecatcher.helpers.EventBus
+import co.ec.cnsyn.codecatcher.helpers.SmsCaught
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -145,7 +145,7 @@ class ActionRunner {
                         GlobalScope.launch {
                             //wait and send
                             delay(2500)
-                            EventBus.publish(SmsCauched(message))
+                            EventBus.publish(SmsCaught(message))
                         }
                     }
                 }

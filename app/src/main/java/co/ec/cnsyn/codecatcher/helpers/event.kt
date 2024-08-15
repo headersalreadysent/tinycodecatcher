@@ -1,4 +1,4 @@
-package co.ec.cnsyn.codecatcher.values
+package co.ec.cnsyn.codecatcher.helpers
 
 import co.ec.cnsyn.codecatcher.sms.SmsData
 import kotlinx.coroutines.ensureActive
@@ -25,4 +25,6 @@ object EventBus {
     }
 }
 
-data class SmsCauched(var sms: SmsData)
+data class SmsCaught(var sms: SmsData)
+
+data class SettingsChange(var name: String, var value: Any?=null)

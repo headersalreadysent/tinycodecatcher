@@ -1,5 +1,6 @@
 package co.ec.cnsyn.codecatcher.composables
 
+import android.widget.Toast
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Box
@@ -34,6 +35,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import co.ec.cnsyn.codecatcher.App
+import co.ec.cnsyn.codecatcher.LocalSettings
 import kotlin.math.absoluteValue
 
 
@@ -53,11 +56,14 @@ fun AutoText(
     softWrap: Boolean = true,
     maxLines: Int = 1,
     style: TextStyle = LocalTextStyle.current,
+    key: String? = null
 ) {
     var fontSizeValue by remember { mutableIntStateOf(fontSize.max()) }
     var lineHeightValue by remember { mutableFloatStateOf(fontSize.max().toFloat() * 1.4F) }
     var readyToDraw by remember { mutableStateOf(false) }
 
+
+    val settings = LocalSettings.current
     Text(
         text = text,
         color = color,
@@ -75,6 +81,15 @@ fun AutoText(
         fontSize = fontSizeValue.sp,
         onTextLayout = { it: TextLayoutResult ->
 
+
+            key?.let {
+                val size = settings.getInt("fontSize-$key")
+                if (size > 0) {
+                    fontSizeValue = size
+                    lineHeightValue = size * 1.4F
+                    readyToDraw = true
+                }
+            }
             if (it.didOverflowHeight && !readyToDraw) {
                 //calculate
                 val nextFontSizeValue = (fontSizeValue.absoluteValue - fontSize.step)
@@ -89,6 +104,9 @@ fun AutoText(
             } else {
                 // Text fits before reaching the minimum, it's readyToDraw
                 readyToDraw = true
+                key?.let {
+                    settings.putInt("fontSize-$key", fontSizeValue.absoluteValue)
+                }
             }
         },
         modifier = modifier.drawWithContent { if (readyToDraw) drawContent() }
@@ -105,8 +123,12 @@ fun AutoTextPreview() {
     ) {
         for (i in 1..10) {
             var j = 10 - i
-            Box(modifier = Modifier.fillMaxWidth(j*0.1.toFloat())
-                .height(60.dp).border(1.dp,Color.Red)) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(j * 0.1.toFloat())
+                    .height(60.dp)
+                    .border(1.dp, Color.Red)
+            ) {
 
                 AutoText(
                     "$i hello this is very long text",
