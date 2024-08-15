@@ -9,12 +9,19 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Phishing
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -24,13 +31,20 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -38,12 +52,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import co.ec.cnsyn.codecatcher.composables.SkewBottomSheet
 import co.ec.cnsyn.codecatcher.database.AppDatabase
 import co.ec.cnsyn.codecatcher.database.DB
 import co.ec.cnsyn.codecatcher.helpers.Settings
 import co.ec.cnsyn.codecatcher.pages.add.Add
 import co.ec.cnsyn.codecatcher.pages.catcher.CatcherPage
 import co.ec.cnsyn.codecatcher.pages.dashboard.Dashboard
+import co.ec.cnsyn.codecatcher.pages.settings.SettingsModal
 import co.ec.cnsyn.codecatcher.sms.DebugSmsReceiver
 import co.ec.cnsyn.codecatcher.ui.theme.CodeCatcherTheme
 
@@ -74,9 +90,11 @@ val LocalNavigation = compositionLocalOf<NavHostController> { error("No NavContr
 val LocalSnackbar = compositionLocalOf<SnackbarHostState> { error("No SnackbarHostState provided") }
 val LocalSettings = compositionLocalOf<Settings> { error("No LocalSettings provided") }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun CodeCatcherApp(context: Context) {
+
 
     val navController = rememberNavController()
     val db = DB.getDatabase(context)
@@ -88,6 +106,7 @@ fun CodeCatcherApp(context: Context) {
         LocalSnackbar provides snackbarHostState,
         LocalSettings provides settings
     ) {
+        var settingsVisible by remember { mutableStateOf(false) }
         Scaffold(
             modifier = Modifier
                 .fillMaxSize(),
@@ -118,6 +137,17 @@ fun CodeCatcherApp(context: Context) {
                         ) {
                             Icon(Icons.Default.Phishing, contentDescription = "")
                         }
+
+                        IconButton(
+                            onClick = {
+                                settingsVisible = !settingsVisible
+                            },
+                            colors = IconButtonDefaults.iconButtonColors(
+                                containerColor = MaterialTheme.colorScheme.surface
+                            )
+                        ) {
+                            Icon(Icons.Default.Settings, contentDescription = "")
+                        }
                     },
                     floatingActionButton = {
                         FloatingActionButton(onClick = {
@@ -146,7 +176,17 @@ fun CodeCatcherApp(context: Context) {
             }
         }
 
+        if (settingsVisible) {
+            SkewBottomSheet(onDismissRequest = {
+                settingsVisible=false
+            }) {
+                SettingsModal()
+            }
+        }
+
+
     }
+
 
 }
 

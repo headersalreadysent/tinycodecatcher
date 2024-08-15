@@ -13,20 +13,31 @@ class Settings(context: Context) {
         context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)
 
     companion object {
+        private lateinit var instance: Settings
         private const val PREFERENCES_NAME = "AppSettings"
+
+        fun get() : Settings{
+            return instance
+        }
     }
 
+    init {
+        instance=this
+    }
+
+
+
     @OptIn(DelicateCoroutinesApi::class)
-    private fun publish(key:String, value:Any?){
+    private fun publish(key: String, value: Any?) {
         GlobalScope.launch {
-            EventBus.publish(SettingsChange(key,value))
+            EventBus.publish(SettingsChange(key, value))
         }
     }
 
     // Store String value
     fun putString(key: String, value: String) {
         sharedPreferences.edit().putString(key, value).apply()
-        publish(key,value)
+        publish(key, value)
     }
 
     // Retrieve String value
@@ -37,7 +48,7 @@ class Settings(context: Context) {
     // Store Int value
     fun putInt(key: String, value: Int) {
         sharedPreferences.edit().putInt(key, value).apply()
-        publish(key,value)
+        publish(key, value)
     }
 
     // Retrieve Int value
@@ -48,7 +59,7 @@ class Settings(context: Context) {
     // Store Boolean value
     fun putBoolean(key: String, value: Boolean) {
         sharedPreferences.edit().putBoolean(key, value).apply()
-        publish(key,value)
+        publish(key, value)
     }
 
     // Retrieve Boolean value
@@ -59,7 +70,7 @@ class Settings(context: Context) {
     // Store Float value
     fun putFloat(key: String, value: Float) {
         sharedPreferences.edit().putFloat(key, value).apply()
-        publish(key,value)
+        publish(key, value)
     }
 
     // Retrieve Float value
@@ -70,7 +81,7 @@ class Settings(context: Context) {
     // Remove a setting
     fun remove(key: String) {
         sharedPreferences.edit().remove(key).apply()
-        publish(key,null)
+        publish(key, null)
     }
 
     // Remove a setting

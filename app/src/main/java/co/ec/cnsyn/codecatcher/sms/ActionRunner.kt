@@ -14,6 +14,7 @@ import co.ec.cnsyn.codecatcher.sms.actions.NotificationAction
 import co.ec.cnsyn.codecatcher.sms.actions.SmsAction
 import co.ec.cnsyn.codecatcher.sms.actions.TTSAction
 import co.ec.cnsyn.codecatcher.helpers.EventBus
+import co.ec.cnsyn.codecatcher.helpers.Settings
 import co.ec.cnsyn.codecatcher.helpers.SmsCaught
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
@@ -159,10 +160,13 @@ class ActionRunner {
      * copy code to clipboard
      */
     private fun copyToClipboard(code: String) {
-        val clipboard = App.context()
-            .getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        val clip = ClipData.newPlainText("code-catcher", code)
-        clipboard.setPrimaryClip(clip)
+        val copySettings=Settings.get().getBoolean("copyAllCodes", false)
+        if(copySettings){
+            val clipboard = App.context()
+                .getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            val clip = ClipData.newPlainText("code-catcher", code)
+            clipboard.setPrimaryClip(clip)
+        }
     }
 
 }

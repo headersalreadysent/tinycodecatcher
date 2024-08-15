@@ -52,6 +52,10 @@
     <string name="add_set_save_button">Save Catcher</string>
     <string name="add_set_save_message">Catcher Saved!</string>
 
+    <!--settings -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_copy_all_codes_to_clipboard">Copy all codes to clipboard.</string>
+
 
 
     <!-- actions settings -->
@@ -88,6 +92,9 @@
     <string name="actionlist_copy_desc">Copy codes to clipboard.</string>
     <string name="actionlist_tts">TTS</string>
     <string name="actionlist_tts_desc">Read codes with TTS.</string>
+
+
+
 
 
 </resources>
