@@ -24,6 +24,9 @@
     <string name="catchers_stats_day_average">%1$d Day</string>
     <string name="catchers_daily_caught">Daily Caught</string>
 
+    <string name="catchers_deleted_last_action">You are deleted last action. Are you sure?</string>
+    <string name="catchers_delete_catcher">Delete Catcher</string>
+
     <!-- add page -->
     <string name="add_set_cather_title">Set Catcher</string>
     <string name="add_select_sender_type_alert"><![CDATA[

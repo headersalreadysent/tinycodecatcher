@@ -1,5 +1,6 @@
 package co.ec.cnsyn.codecatcher.pages.catcher
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
@@ -36,6 +37,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Timeline
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
@@ -73,6 +75,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
+import co.ec.cnsyn.codecatcher.LocalSnackbar
 import co.ec.cnsyn.codecatcher.R
 import co.ec.cnsyn.codecatcher.composables.AutoText
 import co.ec.cnsyn.codecatcher.composables.Calendar
@@ -91,11 +94,17 @@ import co.ec.cnsyn.codecatcher.helpers.dateString
 import co.ec.cnsyn.codecatcher.sms.ActionRunner
 import co.ec.cnsyn.codecatcher.ui.theme.CodeCatcherTheme
 import co.ec.cnsyn.codecatcher.values.actionList
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.Locale
 
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+@OptIn(
+    ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class,
+    DelicateCoroutinesApi::class
+)
 @Composable
 fun CatcherPage(model: CatcherPageViewModel = viewModel(), catcherId: Int? = null) {
 
@@ -111,8 +120,7 @@ fun CatcherPage(model: CatcherPageViewModel = viewModel(), catcherId: Int? = nul
 
 
     Box(
-        modifier = Modifier.fillMaxSize(),
-        Alignment.BottomCenter
+        modifier = Modifier.fillMaxSize(), Alignment.BottomCenter
     ) {
 
         val catchers by model.catchers.observeAsState(listOf())
@@ -121,7 +129,7 @@ fun CatcherPage(model: CatcherPageViewModel = viewModel(), catcherId: Int? = nul
         val scrollState = rememberLazyListState(initialFirstVisibleItemIndex = scrollIndex)
 
         LaunchedEffect(catchers) {
-            if (catchers.isNotEmpty() && catcherId != null){
+            if (catchers.isNotEmpty() && catcherId != null) {
                 catchers.forEachIndexed { index, item ->
                     if (item.catcher.id == catcherId) {
                         scrollIndex = index
@@ -139,8 +147,12 @@ fun CatcherPage(model: CatcherPageViewModel = viewModel(), catcherId: Int? = nul
                 else scrollState.firstVisibleItemIndex
             }
         }
+        var rebuild by remember {
+            mutableStateOf(0)
+        }
         SkewSquare(
-            skew = 30, modifier = Modifier
+            skew = 30,
+            modifier = Modifier
                 .zIndex(2F)
                 .navigationBarsPadding()
                 .fillMaxWidth()
@@ -173,8 +185,7 @@ fun CatcherPage(model: CatcherPageViewModel = viewModel(), catcherId: Int? = nul
                             .width(animatedWidth)
                             .height(6.dp)
                             .background(
-                                animatedColor,
-                                shape = RoundedCornerShape(2.dp)
+                                animatedColor, shape = RoundedCornerShape(2.dp)
                             )
                     ) {
 
@@ -197,8 +208,7 @@ fun CatcherPage(model: CatcherPageViewModel = viewModel(), catcherId: Int? = nul
                         .fillParentMaxWidth(.9F)
                         .fillParentMaxHeight()
                 ) {
-                    CatcherItem(
-                        catcherDetail = catchers[it],
+                    CatcherItem(catcherDetail = catchers[it],
                         allActions = actions,
                         isActive = it == mostVisibleItem.value,
                         addAction = { catcher ->
@@ -214,6 +224,9 @@ fun CatcherPage(model: CatcherPageViewModel = viewModel(), catcherId: Int? = nul
                         },
                         actionParams = { actionDetail ->
                             selectedActionDetail = actionDetail
+                        },
+                        deleteCatcher = { catcherDetail ->
+                            model.deleteCatcher(catcherDetail)
                         }
                     )
                 }
@@ -226,8 +239,7 @@ fun CatcherPage(model: CatcherPageViewModel = viewModel(), catcherId: Int? = nul
         SkewBottomSheet(
             onDismissRequest = {
                 showAddActionSheet = false
-            },
-            sheetState = sheetState
+            }, sheetState = sheetState
         ) {
             selectedCatcher?.let { catcher ->
                 //show add bottom sheet for catcher
@@ -250,8 +262,7 @@ fun CatcherPage(model: CatcherPageViewModel = viewModel(), catcherId: Int? = nul
             dayCodes = dayCodes, close = {
                 dayDetailSheet = false
                 model.clearDayStat()
-            },
-            sheetState = sheetState
+            }, sheetState = sheetState
         )
     }
     ParamsDialog(selectedActionDetail) {
@@ -268,13 +279,18 @@ fun CatcherItem(
     addAction: (catherDetail: CatcherDao.CatcherDetail) -> Unit = { _ -> },
     changeStatus: (action: Action, status: Boolean) -> Unit,
     dayDetail: (catcherId: Int, start: Int) -> Unit,
-    actionParams: (actionDetail: ActionDetail) -> Unit
+    actionParams: (actionDetail: ActionDetail) -> Unit,
+    deleteCatcher: (catcherDetail: CatcherDao.CatcherDetail) -> Unit
 ) {
     val animatedAlpha by animateFloatAsState(
         targetValue = if (isActive) 1F else .8F,
         animationSpec = tween(durationMillis = 100, easing = LinearEasing),
         label = "alpha"
     )
+    //animate when deleted
+    val scope = rememberCoroutineScope()
+    val snackbar = LocalSnackbar.current
+    val deletedLastOneMessage = stringResource(id = R.string.catchers_deleted_last_action)
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -282,6 +298,8 @@ fun CatcherItem(
             .padding(bottom = 90.dp)
             .alpha(animatedAlpha)
     ) {
+
+
         CatcherTopCard(catcherDetail)
         Column(
             modifier = Modifier.padding(horizontal = 8.dp)
@@ -293,58 +311,71 @@ fun CatcherItem(
                     mutableStateOf(action.action.status == 1)
                 }
                 //show every action in list
-                ListItem(
-                    modifier = Modifier
-                        .padding(bottom = 8.dp)
-                        .clickable(enabled && isHasParams) {
-                            actionParams(action)
-                        },
-                    colors = ListItemDefaults.colors(
-                        containerColor = MaterialTheme.colorScheme.secondaryContainer
-                    ),
-                    headlineContent = {
-                        Column {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(text = if (action.detail.name == "") action.detail.key else action.detail.name)
-                                if (isHasParams) {
-                                    Icon(
-                                        Icons.Filled.Settings, contentDescription = "",
-                                        modifier = Modifier
-                                            .height(16.dp)
-                                            .padding(start = 5.dp),
-                                        tint = MaterialTheme.colorScheme.secondary.copy(alpha = .8F)
-                                    )
-                                }
-                            }
-                            if (action.detail.description != "") {
-                                Text(
-                                    text = action.detail.description,
-                                    style = MaterialTheme.typography.bodySmall
+                ListItem(modifier = Modifier
+                    .padding(bottom = 8.dp)
+                    .clickable(enabled && isHasParams) {
+                        actionParams(action)
+                    }, colors = ListItemDefaults.colors(
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer
+                ), headlineContent = {
+                    Column {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(text = if (action.detail.name == "") action.detail.key else action.detail.name)
+                            if (isHasParams) {
+                                Icon(
+                                    Icons.Filled.Settings,
+                                    contentDescription = "",
+                                    modifier = Modifier
+                                        .height(16.dp)
+                                        .padding(start = 5.dp),
+                                    tint = MaterialTheme.colorScheme.secondary.copy(alpha = .8F)
                                 )
                             }
                         }
-                    },
-                    leadingContent = {
-                        IconName(name = action.detail.icon)
-                    },
-                    trailingContent = {
-                        Checkbox(checked = enabled, onCheckedChange = {
-                            changeStatus(action.detail, !enabled)
-                            enabled = !enabled
-                        })
+                        if (action.detail.description != "") {
+                            Text(
+                                text = action.detail.description,
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        }
                     }
-                )
+                }, leadingContent = {
+                    IconName(name = action.detail.icon)
+                }, trailingContent = {
+                    Checkbox(checked = enabled, onCheckedChange = {
+                        if (catcherDetail.actions.size == 1 && enabled) {
+                            scope.launch {
+                                snackbar.showSnackbar(deletedLastOneMessage)
+                            }
+                        }
+                        changeStatus(action.detail, !enabled)
+                        enabled = !enabled
+                    })
+                })
             }
-            if (catcherDetail.actions.size < allActions.size) {
+
+            AnimatedVisibility(visible = catcherDetail.actions.size < allActions.size) {
                 //if there is missing action
                 OutlinedButton(
-                    onClick = { addAction(catcherDetail) },
-                    modifier = Modifier.fillMaxWidth()
+                    onClick = { addAction(catcherDetail) }, modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(text = stringResource(id = R.string.catchers_actions_add_action))
+                }
+            }
+            AnimatedVisibility(visible = catcherDetail.actions.isEmpty()) {
+                OutlinedButton(
+                    onClick = {
+                        deleteCatcher(catcherDetail)
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = MaterialTheme.colorScheme.error
+                    )
+                ) {
+                    Text(text = stringResource(id = R.string.catchers_delete_catcher))
                 }
             }
         }
@@ -357,7 +388,6 @@ fun CatcherItem(
 }
 
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun CatcherTopCard(catcherDetail: CatcherDao.CatcherDetail) {
     val infoTitleStyle = MaterialTheme.typography.bodyMedium.copy(
@@ -372,20 +402,15 @@ fun CatcherTopCard(catcherDetail: CatcherDao.CatcherDetail) {
             .fillMaxWidth()
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+            modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Column(
-                modifier = Modifier
-                    .padding(16.dp)
+                modifier = Modifier.padding(16.dp)
             ) {
                 Text(stringResource(id = R.string.catchers_top_card_sender), style = infoTitleStyle)
                 Text(
-                    if (catcherDetail.catcher.sender == "")
-                        stringResource(id = R.string.catchers_top_card_everybody)
-                    else catcherDetail.catcher.sender,
-                    style = MaterialTheme.typography.bodyLarge
+                    if (catcherDetail.catcher.sender == "") stringResource(id = R.string.catchers_top_card_everybody)
+                    else catcherDetail.catcher.sender, style = MaterialTheme.typography.bodyLarge
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(stringResource(id = R.string.catchers_top_card_regex), style = infoTitleStyle)
@@ -437,8 +462,7 @@ fun CatcherTopCard(catcherDetail: CatcherDao.CatcherDetail) {
                 .fillMaxWidth(),
         ) {
             Text(
-                stringResource(id = R.string.catchers_top_card_description),
-                style = infoTitleStyle
+                stringResource(id = R.string.catchers_top_card_description), style = infoTitleStyle
             )
             Text(catcherDetail.regex.description, style = MaterialTheme.typography.bodyLarge)
         }
@@ -447,8 +471,7 @@ fun CatcherTopCard(catcherDetail: CatcherDao.CatcherDetail) {
 
 @Composable
 fun CatcherStartArea(
-    catcherDetail: CatcherDao.CatcherDetail,
-    dayDetail: (catcherId: Int, start: Int) -> Unit
+    catcherDetail: CatcherDao.CatcherDetail, dayDetail: (catcherId: Int, start: Int) -> Unit
 ) {
     Column {
         Text(
@@ -542,8 +565,7 @@ fun AddActionToCatcherBottomSheet(
 
 @Composable
 fun ParamsDialog(
-    action: ActionDetail?,
-    close: (action: ActionDetail) -> Unit = { _ -> }
+    action: ActionDetail?, close: (action: ActionDetail) -> Unit = { _ -> }
 ) {
     if (action == null || action.detail.defaultParams == "{}") {
         return
@@ -556,10 +578,8 @@ fun ParamsDialog(
         },
     ) {
         Text(
-            text = action.detail.name,
-            style = MaterialTheme.typography.titleLarge.copy(
-                color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.SemiBold
+            text = action.detail.name, style = MaterialTheme.typography.titleLarge.copy(
+                color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.SemiBold
             )
         )
         Text(text = action.detail.description)
@@ -581,8 +601,7 @@ fun DayModalBottom(dayCodes: List<Code>, close: () -> Unit, sheetState: SheetSta
     SkewBottomSheet(
         onDismissRequest = {
             close()
-        },
-        sheetState = sheetState
+        }, sheetState = sheetState
     ) {
         Column(
             modifier = Modifier
@@ -595,8 +614,7 @@ fun DayModalBottom(dayCodes: List<Code>, close: () -> Unit, sheetState: SheetSta
                 text += " (${dayCodes[0].date.dateString("dd.MM.YYYY")})"
             }
             Text(
-                text = text,
-                style = MaterialTheme.typography.titleSmall
+                text = text, style = MaterialTheme.typography.titleSmall
             )
 
 
@@ -604,13 +622,11 @@ fun DayModalBottom(dayCodes: List<Code>, close: () -> Unit, sheetState: SheetSta
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(60.dp),
-                    Alignment.Center
+                        .height(60.dp), Alignment.Center
                 ) {
 
                     CircularProgressIndicator(
-                        modifier = Modifier
-                            .fillMaxHeight(.8F)
+                        modifier = Modifier.fillMaxHeight(.8F)
                     )
                 }
             }
@@ -639,17 +655,15 @@ fun DayModalBottom(dayCodes: List<Code>, close: () -> Unit, sheetState: SheetSta
                             ) {
                                 Text(
                                     text = code.date.dateString("dd"),
-                                    style = MaterialTheme.typography.bodySmall
-                                        .copy(
-                                            color = MaterialTheme.colorScheme.onSecondaryContainer
-                                        )
+                                    style = MaterialTheme.typography.bodySmall.copy(
+                                        color = MaterialTheme.colorScheme.onSecondaryContainer
+                                    )
                                 )
                                 Text(
                                     text = code.date.dateString("MMM"),
-                                    style = MaterialTheme.typography.bodySmall
-                                        .copy(
-                                            color = MaterialTheme.colorScheme.onSecondaryContainer
-                                        )
+                                    style = MaterialTheme.typography.bodySmall.copy(
+                                        color = MaterialTheme.colorScheme.onSecondaryContainer
+                                    )
                                 )
                             }
                             Column(
@@ -715,13 +729,11 @@ fun CatcherPageTopCardPreview() {
 fun CatcherPageAddActionPreview() {
     CodeCatcherTheme {
         val model = MockCatcherViewModel()
-        AddActionToCatcherBottomSheet(
-            model.catchers.value!![0],
+        AddActionToCatcherBottomSheet(model.catchers.value!![0],
             actions = actionList(),
             changeStatus = { _, _ ->
             },
-            onDismissRequest = {}
-        )
+            onDismissRequest = {})
     }
 }
 

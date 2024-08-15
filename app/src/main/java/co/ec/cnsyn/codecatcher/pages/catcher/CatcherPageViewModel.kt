@@ -18,12 +18,13 @@ import co.ec.cnsyn.codecatcher.helpers.dateString
 import co.ec.cnsyn.codecatcher.helpers.unix
 import co.ec.cnsyn.codecatcher.values.actionList
 import co.ec.cnsyn.codecatcher.values.regexList
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
 open class CatcherPageViewModel : ViewModel() {
 
-    var catchers = MutableLiveData<List<CatcherDao.CatcherDetail>>(listOf())
+    var catchers = MutableLiveData<List<CatcherDetail>>(listOf())
 
     var allActions = MutableLiveData<List<Action>>(listOf())
 
@@ -35,18 +36,20 @@ open class CatcherPageViewModel : ViewModel() {
 
     open fun start() {
         //load stats
-        DB.get().catcher().getCatchersWithDetails({
-            catchers.value = it
-        }, { err ->
-            println(err)
-        })
+        loadcatchers()
         async({
             return@async DB.get().action().getAllItems()
         }, {
             allActions.value = it
         })
+    }
 
-
+    fun loadcatchers() {
+        DB.get().catcher().getCatchersWithDetails({
+            catchers.value = it
+        }, { err ->
+            println(err)
+        })
     }
 
     /**
@@ -107,6 +110,19 @@ open class CatcherPageViewModel : ViewModel() {
     fun clearDayStat() {
         dayCodes.value = listOf()
     }
+
+    /**
+     * delete catcher from page
+     */
+    fun deleteCatcher(catcherDetail: CatcherDetail, then: () -> Unit = { -> }) {
+        async({
+            DB.get().catcherAction().deleteCatcher(catcherDetail.catcher.id)
+            return@async DB.get().catcher().delete(catcherDetail.catcher)
+        }, {
+            loadcatchers()
+
+        })
+    }
 }
 
 class MockCatcherViewModel : CatcherPageViewModel() {
@@ -114,7 +130,7 @@ class MockCatcherViewModel : CatcherPageViewModel() {
     override fun start() {
         catchers.value = List(6) {
 
-            var now= unix().toInt()
+            var now = unix().toInt()
             CatcherDetail(
                 catcher = Catcher(
                     id = it,

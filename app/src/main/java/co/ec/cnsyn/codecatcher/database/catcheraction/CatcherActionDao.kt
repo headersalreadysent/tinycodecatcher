@@ -29,5 +29,8 @@ interface CatcherActionDao : BaseDao<CatcherAction> {
     @Query("UPDATE catcheraction SET params=:params WHERE id=:id")
     fun updateParams(id: Int, params: String)
 
+    @Query("DELETE FROM  catcheraction WHERE catcherId=:id")
+    fun deleteCatcher(id: Int)
+
 
 }

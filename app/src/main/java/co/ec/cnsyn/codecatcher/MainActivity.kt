@@ -136,6 +136,7 @@ fun CodeCatcherApp(context: Context) {
                     val catcherId = backStackEntry.arguments?.getString("catcherId")?.toInt()
                     CatcherPage(catcherId = catcherId)
                 }
+                composable("catchers") { CatcherPage() }
                 composable("add") { Add() }
             }
         }
