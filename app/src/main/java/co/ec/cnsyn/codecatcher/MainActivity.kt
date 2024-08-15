@@ -21,9 +21,15 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -64,20 +70,25 @@ class MainActivity : ComponentActivity() {
 
 val LocalDB = compositionLocalOf<AppDatabase> { error("No NavController provided") }
 val LocalNavigation = compositionLocalOf<NavHostController> { error("No NavController provided") }
-
+val LocalSnackbar = compositionLocalOf<SnackbarHostState> { error("No SnackbarHostState provided") }
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun CodeCatcherApp(context: Context) {
 
     val navController = rememberNavController()
     val db = DB.getDatabase(context)
+    val snackbarHostState = SnackbarHostState()
     CompositionLocalProvider(
         LocalNavigation provides navController,
-        LocalDB provides db
+        LocalDB provides db,
+        LocalSnackbar provides snackbarHostState
     ) {
         Scaffold(
             modifier = Modifier
                 .fillMaxSize(),
+            snackbarHost = {
+                SnackbarHost(hostState = snackbarHostState)
+            },
             bottomBar = {
                 BottomAppBar(
                     actions = {

@@ -38,6 +38,7 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -73,6 +74,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import co.ec.cnsyn.codecatcher.LocalNavigation
+import co.ec.cnsyn.codecatcher.LocalSnackbar
 import co.ec.cnsyn.codecatcher.R
 import co.ec.cnsyn.codecatcher.composables.AlertText
 import co.ec.cnsyn.codecatcher.composables.IconName
@@ -151,19 +153,25 @@ fun Add(model: AddViewModel = viewModel()) {
                     }
                 }
                 val navigator = LocalNavigation.current
+                val snackbar = LocalSnackbar.current
+                val savedMessage = stringResource(id = R.string.add_set_save_message)
                 Button(
                     modifier = Modifier
                         .padding(horizontal = 16.dp)
                         .fillMaxWidth()
                         .padding(bottom = 40.dp),
                     shape = RoundedCornerShape(3.dp),
-                    enabled = completeRatio>.99F,
+                    enabled = completeRatio > .99F,
                     onClick = {
                         model.saveCatcher(
                             catcher = catcher,
                             actionDetails = actionsDetails,
                             { catcherId ->
                                 navigator.navigate("catchers/$catcherId")
+                                scope.launch {
+                                    snackbar.showSnackbar(savedMessage,
+                                        duration = SnackbarDuration.Long)
+                                }
                             }
                         )
                     }) {
