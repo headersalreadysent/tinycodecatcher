@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -19,6 +18,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Save
@@ -32,6 +33,7 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
@@ -41,36 +43,36 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
+import co.ec.cnsyn.codecatcher.LocalNavigation
 import co.ec.cnsyn.codecatcher.R
 import co.ec.cnsyn.codecatcher.composables.AlertText
 import co.ec.cnsyn.codecatcher.composables.IconName
@@ -86,6 +88,8 @@ import co.ec.cnsyn.codecatcher.helpers.htmlToAnnotatedString
 import co.ec.cnsyn.codecatcher.helpers.rememberKeyboardVisibility
 import co.ec.cnsyn.codecatcher.pages.catcher.ParamsDialog
 import co.ec.cnsyn.codecatcher.ui.theme.CodeCatcherTheme
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
 
 @Composable
@@ -93,51 +97,76 @@ fun Add(model: AddViewModel = viewModel()) {
     Box(modifier = Modifier.fillMaxSize()) {
         val isKeyboardVisible by rememberKeyboardVisibility()
         val scrollState = rememberScrollState()
+        var completeRatio by remember { mutableStateOf(0F) }
         Column(
             modifier = Modifier
                 .navigationBarsPadding()
                 .then(
                     if (isKeyboardVisible) {
-                        Modifier.padding(bottom = 150.dp)
+                        Modifier.padding(bottom = 170.dp)
                     } else {
-                        Modifier.padding(bottom = 80.dp)
+                        Modifier.padding(bottom = 100.dp)
                     }
                 )
                 .fillMaxSize()
                 .verticalScroll(scrollState),
         ) {
 
-
             val regexes by model.regexes.observeAsState(listOf())
             var catcher by remember { mutableStateOf(Catcher()) }
             var selectedRegex by remember { mutableStateOf<Regex?>(null) }
             var actionsDetails by remember { mutableStateOf<List<ActionDetail>>(listOf()) }
+            LaunchedEffect(selectedRegex, catcher, actionsDetails) {
+                var step = 0
+                if (selectedRegex != null) {
+                    step++
+                }
+                if (catcher.description != "") {
+                    step++;
+                }
+                if (actionsDetails.isNotEmpty()) {
+                    step++;
+                }
+                completeRatio = step.toFloat() / 3F
+            }
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .statusBarsPadding()
             ) {
-
+                val scope = rememberCoroutineScope()
                 StepSender(catcher, regexes) { catcherUpdate, regexUpdate ->
                     catcher = catcherUpdate
                     selectedRegex = regexUpdate
                 }
-
                 val actions by model.actions.observeAsState(listOf())
                 StepActions(actionList = actions) { details ->
                     actionsDetails = details
                 }
-
                 val olderMessages by model.olderMessages.observeAsState(listOf())
-                StepTest(olderMessages, selectedRegex)
-
+                StepTest(olderMessages, selectedRegex) {
+                    scope.launch {
+                        delay(1500)
+                        scrollState.animateScrollTo(scrollState.maxValue)
+                    }
+                }
+                val navigator = LocalNavigation.current
                 Button(
                     modifier = Modifier
                         .padding(horizontal = 16.dp)
                         .fillMaxWidth()
-                        .padding(bottom = 16.dp),
+                        .padding(bottom = 40.dp),
                     shape = RoundedCornerShape(3.dp),
-                    onClick = { /*TODO*/ }) {
+                    enabled = completeRatio>.99F,
+                    onClick = {
+                        model.saveCatcher(
+                            catcher = catcher,
+                            actionDetails = actionsDetails,
+                            { catcherId ->
+                                navigator.navigate("catchers/$catcherId")
+                            }
+                        )
+                    }) {
                     Icon(
                         Icons.Default.Save, contentDescription = "",
                         modifier = Modifier.padding(end = 8.dp)
@@ -153,10 +182,21 @@ fun Add(model: AddViewModel = viewModel()) {
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .navigationBarsPadding()
-                .padding(bottom = 65.dp),
+                .padding(bottom = 80.dp),
             skew = 30,
             cut = SkewSquareCut.TopEnd
         ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                LinearProgressIndicator(
+                    modifier = Modifier.fillMaxWidth(),
+                    progress = {
+                        completeRatio
+                    },
+                )
+            }
 
         }
     }
@@ -203,7 +243,6 @@ fun StepSender(
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
-            val specificText = stringResource(R.string.add_catcher_select_specific)
             SkewSwitch(
                 value = listOf(
                     Pair(
@@ -246,6 +285,9 @@ fun StepSender(
                     modifier = Modifier
                         .fillMaxWidth()
                         .menuAnchor()
+                        .onSizeChanged { size ->
+                            width = with(density) { size.width.toDp() }
+                        }
                         .onGloballyPositioned {
                             width = with(density) { it.size.width.toDp() }
                         },
@@ -432,6 +474,7 @@ fun StepActions(
 fun StepTest(
     olderMessages: List<String>,
     selectedRegex: Regex? = null,
+    scrollToEnd: () -> Unit = { -> }
 ) {
     Card(
         modifier = Modifier
@@ -474,7 +517,9 @@ fun StepTest(
                 tabs.forEachIndexed { index, title ->
                     Tab(text = { Text(title) },
                         selected = tabIndex == index,
-                        onClick = { tabIndex = index }
+                        onClick = {
+                            tabIndex = index
+                        }
                     )
                 }
             }
@@ -491,7 +536,7 @@ fun StepTest(
                             AlertText(
                                 text = stringResource(id = R.string.add_catcher_no_match),
                                 type = "warning",
-                                modifier = Modifier.fillMaxWidth(.8F)
+                                modifier = Modifier.padding(vertical = 8.dp)
                             )
                         }
                     }
@@ -524,13 +569,29 @@ fun StepTest(
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .defaultMinSize(Dp.Unspecified,(config.screenHeightDp.absoluteValue * .30F).dp)
+                            .defaultMinSize(
+                                Dp.Unspecified,
+                                (config.screenHeightDp.absoluteValue * .30F).dp
+                            )
                     ) {
                         val label =
                             stringResource(id = R.string.add_catcher_set_catcher_test_area_text)
                         var value by remember { mutableStateOf("") }
+                        AlertText(
+                            text = stringResource(id = R.string.add_catcher_set_catcher_test_area_description),
+                            modifier = Modifier.padding(vertical = 8.dp)
+                        )
+                        var scope = rememberCoroutineScope()
+
                         OutlinedTextField(
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .onFocusChanged { focusState ->
+                                    if (focusState.isFocused) {
+                                        scrollToEnd()
+
+                                    }
+                                },
                             value = value,
                             onValueChange = {
                                 value = it
@@ -541,19 +602,55 @@ fun StepTest(
                             minLines = 2
                         )
                         selectedRegex?.let {
-                            var testResponse = ""
+                            var testResponse = buildAnnotatedString { append(value) }
                             val searchPattern = it.regex.toPattern().toRegex()
                             val matches = searchPattern.findAll(value).toList()
                             if (matches.isNotEmpty()) {
                                 val match = matches.first().value
-                                testResponse = value.replace(match, "<b>$match</b>")
+                                var parts = value.split(match)
+                                testResponse = buildAnnotatedString {
+                                    append(parts[0])
+                                    withStyle(
+                                        SpanStyle(
+                                            fontWeight = FontWeight.SemiBold,
+                                            color = MaterialTheme.colorScheme.primary,
+                                            textDecoration = TextDecoration.Underline
+                                        )
+                                    ) {
+                                        append(match)
+                                    }
+                                    append(parts[1])
+                                }
 
                             }
-                            Text(
-                                text = htmlToAnnotatedString(testResponse),
-                                modifier = Modifier.padding(4.dp),
-                                style = MaterialTheme.typography.bodyMedium
-                            )
+                            if (value.isNotEmpty()) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(8.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        if (matches.isNotEmpty())
+                                            Icons.Filled.CheckCircle else Icons.Filled.Error,
+                                        contentDescription = "",
+                                        tint =
+                                        if (matches.isNotEmpty())
+                                            MaterialTheme.colorScheme.primary
+                                        else MaterialTheme.colorScheme.error,
+                                        modifier = Modifier.padding(end = 8.dp)
+                                    )
+
+                                    Text(
+                                        text = testResponse,
+                                        modifier = Modifier.padding(4.dp),
+                                        style = MaterialTheme.typography.bodyLarge
+                                            .copy(
+                                                textAlign = TextAlign.Justify
+                                            )
+                                    )
+                                }
+                            }
                         }
 
 

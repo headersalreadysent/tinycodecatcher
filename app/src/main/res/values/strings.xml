@@ -35,7 +35,9 @@
     <string name="add_catcher_set_catcher_sender">Sender</string>
     <string name="add_catcher_set_catcher_description">Description</string>
     <string name="add_catcher_set_catcher_regex">Expression</string>
-    <string name="add_catcher_set_catcher_test_area_text">Test Text</string>
+    <string name="add_catcher_set_catcher_test_area_description">Enter sms body to test expression catch result.</string>
+    <string name="add_catcher_set_catcher_test_area_text">Sms Body</string>
+
 
     <string name="add_set_actions_title">Set Actions</string>
     <string name="add_set_test_title">Test</string>

@@ -31,11 +31,11 @@ import co.ec.cnsyn.codecatcher.ui.theme.CodeCatcherTheme
 @Composable
 fun AlertText(
     text: String,
+    modifier: Modifier = Modifier,
     type: String = "info",
     color: Color =
         MaterialTheme.colorScheme.secondaryContainer,
     isHtml: Boolean = false,
-    modifier: Modifier = Modifier,
 ) {
     val annotatedString = buildAnnotatedString {
         appendInlineContent("${type}Icon", "[info]")
@@ -71,9 +71,9 @@ fun AlertText(
         text = annotatedString,
         modifier = Modifier
             .fillMaxWidth()
+            .then(modifier)
             .background(color, RoundedCornerShape(1.dp))
-            .padding(horizontal = 8.dp, vertical = 4.dp)
-            .then(modifier),
+            .padding(horizontal = 8.dp, vertical = 4.dp),
         style = MaterialTheme.typography.bodySmall.copy(
             textAlign = TextAlign.Justify
         ),

@@ -16,7 +16,7 @@ import kotlinx.serialization.json.Json
 )
 data class CatcherAction(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    val catcherId: Int,
+    var catcherId: Int,
     var actionId: Int,
     var params: String = "",
     var status: Int = 1

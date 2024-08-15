@@ -58,6 +58,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -90,12 +91,13 @@ import co.ec.cnsyn.codecatcher.helpers.dateString
 import co.ec.cnsyn.codecatcher.sms.ActionRunner
 import co.ec.cnsyn.codecatcher.ui.theme.CodeCatcherTheme
 import co.ec.cnsyn.codecatcher.values.actionList
+import kotlinx.coroutines.launch
 import java.util.Locale
 
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun CatcherPage(model: CatcherPageViewModel = viewModel()) {
+fun CatcherPage(model: CatcherPageViewModel = viewModel(), catcherId: Int? = null) {
 
 
     // bottom sheet related
@@ -114,7 +116,22 @@ fun CatcherPage(model: CatcherPageViewModel = viewModel()) {
     ) {
 
         val catchers by model.catchers.observeAsState(listOf())
-        val scrollState = rememberLazyListState(initialFirstVisibleItemIndex = 0)
+        val scope = rememberCoroutineScope()
+        var scrollIndex by remember { mutableIntStateOf(0) }
+        val scrollState = rememberLazyListState(initialFirstVisibleItemIndex = scrollIndex)
+
+        LaunchedEffect(catchers) {
+            if (catchers.isNotEmpty() && catcherId != null){
+                catchers.forEachIndexed { index, item ->
+                    if (item.catcher.id == catcherId) {
+                        scrollIndex = index
+                        scope.launch {
+                            scrollState.scrollToItem(index)
+                        }
+                    }
+                }
+            }
+        }
         var itemWidth by remember { mutableIntStateOf(1) }
         val mostVisibleItem = remember(scrollState, itemWidth) {
             derivedStateOf {
@@ -549,9 +566,9 @@ fun ParamsDialog(
         val instance = ActionRunner.getActionInstance(action.detail.action)
         instance?.let {
             instance.Settings(action) { updated ->
-                val source=updatedAction.copy()
+                val source = updatedAction.copy()
                 source.action.updateParam(updated)
-                updatedAction=source
+                updatedAction = source
             }
         }
 

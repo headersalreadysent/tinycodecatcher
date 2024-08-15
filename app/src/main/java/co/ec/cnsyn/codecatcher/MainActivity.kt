@@ -31,6 +31,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import co.ec.cnsyn.codecatcher.database.AppDatabase
 import co.ec.cnsyn.codecatcher.database.DB
 import co.ec.cnsyn.codecatcher.pages.add.Add
@@ -114,11 +115,16 @@ fun CodeCatcherApp(context: Context) {
         ) { _ ->
             NavHost(
                 navController = navController,
-                //startDestination = "dashboard"
-                startDestination = "add"
+                startDestination = "dashboard"
             ) {
                 composable("dashboard") { Dashboard() }
-                composable("catchers") { CatcherPage() }
+                composable(
+                    "catchers/{catcherId}",
+                    arguments = listOf(navArgument("catcherId") { nullable = true })
+                ) { backStackEntry ->
+                    val catcherId = backStackEntry.arguments?.getString("catcherId")?.toInt()
+                    CatcherPage(catcherId = catcherId)
+                }
                 composable("add") { Add() }
             }
         }
