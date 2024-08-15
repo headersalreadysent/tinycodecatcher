@@ -52,6 +52,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -77,6 +78,7 @@ import co.ec.cnsyn.codecatcher.ui.theme.CodeCatcherTheme
 
 
 import androidx.lifecycle.viewmodel.compose.viewModel
+import co.ec.cnsyn.codecatcher.LocalSnackbar
 import co.ec.cnsyn.codecatcher.R
 import co.ec.cnsyn.codecatcher.composables.Calendar
 import co.ec.cnsyn.codecatcher.composables.IconName
@@ -93,6 +95,7 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonNull.content
 
 @OptIn(
@@ -301,6 +304,9 @@ fun LatestCode(
 ) {
 
     val clipboardManager = LocalClipboardManager.current
+    val scope= rememberCoroutineScope()
+    val snack= LocalSnackbar.current
+    val copiedMessage= stringResource(id = R.string.dashboard_list_last_codes_copied)
     Surface(
         modifier = Modifier
             .fillMaxWidth()
@@ -309,6 +315,9 @@ fun LatestCode(
             .background(MaterialTheme.colorScheme.secondaryContainer)
             .clickable {
                 clipboardManager.setText(AnnotatedString(latest.code.code))
+                scope.launch {
+                    snack.showSnackbar(latest.code.code +" "+ copiedMessage)
+                }
             }
             .padding(vertical = 12.dp)
     ) {

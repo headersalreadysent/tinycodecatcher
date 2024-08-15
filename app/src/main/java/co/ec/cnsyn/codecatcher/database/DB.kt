@@ -41,7 +41,7 @@ object DB {
 
     fun fillDatabase() {
         thread {
-          //  get().clearAllTables()
+            //get().clearAllTables()
 
             val list = get().action().getAllItems()
             if (list.isEmpty()) {

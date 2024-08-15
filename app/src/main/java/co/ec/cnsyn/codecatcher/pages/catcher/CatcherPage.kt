@@ -37,6 +37,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Timeline
+import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
@@ -75,8 +76,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
+import co.ec.cnsyn.codecatcher.LocalNavigation
 import co.ec.cnsyn.codecatcher.LocalSnackbar
 import co.ec.cnsyn.codecatcher.R
+import co.ec.cnsyn.codecatcher.composables.AlertText
 import co.ec.cnsyn.codecatcher.composables.AutoText
 import co.ec.cnsyn.codecatcher.composables.Calendar
 import co.ec.cnsyn.codecatcher.composables.IconName
@@ -109,6 +112,7 @@ import java.util.Locale
 fun CatcherPage(model: CatcherPageViewModel = viewModel(), catcherId: Int? = null) {
 
 
+    val snackbar = LocalSnackbar.current
     // bottom sheet related
     val sheetState = rememberModalBottomSheetState()
     var showAddActionSheet by remember { mutableStateOf(false) }
@@ -146,9 +150,6 @@ fun CatcherPage(model: CatcherPageViewModel = viewModel(), catcherId: Int? = nul
                 return@derivedStateOf if (itemWidth <= scrollState.firstVisibleItemScrollOffset) scrollState.firstVisibleItemIndex + 1
                 else scrollState.firstVisibleItemIndex
             }
-        }
-        var rebuild by remember {
-            mutableStateOf(0)
         }
         SkewSquare(
             skew = 30,
@@ -193,82 +194,118 @@ fun CatcherPage(model: CatcherPageViewModel = viewModel(), catcherId: Int? = nul
                 }
             }
         }
-        LazyRow(
-            modifier = Modifier
-                .fillMaxSize()
-                .statusBarsPadding()
-                .zIndex(1F),
-            state = scrollState,
-            flingBehavior = rememberSnapFlingBehavior(lazyListState = scrollState),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            items(catchers.size) {
-                Box(
-                    modifier = Modifier
-                        .fillParentMaxWidth(.9F)
-                        .fillParentMaxHeight()
-                ) {
-                    CatcherItem(catcherDetail = catchers[it],
-                        allActions = actions,
-                        isActive = it == mostVisibleItem.value,
-                        addAction = { catcher ->
-                            selectedCatcher = catcher
-                            showAddActionSheet = true
-                        },
-                        changeStatus = { action, status ->
-                            model.actionStatus(catchers[it].catcher.id, action, status)
-                        },
-                        dayDetail = { catcherId, start ->
-                            model.loadDayStats(catcherId, start)
-                            dayDetailSheet = true
-                        },
-                        actionParams = { actionDetail ->
-                            selectedActionDetail = actionDetail
-                        },
-                        deleteCatcher = { catcherDetail ->
-                            model.deleteCatcher(catcherDetail)
-                        }
+        val catcherDeletedMessage = stringResource(id = R.string.catchers_delete_catcher_message)
+        if (catchers.isEmpty()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .statusBarsPadding()
+                    .zIndex(3F),
+                Alignment.Center
+            ) {
+                Column(modifier = Modifier
+                    .fillMaxWidth(.6F)
+                    .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = stringResource(id = R.string.catchers_no_catcher),
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.bodySmall
                     )
+                    val navigator= LocalNavigation.current
+                    Button(onClick = {
+                        navigator.navigate("add")
+                    }) {
+                        Text(stringResource(id = R.string.catchers_add_catcher_button),
+                            style = MaterialTheme.typography.bodyLarge)
+                    }
                 }
-
             }
         }
-    }
+        if(catchers.isNotEmpty()){
+            LazyRow(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .statusBarsPadding()
+                    .zIndex(1F),
+                state = scrollState,
+                flingBehavior = rememberSnapFlingBehavior(lazyListState = scrollState),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                items(catchers.size) {
+                    Box(
+                        modifier = Modifier
+                            .fillParentMaxWidth(if (catchers.size == 1) 1F else .9F)
+                            .fillParentMaxHeight()
+                    ) {
+                        CatcherItem(catcherDetail = catchers[it],
+                            allActions = actions,
+                            isActive = it == mostVisibleItem.value,
+                            addAction = { catcher ->
+                                selectedCatcher = catcher
+                                showAddActionSheet = true
+                            },
+                            changeStatus = { action, status ->
+                                model.actionStatus(catchers[it].catcher.id, action, status)
+                            },
+                            dayDetail = { catcherId, start ->
+                                model.loadDayStats(catcherId, start)
+                                dayDetailSheet = true
+                            },
+                            actionParams = { actionDetail ->
+                                selectedActionDetail = actionDetail
+                            },
+                            deleteCatcher = { catcherDetail ->
+                                model.deleteCatcher(catcherDetail)
+                                scope.launch {
+                                    snackbar.showSnackbar(catcherDeletedMessage)
+                                }
+                            }
+                        )
+                    }
 
-    if (showAddActionSheet) {
-        SkewBottomSheet(
-            onDismissRequest = {
-                showAddActionSheet = false
-            }, sheetState = sheetState
-        ) {
-            selectedCatcher?.let { catcher ->
-                //show add bottom sheet for catcher
-                AddActionToCatcherBottomSheet(
-                    catcherDetail = catcher,
-                    actions = actions,
-                    changeStatus = { action, status ->
-                        model.actionStatus(catcher.catcher.id, action, status)
-                    },
+                }
+            }
+            if (showAddActionSheet) {
+                SkewBottomSheet(
                     onDismissRequest = {
                         showAddActionSheet = false
-                    },
+                    }, sheetState = sheetState
+                ) {
+                    selectedCatcher?.let { catcher ->
+                        //show add bottom sheet for catcher
+                        AddActionToCatcherBottomSheet(
+                            catcherDetail = catcher,
+                            actions = actions,
+                            changeStatus = { action, status ->
+                                model.actionStatus(catcher.catcher.id, action, status)
+                            },
+                            onDismissRequest = {
+                                showAddActionSheet = false
+                            },
+                        )
+                    }
+                }
+            }
+            val dayCodes by model.dayCodes.observeAsState(listOf())
+            if (dayDetailSheet) {
+                DayModalBottom(
+                    dayCodes = dayCodes, close = {
+                        dayDetailSheet = false
+                        model.clearDayStat()
+                    }, sheetState = sheetState
                 )
             }
+            ParamsDialog(selectedActionDetail) {
+                //close action
+                selectedActionDetail = null
+            }
         }
+
     }
-    val dayCodes by model.dayCodes.observeAsState(listOf())
-    if (dayDetailSheet) {
-        DayModalBottom(
-            dayCodes = dayCodes, close = {
-                dayDetailSheet = false
-                model.clearDayStat()
-            }, sheetState = sheetState
-        )
-    }
-    ParamsDialog(selectedActionDetail) {
-        //close action
-        selectedActionDetail = null
-    }
+
+
 }
 
 @Composable

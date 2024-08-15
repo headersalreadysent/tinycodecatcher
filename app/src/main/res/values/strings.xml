@@ -11,6 +11,7 @@
     <string name="dashboard_stat_catcher_count">Catcher Count</string>
     <string name="dashboard_stat_code_count">Code Count</string>
     <string name="dashboard_list_last_codes">Last Codes</string>
+    <string name="dashboard_list_last_codes_copied">copied to clipboard</string>
 
 
     <!-- catchers page -->
@@ -26,6 +27,10 @@
 
     <string name="catchers_deleted_last_action">You are deleted last action. Are you sure?</string>
     <string name="catchers_delete_catcher">Delete Catcher</string>
+    <string name="catchers_delete_catcher_message">Catcher deleted!</string>
+
+    <string name="catchers_no_catcher">No catcher found!</string>
+    <string name="catchers_add_catcher_button">Add Catcher</string>
 
     <!-- add page -->
     <string name="add_set_cather_title">Set Catcher</string>
