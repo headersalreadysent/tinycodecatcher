@@ -26,7 +26,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
-import kotlinx.serialization.json.JsonNull.content
 
 enum class SkewSquareCut {
     TopStart, TopEnd, BottomStart, BottomEnd

@@ -134,10 +134,10 @@ fun Add(model: AddViewModel = viewModel()) {
                     step++
                 }
                 if (catcher.description != "") {
-                    step++;
+                    step++
                 }
                 if (actionsDetails.isNotEmpty()) {
-                    step++;
+                    step++
                 }
                 completeRatio = step.toFloat() / 3F
             }
@@ -531,7 +531,7 @@ fun StepTest(
                     )
                 }
             }
-            var config = LocalConfiguration.current
+            val config = LocalConfiguration.current
             when (tabIndex) {
                 0 -> {
                     if (matchedMessages != null && matchedMessages!!.isEmpty()) {
@@ -589,7 +589,6 @@ fun StepTest(
                             text = stringResource(id = R.string.add_catcher_set_catcher_test_area_description),
                             modifier = Modifier.padding(vertical = 8.dp)
                         )
-                        var scope = rememberCoroutineScope()
 
                         OutlinedTextField(
                             modifier = Modifier
@@ -615,7 +614,7 @@ fun StepTest(
                             val matches = searchPattern.findAll(value).toList()
                             if (matches.isNotEmpty()) {
                                 val match = matches.first().value
-                                var parts = value.split(match)
+                                val parts = value.split(match)
                                 testResponse = buildAnnotatedString {
                                     append(parts[0])
                                     withStyle(

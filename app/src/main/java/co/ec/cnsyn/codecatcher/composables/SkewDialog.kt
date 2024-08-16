@@ -17,7 +17,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import co.ec.cnsyn.codecatcher.ui.theme.CodeCatcherTheme
-import kotlinx.serialization.json.JsonNull.content
 
 enum class SkewDialogCut { Top, Bottom }
 

@@ -9,14 +9,11 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -67,7 +64,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -79,7 +75,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import co.ec.cnsyn.codecatcher.LocalNavigation
 import co.ec.cnsyn.codecatcher.LocalSnackbar
 import co.ec.cnsyn.codecatcher.R
-import co.ec.cnsyn.codecatcher.composables.AlertText
 import co.ec.cnsyn.codecatcher.composables.AutoText
 import co.ec.cnsyn.codecatcher.composables.Calendar
 import co.ec.cnsyn.codecatcher.composables.IconName
@@ -91,22 +86,17 @@ import co.ec.cnsyn.codecatcher.composables.StatCard
 import co.ec.cnsyn.codecatcher.database.action.Action
 import co.ec.cnsyn.codecatcher.database.catcher.CatcherDao
 import co.ec.cnsyn.codecatcher.database.code.Code
-import co.ec.cnsyn.codecatcher.database.code.CodeDao
 import co.ec.cnsyn.codecatcher.database.relations.ActionDetail
 import co.ec.cnsyn.codecatcher.helpers.dateString
 import co.ec.cnsyn.codecatcher.sms.ActionRunner
 import co.ec.cnsyn.codecatcher.ui.theme.CodeCatcherTheme
 import co.ec.cnsyn.codecatcher.values.actionList
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.Locale
 
 
 @OptIn(
     ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class,
-    DelicateCoroutinesApi::class
 )
 @Composable
 fun CatcherPage(model: CatcherPageViewModel = viewModel(), catcherId: Int? = null) {

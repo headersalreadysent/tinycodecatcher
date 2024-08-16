@@ -51,7 +51,7 @@ fun Calendar(
         //lets find end of today
         var date = unix()
         date = date - (date % 86400) + 86400
-        var maxValue = 0;
+        var maxValue = 0
         while (date > minDate) {
             val dayCount = stats.filter { it < date && it >= date - 86400 }.size
             dayList[date] = dayCount
@@ -147,7 +147,7 @@ fun Calendar(
 fun CalendarPreview() {
     CodeCatcherTheme {
         var now = unix()
-        var list = List(60) {
+        val list = List(60) {
             now -= (Random.nextFloat() * 86400).toInt()
             return@List now.toInt()
         }

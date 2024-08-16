@@ -1,6 +1,5 @@
 package co.ec.cnsyn.codecatcher.composables
 
-import android.util.Size
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
