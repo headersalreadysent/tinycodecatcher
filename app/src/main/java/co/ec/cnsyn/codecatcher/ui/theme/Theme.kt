@@ -1,19 +1,33 @@
 package co.ec.cnsyn.codecatcher.ui.theme
 
-import android.app.Activity
+import android.content.Context
 import android.os.Build
+import android.widget.Toast
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.platform.LocalContext
 
 
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
+import co.ec.cnsyn.codecatcher.helpers.EventBus
+import co.ec.cnsyn.codecatcher.helpers.Settings
+import co.ec.cnsyn.codecatcher.helpers.SettingsChange
+import kotlinx.coroutines.launch
 
 private val lightScheme = lightColorScheme(
     primary = primaryLight,
@@ -107,24 +121,55 @@ val unspecified_scheme = ColorFamily(
 
 @Composable
 fun CodeCatcherTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = false,
+
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
+
+    val context = LocalContext.current
+    val settings = Settings(context)
+    val darkTheme = isSystemInDarkTheme()
+
+    var dynamicColor by remember {
+        mutableStateOf<Boolean>(
+            settings.getBoolean("dynamicColor", true)
+        )
+    }
+    var colorScheme by remember {
+        mutableStateOf<ColorScheme>(
+            schemaCalculator(context, dynamicColor, darkTheme)
+        )
+    }
+    val scope = rememberCoroutineScope()
+    LaunchedEffect(dynamicColor) {
+        colorScheme = schemaCalculator(context, dynamicColor, darkTheme)
+    }
+    scope.launch {
+        EventBus.subscribe<SettingsChange> {
+            if (it.name == "dynamicColor") {
+                dynamicColor = it.value as Boolean
+            }
+
+        }
+    }
+
+    MaterialTheme(
+        colorScheme = colorScheme,
+        typography = AppTypography,
+        content = content
+    )
+}
+
+fun schemaCalculator(
+    context: Context,
+    dynamicColor: Boolean?,
+    darkTheme: Boolean = false
+): ColorScheme {
+    return when {
+        (dynamicColor ?: true) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
 
         darkTheme -> darkScheme
         else -> lightScheme
     }
-
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = Typography,
-        content = content
-    )
 }

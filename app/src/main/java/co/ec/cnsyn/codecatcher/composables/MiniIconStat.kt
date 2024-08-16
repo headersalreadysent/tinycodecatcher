@@ -58,8 +58,9 @@ fun MiniIconStat(
                         MaterialTheme.colorScheme.primaryContainer,
                         CircleShape
                     )
-                    .padding(8.dp)
-
+                    .padding(8.dp),
+                tint =
+                MaterialTheme.colorScheme.onPrimaryContainer,
             )
             Column(
                 modifier = Modifier

@@ -1,13 +1,11 @@
 package co.ec.cnsyn.codecatcher.pages.settings
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,40 +18,70 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import co.ec.cnsyn.codecatcher.LocalSettings
 import co.ec.cnsyn.codecatcher.R
-import co.ec.cnsyn.codecatcher.composables.SkewDialog
-import co.ec.cnsyn.codecatcher.sms.ActionRunner
+import co.ec.cnsyn.codecatcher.composables.SkewBottomSheet
 import co.ec.cnsyn.codecatcher.ui.theme.CodeCatcherTheme
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsModal() {
-    Column(modifier = Modifier.fillMaxWidth()) {
-        val settings = LocalSettings.current
-        val dialogVisible by remember{ mutableStateOf(false) }
-        Text(
-            text = "Settings",
-            style = MaterialTheme.typography.bodyLarge.copy(
-                color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.Bold
-            )
-        )
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            var copy by remember {
-                mutableStateOf(settings.getBoolean("copyAllCodes", false))
-            }
-            Text(stringResource(R.string.settings_copy_all_codes_to_clipboard))
-            Checkbox(checked = copy, onCheckedChange = {
-                copy = !copy
-                settings.putBoolean("copyAllCodes", copy)
-            })
-        }
+fun SettingsModal(
+    close: () -> Unit = { -> }
+) {
+    SkewBottomSheet(
+        onDismissRequest = {
+            close()
+        },
+        fill = MaterialTheme.colorScheme.secondaryContainer
 
+    ) {
+
+        Column(modifier = Modifier.fillMaxWidth()) {
+            val settings = LocalSettings.current
+            val dialogVisible by remember { mutableStateOf(false) }
+            Text(
+                text = "Settings",
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Bold
+                )
+            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                var copy by remember {
+                    mutableStateOf(settings.getBoolean("copyAllCodes", false))
+                }
+                Text(
+                    stringResource(R.string.settings_copy_all_codes_to_clipboard),
+                    color = MaterialTheme.colorScheme.onSecondaryContainer
+                )
+                Checkbox(checked = copy, onCheckedChange = {
+                    copy = !copy
+                    settings.putBoolean("copyAllCodes", copy)
+                })
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                var copy by remember {
+                    mutableStateOf(settings.getBoolean("dynamicColor", true))
+                }
+                Text(
+                    stringResource(R.string.settings_use_dynamic_template),
+                    color = MaterialTheme.colorScheme.onSecondaryContainer
+                )
+                Checkbox(checked = copy, onCheckedChange = {
+                    copy = !copy
+                    settings.putBoolean("dynamicColor", copy)
+                })
+            }
+
+        }
     }
 }
 

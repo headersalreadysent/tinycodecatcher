@@ -25,7 +25,7 @@ enum class SkewDialogCut { Top, Bottom }
 fun SkewDialog(
     modifier: Modifier = Modifier,
     onDismissRequest: () -> Unit,
-    containerColor: Color = MaterialTheme.colorScheme.surface,
+    fill: Color = MaterialTheme.colorScheme.surface,
     minHeight: Dp = 0.dp,
     cut: SkewDialogCut = SkewDialogCut.Top,
     content: @Composable ColumnScope.() -> Unit,
@@ -46,7 +46,8 @@ fun SkewDialog(
             if (cut == SkewDialogCut.Top){
 
                 SkewSquare(
-                    skew = 40, fill = containerColor,
+                    skew = 30,
+                    fill = fill,
                     cut =  SkewSquareCut.TopStart
                 )
             }
@@ -54,14 +55,14 @@ fun SkewDialog(
                 modifier = Modifier
                     .fillMaxWidth()
                     .defaultMinSize(0.dp, minHeight)
-                    .background(containerColor)
+                    .background(fill)
                     .padding(16.dp)
             ) {
                 content()
             }
             if (cut == SkewDialogCut.Bottom){
                 SkewSquare(
-                    skew = 40, fill = containerColor,
+                    skew = 40, fill = fill,
                     cut = SkewSquareCut.BottomEnd
                 )
             }

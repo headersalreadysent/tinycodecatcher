@@ -160,7 +160,8 @@ fun CatcherPage(model: CatcherPageViewModel = viewModel(), catcherId: Int? = nul
                 .onGloballyPositioned {
                     itemWidth = (it.size.width * .8F).toInt()
                 },
-            cut = SkewSquareCut.TopStart
+            cut = SkewSquareCut.TopStart,
+            tonalElevate = 3.dp
         ) {
             Row(
                 modifier = Modifier
@@ -203,27 +204,31 @@ fun CatcherPage(model: CatcherPageViewModel = viewModel(), catcherId: Int? = nul
                     .zIndex(3F),
                 Alignment.Center
             ) {
-                Column(modifier = Modifier
-                    .fillMaxWidth(.6F)
-                    .padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth(.6F)
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
                     Text(
                         text = stringResource(id = R.string.catchers_no_catcher),
                         modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.Center,
                         style = MaterialTheme.typography.bodySmall
                     )
-                    val navigator= LocalNavigation.current
+                    val navigator = LocalNavigation.current
                     Button(onClick = {
                         navigator.navigate("add")
                     }) {
-                        Text(stringResource(id = R.string.catchers_add_catcher_button),
-                            style = MaterialTheme.typography.bodyLarge)
+                        Text(
+                            stringResource(id = R.string.catchers_add_catcher_button),
+                            style = MaterialTheme.typography.bodyLarge
+                        )
                     }
                 }
             }
         }
-        if(catchers.isNotEmpty()){
+        if (catchers.isNotEmpty()) {
             LazyRow(
                 modifier = Modifier
                     .fillMaxSize()
@@ -583,7 +588,10 @@ fun AddActionToCatcherBottomSheet(
                 ),
                 headlineContent = {
                     Column {
-                        Text(text = if (action.name == "") action.key else action.name)
+                        Text(
+                            text = if (action.name == "") action.key else action.name,
+                            style = MaterialTheme.typography.titleMedium
+                        )
                         Text(
                             text = if (action.description == "") action.key else action.description,
                             style = MaterialTheme.typography.bodySmall

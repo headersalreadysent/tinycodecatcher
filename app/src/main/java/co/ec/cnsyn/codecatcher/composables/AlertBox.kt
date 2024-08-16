@@ -34,7 +34,7 @@ fun AlertText(
     modifier: Modifier = Modifier,
     type: String = "info",
     color: Color =
-        MaterialTheme.colorScheme.secondaryContainer,
+        MaterialTheme.colorScheme.tertiaryContainer,
     isHtml: Boolean = false,
 ) {
     val annotatedString = buildAnnotatedString {
@@ -75,7 +75,8 @@ fun AlertText(
             .background(color, RoundedCornerShape(1.dp))
             .padding(horizontal = 8.dp, vertical = 4.dp),
         style = MaterialTheme.typography.bodySmall.copy(
-            textAlign = TextAlign.Justify
+            textAlign = TextAlign.Justify,
+            color = MaterialTheme.colorScheme.onTertiaryContainer
         ),
         inlineContent = types
     )

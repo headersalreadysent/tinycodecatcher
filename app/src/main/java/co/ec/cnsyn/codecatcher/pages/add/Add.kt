@@ -100,6 +100,16 @@ fun Add(model: AddViewModel = viewModel()) {
         val isKeyboardVisible by rememberKeyboardVisibility()
         val scrollState = rememberScrollState()
         var completeRatio by remember { mutableStateOf(0F) }
+
+        LinearProgressIndicator(
+            modifier = Modifier.fillMaxWidth()
+                .align(Alignment.TopStart)
+                .height(8.dp),
+            color = MaterialTheme.colorScheme.secondary,
+            progress = {
+                completeRatio
+            },
+        )
         Column(
             modifier = Modifier
                 .navigationBarsPadding()
@@ -107,7 +117,7 @@ fun Add(model: AddViewModel = viewModel()) {
                     if (isKeyboardVisible) {
                         Modifier.padding(bottom = 170.dp)
                     } else {
-                        Modifier.padding(bottom = 100.dp)
+                        Modifier.padding(bottom = 60.dp)
                     }
                 )
                 .fillMaxSize()
@@ -159,7 +169,7 @@ fun Add(model: AddViewModel = viewModel()) {
                     modifier = Modifier
                         .padding(horizontal = 16.dp)
                         .fillMaxWidth()
-                        .padding(bottom = 40.dp),
+                        .padding(bottom = 100.dp),
                     shape = RoundedCornerShape(3.dp),
                     enabled = completeRatio > .99F,
                     onClick = {
@@ -192,19 +202,10 @@ fun Add(model: AddViewModel = viewModel()) {
                 .navigationBarsPadding()
                 .padding(bottom = 80.dp),
             skew = 30,
-            cut = SkewSquareCut.TopEnd
+            cut = SkewSquareCut.TopEnd,
+            tonalElevate = 3.dp,
+            fill = MaterialTheme.colorScheme.surface,
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-            ) {
-                LinearProgressIndicator(
-                    modifier = Modifier.fillMaxWidth(),
-                    progress = {
-                        completeRatio
-                    },
-                )
-            }
 
         }
     }
@@ -246,7 +247,6 @@ fun StepSender(
             var senderType by remember { mutableStateOf(0) }
             AlertText(
                 text = stringResource(id = R.string.add_select_sender_type_alert),
-                color = MaterialTheme.colorScheme.secondaryContainer,
                 isHtml = true,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
@@ -350,7 +350,7 @@ fun StepSender(
                     catcher = catcher.copy(description = it)
                 },
                 label = { Text(text = descriptionText) },
-                placeholder = { Text(text = descriptionText) },
+                placeholder = { Text(text = selectedRegex?.description ?: "") },
                 maxLines = 3,
                 minLines = 2
             )

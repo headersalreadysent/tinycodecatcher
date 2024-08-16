@@ -83,6 +83,8 @@ dependencies {
     implementation(libs.androidx.material.icons.extended)
 
     implementation(libs.accompanist.permissions)
+    implementation(libs.androidx.ui.text.google.fonts) // Update version as needed
+
 
 
 

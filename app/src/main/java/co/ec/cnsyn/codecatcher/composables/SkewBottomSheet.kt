@@ -27,6 +27,7 @@ fun SkewBottomSheet(
     sheetState: SheetState = rememberModalBottomSheetState(),
     skew: Int = 45,
     cut: SkewSquareCut = SkewSquareCut.TopEnd,
+    fill: Color = MaterialTheme.colorScheme.surface,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     ModalBottomSheet(
@@ -35,20 +36,21 @@ fun SkewBottomSheet(
         sheetState = sheetState,
         shape = RoundedCornerShape(0.dp),
         containerColor = Color.Transparent,
+        tonalElevation = 0.dp,
         dragHandle = {
             SkewSquare(
                 skew = skew,
                 cut = cut,
-                fill = MaterialTheme.colorScheme.surface,
-                modifier = Modifier.padding(top=skew.dp)
-            )
+                fill = fill,
+                tonalElevate = 0.dp
+            ) {
+            }
         }
     ) {
-
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.surface)
+                .background(fill)
                 .padding(horizontal = 16.dp)
                 .padding(bottom = 8.dp)
         ) {
@@ -63,7 +65,12 @@ fun SkewBottomSheet(
 @Composable
 fun SkewBottomSheetPreview() {
     CodeCatcherTheme {
-        SkewBottomSheet(onDismissRequest = { /*TODO*/ }) {
+        SkewBottomSheet(
+            onDismissRequest = { /*TODO*/ },
+            sheetState = rememberModalBottomSheetState(
+
+            )
+        ) {
             Text("test")
         }
     }

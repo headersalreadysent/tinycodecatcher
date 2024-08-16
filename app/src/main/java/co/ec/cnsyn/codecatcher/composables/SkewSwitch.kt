@@ -85,7 +85,7 @@ fun SkewSwitch(
     activeColor: Color = MaterialTheme.colorScheme.primary,
     passiveColor: Color = MaterialTheme.colorScheme.secondaryContainer,
     activeTextColor: Color = MaterialTheme.colorScheme.onPrimary,
-    passiveTextColor: Color = MaterialTheme.colorScheme.onSurface,
+    passiveTextColor: Color = MaterialTheme.colorScheme.onSecondaryContainer,
     animateTime: Int = 200
 ) {
     var width by remember {

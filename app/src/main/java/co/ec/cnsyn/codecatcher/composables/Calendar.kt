@@ -23,6 +23,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
@@ -41,6 +42,7 @@ fun Calendar(
     stats: List<Int>,
     numberInRow: Int = 14,
     titleVisible: Boolean = true,
+    color:Color = MaterialTheme.colorScheme.primary.copy(alpha = 0F),
     dayClick: (start: Int) -> Unit,
 ) {
     if (stats.isNotEmpty()) {
@@ -81,7 +83,8 @@ fun Calendar(
                     modifier = Modifier
                         .fillMaxWidth(),
                     style = MaterialTheme.typography.titleSmall.copy(
-                        fontWeight = FontWeight.SemiBold
+                        fontWeight = FontWeight.SemiBold,
+                        color = color.copy(alpha = .8F),
                     )
                 )
             }
@@ -102,11 +105,11 @@ fun Calendar(
                     if (width > 0) {
                         dayList.toList().forEach { it ->
                             val dateValue = it.first
-                            var color = MaterialTheme.colorScheme.primary.copy(alpha = 0F)
                             var count = 0
+                            var boxColor=color
                             if (it.second > 0) {
                                 val fraction = (it.second.toFloat() / maxValue.toFloat())
-                                color = color.copy(alpha = fraction)
+                                boxColor = color.copy(alpha = fraction)
                                 count = it.second
                             }
                             Box(
@@ -114,7 +117,7 @@ fun Calendar(
                                     .padding(.5.dp)
                                     .width(boxWidth)
                                     .aspectRatio(1F)
-                                    .background(color)
+                                    .background(boxColor)
                                     .border(
                                         .5.dp,
                                         MaterialTheme.colorScheme.primaryContainer.copy(alpha = .5F)
@@ -126,6 +129,7 @@ fun Calendar(
                             ) {
                                 Text(
                                     text = if (count == 0) "" else count.toString(),
+                                    color = color.copy(alpha = .8F),
                                     modifier = Modifier.alpha(.3F)
                                 )
                             }

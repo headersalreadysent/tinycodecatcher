@@ -125,7 +125,8 @@ fun Dashboard(model: DashboardViewModel = viewModel()) {
                 .map { (index, offset) -> index * 100 + offset }
                 .collect { position -> scrollPosition = position }
         }
-        SkewSquare(modifier = Modifier.zIndex(3F), skew = 30) {
+        SkewSquare(modifier = Modifier.zIndex(3F), skew = 30,
+            fill = MaterialTheme.colorScheme.primaryContainer) {
             Row(
                 modifier = Modifier
                     .statusBarsPadding()
@@ -151,7 +152,11 @@ fun Dashboard(model: DashboardViewModel = viewModel()) {
                 }
                 Row(modifier = Modifier.weight(2F)) {
                     val calendar by model.calendar.observeAsState(listOf())
-                    Calendar(stats = calendar, numberInRow = 10) {
+                    Calendar(
+                        stats = calendar,
+                        numberInRow = 10,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                    ) {
 
                     }
                 }
@@ -187,9 +192,11 @@ fun Dashboard(model: DashboardViewModel = viewModel()) {
                         titleHeight = it.size.height + extraSpace
                     },
                 style = MaterialTheme.typography.titleMedium.copy(
-                    textAlign = TextAlign.End
+                    textAlign = TextAlign.End,
+                    color = MaterialTheme.colorScheme.primary
                 )
             )
+
 
             LazyColumn(
                 state = listState,
@@ -304,9 +311,9 @@ fun LatestCode(
 ) {
 
     val clipboardManager = LocalClipboardManager.current
-    val scope= rememberCoroutineScope()
-    val snack= LocalSnackbar.current
-    val copiedMessage= stringResource(id = R.string.dashboard_list_last_codes_copied)
+    val scope = rememberCoroutineScope()
+    val snack = LocalSnackbar.current
+    val copiedMessage = stringResource(id = R.string.dashboard_list_last_codes_copied)
     Surface(
         modifier = Modifier
             .fillMaxWidth()
@@ -316,7 +323,7 @@ fun LatestCode(
             .clickable {
                 clipboardManager.setText(AnnotatedString(latest.code.code))
                 scope.launch {
-                    snack.showSnackbar(latest.code.code +" "+ copiedMessage)
+                    snack.showSnackbar(latest.code.code + " " + copiedMessage)
                 }
             }
             .padding(vertical = 12.dp)
@@ -337,8 +344,9 @@ fun LatestCode(
             ) {
                 Text(
                     text = latest.code.date.dateString("dd"),
-                    style = MaterialTheme.typography.bodySmall
+                    style = MaterialTheme.typography.bodyMedium
                         .copy(
+                            fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.onSecondaryContainer
                         )
                 )
@@ -346,6 +354,7 @@ fun LatestCode(
                     text = latest.code.date.dateString("MMM"),
                     style = MaterialTheme.typography.bodySmall
                         .copy(
+                            fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.onSecondaryContainer
                         )
                 )
@@ -370,7 +379,9 @@ fun LatestCode(
                 Text(
                     text = latest.code.code,
                     modifier = Modifier.padding(bottom = 2.dp),
-                    style = MaterialTheme.typography.bodyLarge
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        fontWeight = FontWeight.Bold
+                    )
                 )
                 Text(
                     text = latest.code.sms,

@@ -115,6 +115,7 @@ fun CodeCatcherApp(context: Context) {
             },
             bottomBar = {
                 BottomAppBar(
+                    tonalElevation = 3.dp,
                     actions = {
                         IconButton(
                             onClick = {
@@ -177,10 +178,8 @@ fun CodeCatcherApp(context: Context) {
         }
 
         if (settingsVisible) {
-            SkewBottomSheet(onDismissRequest = {
-                settingsVisible=false
-            }) {
-                SettingsModal()
+            SettingsModal {
+                settingsVisible = false
             }
         }
 
