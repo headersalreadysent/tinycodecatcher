@@ -72,6 +72,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
 import co.ec.cnsyn.codecatcher.LocalNavigation
 import co.ec.cnsyn.codecatcher.LocalSnackbar
@@ -104,6 +105,7 @@ fun Add(model: AddViewModel = viewModel()) {
         LinearProgressIndicator(
             modifier = Modifier.fillMaxWidth()
                 .align(Alignment.TopStart)
+                .zIndex(3F)
                 .height(8.dp),
             color = MaterialTheme.colorScheme.secondary,
             progress = {

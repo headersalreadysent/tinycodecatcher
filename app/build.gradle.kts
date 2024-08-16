@@ -84,6 +84,7 @@ dependencies {
 
     implementation(libs.accompanist.permissions)
     implementation(libs.androidx.ui.text.google.fonts) // Update version as needed
+    implementation(libs.accompanist.systemuicontroller)
 
 
 

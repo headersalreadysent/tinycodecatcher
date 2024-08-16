@@ -3,6 +3,7 @@ package co.ec.cnsyn.codecatcher
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.IntentFilter
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -23,16 +24,20 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.view.WindowCompat
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -47,6 +52,7 @@ import co.ec.cnsyn.codecatcher.pages.dashboard.Dashboard
 import co.ec.cnsyn.codecatcher.pages.settings.SettingsModal
 import co.ec.cnsyn.codecatcher.sms.DebugSmsReceiver
 import co.ec.cnsyn.codecatcher.ui.theme.CodeCatcherTheme
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 
 class MainActivity : ComponentActivity() {
@@ -61,11 +67,13 @@ class MainActivity : ComponentActivity() {
         }
 
 
-        registerReceiver(
-            DebugSmsReceiver(),
-            IntentFilter("co.ec.cnsyn.codecatcher.DEBUG_SMS"),
-            RECEIVER_NOT_EXPORTED
-        )
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            registerReceiver(
+                DebugSmsReceiver(),
+                IntentFilter("co.ec.cnsyn.codecatcher.DEBUG_SMS"),
+                RECEIVER_NOT_EXPORTED
+            )
+        }
     }
 }
 
@@ -75,23 +83,36 @@ val LocalNavigation = compositionLocalOf<NavHostController> { error("No NavContr
 val LocalSnackbar = compositionLocalOf<SnackbarHostState> { error("No SnackbarHostState provided") }
 val LocalSettings = compositionLocalOf<Settings> { error("No LocalSettings provided") }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun CodeCatcherApp(context: Context) {
-
+    var uiController = rememberSystemUiController()
+    val surfaceColor=MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
+    SideEffect {
+        uiController.setNavigationBarColor(
+            color = surfaceColor,
+            darkIcons = true
+        )
+    }
 
     val navController = rememberNavController()
     val db = DB.getDatabase(context)
     val snackbarHostState = SnackbarHostState()
     val settings = Settings(context)
+
     CompositionLocalProvider(
         LocalNavigation provides navController,
         LocalDB provides db,
         LocalSnackbar provides snackbarHostState,
         LocalSettings provides settings
     ) {
+
         var settingsVisible by remember { mutableStateOf(false) }
+        if (settingsVisible) {
+            SettingsModal {
+                settingsVisible = false
+            }
+        }
         Scaffold(
             modifier = Modifier
                 .fillMaxSize(),
@@ -162,11 +183,6 @@ fun CodeCatcherApp(context: Context) {
             }
         }
 
-        if (settingsVisible) {
-            SettingsModal {
-                settingsVisible = false
-            }
-        }
 
 
     }
