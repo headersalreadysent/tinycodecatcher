@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -124,26 +125,33 @@ fun CodeCatcherTheme(
     val settings = Settings(context)
     val darkTheme = isSystemInDarkTheme()
 
-    var dynamicColor by remember {
-        mutableStateOf<Boolean>(
-            settings.getBoolean("dynamicColor", true)
-        )
-    }
+    var dynamicColor by remember { mutableStateOf(settings.getBoolean("dynamicColor", true)) }
+    var useDarkMode by remember { mutableStateOf(settings.getBoolean("darkMode", true)) }
+
     var colorScheme by remember {
-        mutableStateOf<ColorScheme>(
-            schemaCalculator(context, dynamicColor, darkTheme)
+        mutableStateOf(
+            schemaCalculator(
+                context,
+                dynamicColor,
+                darkTheme && useDarkMode
+            )
         )
     }
     val scope = rememberCoroutineScope()
-    LaunchedEffect(dynamicColor) {
-        colorScheme = schemaCalculator(context, dynamicColor, darkTheme)
+    LaunchedEffect(dynamicColor,useDarkMode) {
+        colorScheme = schemaCalculator(context, dynamicColor, darkTheme && useDarkMode)
     }
-    scope.launch {
-        EventBus.subscribe<SettingsChange> {
-            if (it.name == "dynamicColor") {
-                dynamicColor = it.value as Boolean
-            }
 
+    SideEffect {
+        scope.launch {
+            EventBus.subscribe<SettingsChange> {
+                if (it.name == "dynamicColor") {
+                    dynamicColor = it.value as Boolean
+                }
+                if (it.name == "darkMode") {
+                    useDarkMode = it.value as Boolean
+                }
+            }
         }
     }
 

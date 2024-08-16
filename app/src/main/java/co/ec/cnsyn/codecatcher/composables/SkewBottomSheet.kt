@@ -6,11 +6,16 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.waterfall
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -38,44 +43,37 @@ fun SkewBottomSheet(
     fill: Color = MaterialTheme.colorScheme.surface,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    Box(modifier = Modifier.fillMaxSize()) {
-        // Adjust for system bars
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .systemBarsPadding() // Ensure padding for system bars
-        ) {
-            ModalBottomSheet(
-                onDismissRequest = onDismissRequest,
-                modifier = modifier,
-                sheetState = sheetState,
-                shape = RoundedCornerShape(0.dp),
-                containerColor = Color.Transparent,
-                tonalElevation = 0.dp,
-                windowInsets = BottomSheetDefaults.windowInsets,
-                dragHandle = {
-                    SkewSquare(
-                        skew = skew,
-                        cut = cut,
-                        fill = fill,
-                        tonalElevate = 0.dp
-                    ) {
-                    }
-                }
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(fill)
-                        .padding(horizontal = 16.dp)
-                        .padding(bottom = 8.dp)
-                ) {
-                    content()
-                }
-            }
 
+    ModalBottomSheet(
+        onDismissRequest = onDismissRequest,
+        modifier = modifier,
+        sheetState = sheetState,
+        shape = RoundedCornerShape(0.dp),
+        containerColor = Color.Transparent,
+        tonalElevation = 0.dp,
+        windowInsets = WindowInsets.Companion.ime,
+        dragHandle = {
+            SkewSquare(
+                skew = skew,
+                cut = cut,
+                fill = fill,
+                tonalElevate = 0.dp
+            ) {
+            }
+        }
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(fill)
+                .padding(horizontal = 16.dp)
+                .padding(bottom = 8.dp)
+                .navigationBarsPadding()
+        ) {
+            content()
         }
     }
+
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

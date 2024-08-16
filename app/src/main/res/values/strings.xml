@@ -56,6 +56,7 @@
     <string name="settings_title">Settings</string>
     <string name="settings_copy_all_codes_to_clipboard">Copy all codes to clipboard.</string>
     <string name="settings_use_dynamic_template">Use dynamic colors.</string>
+    <string name="settings_use_dark_mode">Use dark mode.</string>
 
 
 

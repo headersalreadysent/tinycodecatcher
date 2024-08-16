@@ -38,7 +38,6 @@ fun SettingsModal(
 
         Column(modifier = Modifier.fillMaxWidth()) {
             val settings = LocalSettings.current
-            val dialogVisible by remember { mutableStateOf(false) }
             Text(
                 text = "Settings",
                 style = MaterialTheme.typography.bodyLarge.copy(
@@ -78,6 +77,24 @@ fun SettingsModal(
                 Checkbox(checked = copy, onCheckedChange = {
                     copy = !copy
                     settings.putBoolean("dynamicColor", copy)
+                })
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                var copy by remember {
+                    mutableStateOf(settings.getBoolean("darkMode", true))
+                }
+                Text(
+                    stringResource(R.string.settings_use_dark_mode),
+                    color = MaterialTheme.colorScheme.onSecondaryContainer
+                )
+                Checkbox(checked = copy, onCheckedChange = {
+                    copy = !copy
+                    settings.putBoolean("darkMode", copy)
                 })
             }
 

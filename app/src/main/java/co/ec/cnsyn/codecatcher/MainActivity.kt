@@ -86,7 +86,7 @@ val LocalSettings = compositionLocalOf<Settings> { error("No LocalSettings provi
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun CodeCatcherApp(context: Context) {
-    var uiController = rememberSystemUiController()
+    val uiController = rememberSystemUiController()
     val surfaceColor=MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
     SideEffect {
         uiController.setNavigationBarColor(
