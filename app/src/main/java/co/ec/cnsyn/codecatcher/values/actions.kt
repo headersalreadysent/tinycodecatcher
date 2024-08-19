@@ -9,7 +9,8 @@ private var actions = listOf(
         1,
         key = "notification",
         icon = "Notifications",
-        action = "NotificationAction"
+        action = "NotificationAction",
+        defaultParams = "{\"notificationTitle\":\"\"}"
     ),
     Action(
         2,

@@ -74,11 +74,18 @@
     <string name="action_SmsAction_forward_send_type_sms">Sms Content</string>
     <string name="action_SmsAction_forward_send_type_code">Caught Content</string>
     <string name="action_SmsAction_error">Sending sms failed.</string>
-    <string name="action_TTSAction_error">TTS failed.</string>
-    <string name="action_TTSAction_language_error">TTS language error.</string>
+
     <string name="action_NotificationAction_permission_error">CodeCatcher notification permission missing.</string>
     <string name="action_NotificationAction_error">CodeCatcher notification error.</string>
+    <string name="action_NotificationAction_tts_content">_sender_ verification code is _code_</string>
+    <string name="action_NotificationAction_notification_title_title">Notification Title Template</string>
+    <string name="action_NotificationAction_notification_title">_sender_ Verification Code</string>
+    <string name="action_NotificationAction_notification_content_title">Notification Content Template</string>
+    <string name="action_NotificationAction_notification_content">_code_\n_message_</string>
+    <string name="action_NotificationAction_notification_hint">You can use _sender_, _code_ and _message_ placeholders</string>
 
+    <string name="action_TTSAction_error">TTS failed.</string>
+    <string name="action_TTSAction_language_error">TTS language error.</string>
     <string name="action_TTSAction_adjust_volume">Increase volume if phone is silent</string>
     <string-array name="action_TTSAction_adjust_volume_params">
         <item>Yes</item>
