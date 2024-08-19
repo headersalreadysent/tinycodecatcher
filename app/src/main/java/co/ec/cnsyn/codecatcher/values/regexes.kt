@@ -6,25 +6,26 @@ import co.ec.cnsyn.codecatcher.helpers.translate
 
 private var regexes = listOf(
     Regex(
-        id = 1,
         regex = "\\b[0-9]{4}\\b",
         key = "4digit",
     ),
     Regex(
-        id = 2,
         regex = "\\b[0-9]{5}\\b",
         key = "5digit",
     ),
     Regex(
-        id = 3,
         regex = "\\b[0-9]{6}\\b",
         key = "6digit",
     ),
     Regex(
-        id = 4,
         regex = "\\bhttps?://([a-zA-Z0-9_-]+\\.)+[a-zA-Z]{2,}(/[a-zA-Z0-9#%&?=._-]*)?\\b",
         key = "url"
+    ),
+    Regex(
+        regex = ".*",
+        key = "any"
     )
+
 )
 
 

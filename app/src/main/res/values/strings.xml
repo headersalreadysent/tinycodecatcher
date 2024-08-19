@@ -79,6 +79,17 @@
     <string name="action_NotificationAction_permission_error">CodeCatcher notification permission missing.</string>
     <string name="action_NotificationAction_error">CodeCatcher notification error.</string>
 
+    <string name="action_TTSAction_adjust_volume">Increase volume if phone is silent</string>
+    <string-array name="action_TTSAction_adjust_volume_params">
+        <item>Yes</item>
+        <item>No</item>
+    </string-array>
+    <string name="action_TTSAction_locale">TTS language</string>
+    <string name="action_TTSAction_locale_default">Default</string>
+    <string name="action_TTSAction_tts_content_title">TTS Content</string>
+    <string name="action_TTSAction_tts_content_hint">You can use _sender and _code_ placeholders</string>
+    <string name="action_TTSAction_tts_content">_sender_ verification code is _code_</string>
+
 
 
     <!-- regex values languages-->
@@ -90,6 +101,8 @@
     <string name="regexlist_6digit_desc">Catches 6 digit numeric codes.</string>
     <string name="regexlist_url">Url</string>
     <string name="regexlist_url_desc">Catches valid urls.</string>
+    <string name="regexlist_any">Anything</string>
+    <string name="regexlist_any_desc">Matches anything in message content</string>
 
     <!-- action list languages -->
     <string name="actionlist_notification">Notification</string>

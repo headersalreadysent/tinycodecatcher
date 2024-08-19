@@ -28,7 +28,8 @@ private var actions = listOf(
         4,
         key = "tts",
         icon = "Mic",
-        action = "TTSAction"
+        action = "TTSAction",
+        defaultParams = "{\"adjustVolume\":\"yes\"}"
     )
 )
 
