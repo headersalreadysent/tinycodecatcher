@@ -58,6 +58,12 @@
     <string name="settings_use_dynamic_template">Use dynamic colors.</string>
     <string name="settings_use_dark_mode">Use dark mode.</string>
 
+    <string-array name="settings_use_dark_options">
+        <item>Dark</item>
+        <item>Automatic</item>
+        <item>Light</item>
+    </string-array>
+
 
 
     <!-- actions settings -->

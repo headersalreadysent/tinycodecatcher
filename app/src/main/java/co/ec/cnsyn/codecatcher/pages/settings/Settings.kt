@@ -24,6 +24,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -103,15 +104,16 @@ fun SettingsModal(
                     stringResource(R.string.settings_use_dark_mode),
                     color = MaterialTheme.colorScheme.onSecondaryContainer
                 )
+                val options = stringArrayResource(R.array.settings_use_dark_options)
+
                 ToggleButton(
                     value = darkMode,
                     values = mapOf(
-                        -1 to "Dark",
-                        0 to "Automatic",
-                        1 to "Light"
+                        -1 to options[0],
+                        0 to options[1],
+                        1 to options[2]
                     ),
                     onChange = {
-                        println("darkMode is $it")
                         darkMode=it as Int
                         settings.putInt("darkModeSelection", darkMode)
                     }
