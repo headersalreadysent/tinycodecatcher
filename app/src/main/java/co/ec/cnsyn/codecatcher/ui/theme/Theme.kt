@@ -126,20 +126,21 @@ fun CodeCatcherTheme(
     val darkTheme = isSystemInDarkTheme()
 
     var dynamicColor by remember { mutableStateOf(settings.getBoolean("dynamicColor", true)) }
-    var useDarkMode by remember { mutableStateOf(settings.getBoolean("darkMode", true)) }
+    var useDarkMode by remember { mutableStateOf(settings.getInt("darkModeSelection", 0)) }
 
     var colorScheme by remember {
         mutableStateOf(
             schemaCalculator(
                 context,
                 dynamicColor,
-                darkTheme && useDarkMode
+                darkTheme,
+                useDarkMode
             )
         )
     }
     val scope = rememberCoroutineScope()
-    LaunchedEffect(dynamicColor,useDarkMode) {
-        colorScheme = schemaCalculator(context, dynamicColor, darkTheme && useDarkMode)
+    LaunchedEffect(dynamicColor, useDarkMode) {
+        colorScheme = schemaCalculator(context, dynamicColor, darkTheme, useDarkMode)
     }
 
     SideEffect {
@@ -148,8 +149,8 @@ fun CodeCatcherTheme(
                 if (it.name == "dynamicColor") {
                     dynamicColor = it.value as Boolean
                 }
-                if (it.name == "darkMode") {
-                    useDarkMode = it.value as Boolean
+                if (it.name == "darkModeSelection") {
+                    useDarkMode = it.value as Int
                 }
             }
         }
@@ -165,14 +166,26 @@ fun CodeCatcherTheme(
 fun schemaCalculator(
     context: Context,
     dynamicColor: Boolean?,
-    darkTheme: Boolean = false
+    phoneInDark: Boolean,
+    darkTheme: Int = 0
 ): ColorScheme {
-    return when {
-        (dynamicColor ?: true) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
 
-        darkTheme -> darkScheme
-        else -> lightScheme
+    if (dynamicColor != false && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+
+        return when (darkTheme) {
+            -1 -> dynamicDarkColorScheme(context)
+            0 -> if (phoneInDark) dynamicDarkColorScheme(context) else dynamicLightColorScheme(
+                context
+            )
+            1 -> dynamicLightColorScheme(context)
+            else -> dynamicLightColorScheme(context)
+        }
+    } else {
+        return when (darkTheme) {
+            -1 -> darkScheme
+            0 -> if (phoneInDark) darkScheme else lightScheme
+            1 -> lightScheme
+            else -> lightScheme
+        }
     }
 }
