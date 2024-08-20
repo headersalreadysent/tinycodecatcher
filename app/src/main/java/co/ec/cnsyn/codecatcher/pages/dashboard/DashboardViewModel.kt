@@ -35,6 +35,9 @@ open class DashboardViewModel : ViewModel() {
     var calendar = MutableLiveData<List<Int>>(listOf())
     var requiredPerms = MutableLiveData<List<PermissionInfo>>(listOf())
 
+    var catcherStat = MutableLiveData<List<Pair<String, Float>>>(listOf())
+    var actionStat = MutableLiveData<List<Pair<String, Float>>>(listOf())
+
 
     init {
         start()
@@ -50,6 +53,7 @@ open class DashboardViewModel : ViewModel() {
 
         //load stats
         loadLatest()
+        calculateCatcherStats()
         async({
             val catcherCount = DB.get().catcher().getActiveCount()
             val codeCount = DB.get().code().getCount()
@@ -72,6 +76,26 @@ open class DashboardViewModel : ViewModel() {
     private fun loadLatest() {
         async({ DB.get().code().getLatest() }, {
             codes.value = it
+        })
+    }
+
+    /**
+     * calculate catcher stats
+     */
+    private fun calculateCatcherStats() {
+        async({ DB.get().code().catcherCountStats() }, {
+            catcherStat.value=it.map {
+                return@map Pair(
+                    (if(it.sender!="") it.sender+"-" else "")+it.name,
+                    it.count.toFloat())
+            }
+        })
+        async({ DB.get().action().actionCountStats() }, {
+            actionStat.value=it.map {
+                return@map Pair(
+                    it.name,
+                    it.count.toFloat())
+            }
         })
     }
 
@@ -170,6 +194,13 @@ class MockDashboardViewModel : DashboardViewModel() {
         calendar.value = List(30) {
             now = (now - 86400 * Random.nextFloat()).toLong()
             return@List now.toInt()
+        }
+        catcherStat.value=List(Random.nextInt(3,7)){
+            Pair("Catcher $it", Random.nextFloat() * 10)
+        }
+
+        actionStat.value=List(Random.nextInt(3,7)){
+            Pair("Action $it", Random.nextFloat() * 10)
         }
     }
 }

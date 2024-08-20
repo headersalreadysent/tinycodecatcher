@@ -98,12 +98,26 @@ ORDER BY
     @Query("SELECT *  FROM code WHERE catcherId = :catcherId ORDER BY date DESC LIMIT 5")
     fun getLastItemsOfCatcher(catcherId: Int): List<Code>
 
+    data class CatcherCountStat(val sender: String, val name: String, val count: Int)
+
+    @Query(
+        """
+SELECT t.sender,r.name,count(c.id) AS count 
+FROM Code c 
+LEFT JOIN Catcher t ON c.catcherId=t.id 
+LEFT JOIN regex r ON r.id=t.regexId
+WHERE t.status=1
+GROUP BY c.catcherId
+    """
+    )
+    fun catcherCountStats(): List<CatcherCountStat>
+
     /**
      * get latest
      */
-    fun getLatest(): List<Latest> {
+    fun getLatest(limit: Int = 10): List<Latest> {
         val db = DB.get()
-        val codes = db.code().getLatestCodes(20)
+        val codes = db.code().getLatestCodes(limit)
         val catcherIds = codes.map { it.catcherId }.toSet().toList()
 
         val catchers = db.catcher().getCatchers(catcherIds.toIntArray()).associateBy { it.id }

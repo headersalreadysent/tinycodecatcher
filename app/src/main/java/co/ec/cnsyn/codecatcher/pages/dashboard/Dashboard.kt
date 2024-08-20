@@ -1,9 +1,11 @@
 package co.ec.cnsyn.codecatcher.pages.dashboard
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import com.google.accompanist.permissions.rememberPermissionState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,6 +14,7 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,15 +26,19 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DataObject
 import androidx.compose.material.icons.filled.Phishing
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -63,9 +70,11 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import co.ec.cnsyn.codecatcher.ui.theme.CodeCatcherTheme
 import androidx.lifecycle.viewmodel.compose.viewModel
+import co.ec.cnsyn.codecatcher.LocalNavigation
 import co.ec.cnsyn.codecatcher.LocalSnackbar
 import co.ec.cnsyn.codecatcher.R
 import co.ec.cnsyn.codecatcher.composables.Calendar
+import co.ec.cnsyn.codecatcher.composables.DoughnutChart
 import co.ec.cnsyn.codecatcher.composables.IconName
 import co.ec.cnsyn.codecatcher.composables.MiniIconStat
 import co.ec.cnsyn.codecatcher.composables.RealDevice
@@ -78,10 +87,12 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlin.math.ceil
+import kotlin.random.Random
 
 @OptIn(
     ExperimentalLayoutApi::class,
-    ExperimentalMaterial3Api::class
+    ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class
 )
 @Composable
 fun Dashboard(model: DashboardViewModel = viewModel()) {
@@ -91,21 +102,7 @@ fun Dashboard(model: DashboardViewModel = viewModel()) {
             .fillMaxWidth()
             .wrapContentSize()
     ) {
-        val listState = rememberLazyListState()
-        var scrollPosition by remember { mutableIntStateOf(0) }
-        var titleHeight by remember { mutableIntStateOf(0) }
-
         val stat by model.stats.observeAsState(mapOf())
-
-        LaunchedEffect(listState) {
-            //listen scroll
-            snapshotFlow {
-                listState.firstVisibleItemIndex to listState.firstVisibleItemScrollOffset
-            }
-                .distinctUntilChanged()
-                .map { (index, offset) -> index * 100 + offset }
-                .collect { position -> scrollPosition = position }
-        }
         SkewSquare(
             modifier = Modifier.zIndex(3F), skew = 30,
             fill = MaterialTheme.colorScheme.primaryContainer
@@ -167,14 +164,8 @@ fun Dashboard(model: DashboardViewModel = viewModel()) {
 
 
         }
-
-        var extraSpace = 0
-        var padding = 0
-
-        with(LocalDensity.current) {
-            extraSpace = 50.dp.toPx().toInt()
-            padding = 20.dp.toPx().toInt() * -1
-        }
+        val verticalScrollState = rememberScrollState()
+        val density = LocalDensity.current
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -182,35 +173,100 @@ fun Dashboard(model: DashboardViewModel = viewModel()) {
                 .padding(16.dp)
                 .zIndex(2F)
                 .graphicsLayer {
-                    translationY =
-                        (if (scrollPosition < titleHeight) scrollPosition * -1 else titleHeight * -1).toFloat() + padding
+                    translationY = with(density) { 45.dp.toPx() * -1 }
+
                 }
+                .verticalScroll(verticalScrollState)
         ) {
-            val codes by model.codes.observeAsState(listOf())
+
+            SkewSquare(
+                modifier = Modifier
+                    .padding(bottom = 16.dp)
+                    .padding(top = 30.dp)
+                    .fillMaxWidth(),
+                cut = SkewSquareCut.TopStart,
+                skew = 30,
+                fill = MaterialTheme.colorScheme.secondaryContainer
+            ) {
+                Text(
+                    text = stringResource(id = R.string.dashboard_list_catcher_stat),
+                    modifier = Modifier
+                        .fillMaxWidth().padding(horizontal = 16.dp),
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        textAlign = TextAlign.End,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer
+                    )
+                )
+                val catcherStats by model.catcherStat.observeAsState(listOf())
+                val actionStats by model.actionStat.observeAsState(listOf())
+                val graphListState = rememberLazyListState(initialFirstVisibleItemIndex = 0)
+                LazyRow(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    state = graphListState,
+                    flingBehavior = rememberSnapFlingBehavior(lazyListState = graphListState),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    item {
+                        if (catcherStats.isNotEmpty()) {
+                            DoughnutChart(
+                                modifier = Modifier
+                                    .fillParentMaxWidth(),
+                                data = catcherStats,
+                                title = stringResource(id = R.string.dashboard_graph_catcher_graph_title),
+                                formatter = "%.0f"
+                            )
+                        }
+                    }
+                    item {
+                        if (catcherStats.isNotEmpty()) {
+                            DoughnutChart(
+                                modifier = Modifier
+                                    .fillParentMaxWidth(),
+                                data = actionStats,
+                                title = stringResource(id = R.string.dashboard_graph_action_graph_title),
+                                formatter = "%.0f"
+                            )
+                        }
+                    }
+
+                }
+
+
+            }
+
             //calculate space for translate
             Text(
                 text = stringResource(id = R.string.dashboard_list_last_codes),
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .onGloballyPositioned {
-                        titleHeight = it.size.height + extraSpace
-                    },
+                    .fillMaxWidth(),
                 style = MaterialTheme.typography.titleMedium.copy(
                     textAlign = TextAlign.End,
                     color = MaterialTheme.colorScheme.primary
                 )
             )
+            val codes by model.codes.observeAsState(listOf())
 
-
-            LazyColumn(
-                state = listState,
+            codes.forEachIndexed { index, item ->
+                LatestCode(
+                    item,
+                    isLatest = index == codes.size - 1
+                )
+            }
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 120.dp),
+                Alignment.Center
             ) {
-                items(codes.size) { i ->
-                    LatestCode(
-                        codes[i],
-                        isLatest = i == codes.size - 1
-                    )
-
+                val nav = LocalNavigation.current
+                OutlinedButton(
+                    onClick = {
+                        nav.navigate("about")
+                    },
+                    modifier = Modifier.fillMaxWidth(.7F)
+                ) {
+                    Text(text = stringResource(id = R.string.dashboard_about))
                 }
             }
 
@@ -335,7 +391,7 @@ fun LatestCode(
         Row(
             modifier = Modifier
                 .background(MaterialTheme.colorScheme.secondaryContainer)
-                .fillMaxSize()
+                .fillMaxWidth()
                 .height(IntrinsicSize.Max),
         ) {
             Column(

@@ -10,8 +10,15 @@
     <string name="dashboard_permission_needs_some_permission">Code Catcher need some permissions:</string>
     <string name="dashboard_stat_catcher_count">Catcher Count</string>
     <string name="dashboard_stat_code_count">Code Count</string>
+    <string name="dashboard_list_catcher_stat">Catcher Stat</string>
+
+    <string name="dashboard_graph_catcher_graph_title">Catcher Run Count</string>
+    <string name="dashboard_graph_action_graph_title">Action Run Count</string>
+
     <string name="dashboard_list_last_codes">Last Codes</string>
     <string name="dashboard_list_last_codes_copied">copied to clipboard</string>
+
+    <string name="dashboard_about">About CodeCatcher</string>
 
 
     <!-- catchers page -->
@@ -122,6 +129,9 @@
     <string name="actionlist_tts_desc">Read codes with TTS.</string>
 
 
+
+    <!--composibles-->
+    <string name="doughnut_total_text">Total</string>
 
 
 
