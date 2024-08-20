@@ -22,4 +22,5 @@
 
 # Keep all classes related to Material Components
 -keep class androidx.compose.material.icons.filled.** { *; }
+-keep class androidx.compose.material.icons.automirrored.filled.** { *; }
 

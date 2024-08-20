@@ -4,9 +4,9 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Message
+import androidx.compose.material.icons.automirrored.filled.Message
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Send
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -19,11 +19,11 @@ import co.ec.cnsyn.codecatcher.database.catcheraction.CatcherAction
 import co.ec.cnsyn.codecatcher.database.code.Code
 import co.ec.cnsyn.codecatcher.database.code.CodeDao
 import co.ec.cnsyn.codecatcher.database.relations.ActionDetail
+import co.ec.cnsyn.codecatcher.helpers.EventBus
+import co.ec.cnsyn.codecatcher.helpers.SmsCaught
 import co.ec.cnsyn.codecatcher.helpers.async
 import co.ec.cnsyn.codecatcher.helpers.translate
 import co.ec.cnsyn.codecatcher.helpers.unix
-import co.ec.cnsyn.codecatcher.helpers.EventBus
-import co.ec.cnsyn.codecatcher.helpers.SmsCaught
 import co.ec.cnsyn.codecatcher.sms.ActionRunner
 import co.ec.cnsyn.codecatcher.sms.SmsData
 import kotlinx.coroutines.launch
@@ -44,7 +44,7 @@ open class DashboardViewModel : ViewModel() {
     init {
         start()
         viewModelScope.launch {
-            EventBus.subscribe<SmsCaught> { message ->
+            EventBus.subscribe<SmsCaught> { _ ->
                 loadLatest()
             }
         }
@@ -128,7 +128,7 @@ open class DashboardViewModel : ViewModel() {
             permissions.add(
                 PermissionInfo(
                     Manifest.permission.RECEIVE_SMS,
-                    Icons.Filled.Message,
+                    Icons.AutoMirrored.Filled.Message,
                     translate("dashboard_permission_RECEIVE_SMS")
                 )
             )
@@ -154,7 +154,7 @@ open class DashboardViewModel : ViewModel() {
             permissions.add(
                 PermissionInfo(
                     Manifest.permission.SEND_SMS,
-                    Icons.Filled.Send,
+                    Icons.AutoMirrored.Filled.Send,
                     translate("dashboard_permission_SEND_SMS")
                 )
             )
