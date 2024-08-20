@@ -24,6 +24,8 @@ import co.ec.cnsyn.codecatcher.helpers.translate
 import co.ec.cnsyn.codecatcher.helpers.unix
 import co.ec.cnsyn.codecatcher.helpers.EventBus
 import co.ec.cnsyn.codecatcher.helpers.SmsCaught
+import co.ec.cnsyn.codecatcher.sms.ActionRunner
+import co.ec.cnsyn.codecatcher.sms.SmsData
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
@@ -101,6 +103,17 @@ open class DashboardViewModel : ViewModel() {
 
 
     data class PermissionInfo(val permission: String, val icon: ImageVector, val text: String)
+
+    fun generateTestSms(){
+        val testSender= translate("dashboard_test_sms_sender")
+        val testContent= translate("dashboard_test_sms_content")+" "+Random.nextInt(100000,999999)
+        ActionRunner().runSmsList(
+            listOf(
+                SmsData(testSender, testContent, unix())
+            )
+        )
+        start()
+    }
 
     /**
      * calculate permission list

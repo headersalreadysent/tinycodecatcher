@@ -2,6 +2,7 @@ package co.ec.cnsyn.codecatcher.database
 
 import android.content.Context
 import androidx.room.Room
+import co.ec.cnsyn.codecatcher.BuildConfig
 import co.ec.cnsyn.codecatcher.database.catcher.Catcher
 import co.ec.cnsyn.codecatcher.database.catcheraction.CatcherAction
 import co.ec.cnsyn.codecatcher.database.code.Code
@@ -50,34 +51,59 @@ object DB {
                 get().regex().insertAll(*regexes.toTypedArray())
                 get().action().insertAll(*actionList().toTypedArray())
 
-                val catchers = List(regexes.size) { it ->
-                    Catcher(
-                        id = it + 1,
-                        sender = "",
-                        description = regexes[it].description,
-                        regexId = it + 1
-                    )
-                }
-                val catchersAction = mutableListOf<CatcherAction>()
-                for (i in 1..catchers.size) {
-                    val rands = randomAction(Random.nextInt(1, 4), 1..4)
-                    rands.forEach { action ->
-                        catchersAction.add(
-                            CatcherAction(
-                                catcherId = i,
-                                actionId = action,
-                                params = actionList()
-                                    .find { it.id == action }?.defaultParams ?: "{}"
+                if (BuildConfig.DEBUG) {
+                    //if debug generate some records to testing
+                    val catchers = List(regexes.size) { it ->
+                        Catcher(
+                            id = it + 1,
+                            sender = "",
+                            description = regexes[it].description,
+                            regexId = it + 1
+                        )
+                    }
+                    val catchersAction = mutableListOf<CatcherAction>()
+                    for (i in 1..catchers.size) {
+                        val rands = randomAction(Random.nextInt(1, 4), 1..4)
+                        rands.forEach { action ->
+                            catchersAction.add(
+                                CatcherAction(
+                                    catcherId = i,
+                                    actionId = action,
+                                    params = actionList()
+                                        .find { it.id == action }?.defaultParams ?: "{}"
 
+                                )
+                            )
+                        }
+                    }
+
+                    get().catcher().insertAll(*catchers.toTypedArray())
+                    get().catcherAction().insertAll(*catchersAction.toTypedArray())
+
+
+                    generateFakeData()
+                } else {
+                    //generate only one
+                    get().regex().getAllItems().find { it.key == "6digit" }?.let {
+                        get().catcher().insert(
+                            Catcher(
+                                id = 1,
+                                sender = "",
+                                description = it.description,
+                                regexId = it.id
                             )
                         )
                     }
+                    get().action().getAllItems().filter { it.key == "tts" || it.key=="copy" || it.key=="notification" }.map {
+                        return@map CatcherAction(
+                            catcherId = 1,
+                            actionId = it.id,
+                            params = it.defaultParams
+                        )
+                    }.let {
+                        get().catcherAction().insertAll(*it.toTypedArray())
+                    }
                 }
-
-                get().catcher().insertAll(*catchers.toTypedArray())
-                get().catcherAction().insertAll(*catchersAction.toTypedArray())
-
-                generateFakeData()
             }
 
         }

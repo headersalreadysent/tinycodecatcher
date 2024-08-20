@@ -212,8 +212,8 @@ fun Dashboard(model: DashboardViewModel = viewModel()) {
                     flingBehavior = rememberSnapFlingBehavior(lazyListState = graphListState),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    item {
-                        if (catcherStats.isNotEmpty() && catcherStats.size > 1) {
+                    if (catcherStats.isNotEmpty()) {
+                        item {
                             //if there is stat
                             DoughnutChart(
                                 modifier = Modifier
@@ -224,8 +224,8 @@ fun Dashboard(model: DashboardViewModel = viewModel()) {
                             )
                         }
                     }
-                    item {
-                        if (catcherStats.isNotEmpty()) {
+                    if (actionStats.isNotEmpty()) {
+                        item {
                             DoughnutChart(
                                 modifier = Modifier
                                     .fillParentMaxWidth(),
@@ -244,9 +244,10 @@ fun Dashboard(model: DashboardViewModel = viewModel()) {
 
             val codes by model.codes.observeAsState(listOf())
             if (codes.isEmpty()) {
-                var height= LocalConfiguration.current.screenHeightDp.absoluteValue*.5F
+                val height = LocalConfiguration.current.screenHeightDp.absoluteValue * .5F
                 Column(
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
                         .height(height.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
@@ -256,11 +257,22 @@ fun Dashboard(model: DashboardViewModel = viewModel()) {
                         colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.secondary),
                         modifier = Modifier.fillMaxWidth(.5F)
                     )
-                    Text(text = stringResource(R.string.dashboard_no_code),
-                        style = MaterialTheme.typography.bodyMedium)
+                    Text(
+                        text = stringResource(R.string.dashboard_no_code),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+
+                    OutlinedButton(
+                        onClick = {
+                            model.generateTestSms()
+                        },
+                        modifier = Modifier.padding(top = 16.dp)
+                    ) {
+                        Text(text = stringResource(R.string.dashboard_no_code_run_sample))
+                    }
                 }
             }
-            if(codes.isNotEmpty()){
+            if (codes.isNotEmpty()) {
                 Text(
                     text = stringResource(id = R.string.dashboard_list_last_codes),
                     modifier = Modifier
@@ -285,15 +297,15 @@ fun Dashboard(model: DashboardViewModel = viewModel()) {
                     .padding(bottom = 120.dp),
                 Alignment.Center
             ) {
-                val nav = LocalNavigation.current
-                OutlinedButton(
-                    onClick = {
-                        nav.navigate("about")
-                    },
-                    modifier = Modifier.fillMaxWidth(.7F)
-                ) {
-                    Text(text = stringResource(id = R.string.dashboard_about))
-                }
+                  val nav = LocalNavigation.current
+                  OutlinedButton(
+                      onClick = {
+                          nav.navigate("about")
+                      },
+                      modifier = Modifier.fillMaxWidth(.7F)
+                  ) {
+                      Text(text = stringResource(id = R.string.dashboard_about))
+                  }
             }
 
         }

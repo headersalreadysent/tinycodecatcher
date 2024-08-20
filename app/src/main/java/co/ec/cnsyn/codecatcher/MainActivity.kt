@@ -78,7 +78,7 @@ class MainActivity : ComponentActivity() {
         }
 
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if (BuildConfig.DEBUG && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             registerReceiver(
                 DebugSmsReceiver(),
                 IntentFilter("co.ec.cnsyn.codecatcher.DEBUG_SMS"),
@@ -89,8 +89,8 @@ class MainActivity : ComponentActivity() {
 }
 
 
-val LocalDB = compositionLocalOf<AppDatabase> { error("No NavController provided") }
-val LocalNavigation = compositionLocalOf<NavHostController> { error("No NavController provided") }
+val LocalDB = compositionLocalOf<AppDatabase> { error("No DB provided") }
+val LocalNavigation = compositionLocalOf<NavHostController> { NavHostController(App.context()) }
 val LocalSnackbar = compositionLocalOf<SnackbarHostState> { SnackbarHostState() }
 val LocalSettings = compositionLocalOf<Settings> { Settings(App.context()) }
 

@@ -13,12 +13,15 @@
     <string name="dashboard_list_catcher_stat">Catcher Stat</string>
 
     <string name="dashboard_graph_catcher_graph_title">Catcher Run Count</string>
-    <string name="dashboard_graph_action_graph_title">Action Run Count</string>
+    <string name="dashboard_graph_action_graph_title">Action Count</string>
 
     <string name="dashboard_list_last_codes">Last Codes</string>
     <string name="dashboard_list_last_codes_copied">copied to clipboard</string>
 
     <string name="dashboard_no_code">There is no code yet.</string>
+    <string name="dashboard_no_code_run_sample">Generate Test Sms</string>
+    <string name="dashboard_test_sms_sender">CodeCatcher Test Sender</string>
+    <string name="dashboard_test_sms_content">This is the test sms for seeing actions in live. Sms catch code:</string>
     <string name="dashboard_about">About CodeCatcher</string>
 
 

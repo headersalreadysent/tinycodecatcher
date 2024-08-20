@@ -153,6 +153,8 @@ fun CatcherPage(model: CatcherPageViewModel = viewModel(), catcherId: Int? = nul
             cut = SkewSquareCut.TopStart,
             tonalElevate = 3.dp
         ) {
+            if(catchers.size>1){
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -183,6 +185,7 @@ fun CatcherPage(model: CatcherPageViewModel = viewModel(), catcherId: Int? = nul
 
                     }
                 }
+            }
             }
         }
         val catcherDeletedMessage = stringResource(id = R.string.catchers_delete_catcher_message)
