@@ -8,11 +8,13 @@ import android.speech.tts.TextToSpeech
 import android.text.TextUtils.replace
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.core.app.NotificationCompat
@@ -25,6 +27,7 @@ import co.ec.cnsyn.codecatcher.database.relations.CatcherWithActions
 import co.ec.cnsyn.codecatcher.database.relations.CatcherWithRegex
 import co.ec.cnsyn.codecatcher.helpers.translate
 import co.ec.cnsyn.codecatcher.sms.SmsData
+import co.ec.cnsyn.codecatcher.ui.theme.secondaryLight
 import kotlinx.serialization.json.JsonNull.content
 import kotlin.random.Random
 
@@ -56,7 +59,8 @@ class NotificationAction : BaseAction {
             var notificationBuilder = NotificationCompat.Builder(context, channelId)
 
             notificationBuilder = setupTexts(catcher, action, sms, notificationBuilder)
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setSmallIcon(R.mipmap.ic_launcher_round)
+                .setColor(secondaryLight.toArgb())
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setAutoCancel(true)
             notificationManager?.notify(

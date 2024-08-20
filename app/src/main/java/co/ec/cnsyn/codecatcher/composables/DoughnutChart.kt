@@ -51,7 +51,7 @@ fun DoughnutChart(
     defaultText: String? = null
 ) {
     //get values as list
-    val total=data.map { it.second }.sum()
+    val total = data.map { it.second }.sum()
 
     var tappedSegment by remember { mutableIntStateOf(-1) }
     var tappedDegree by remember { mutableDoubleStateOf(-1.0) }
@@ -198,7 +198,9 @@ fun DoughnutChartPreview() {
 
 fun generateColorShades(startColor: Color, endColor: Color, numShades: Int): List<Color> {
     val colors = mutableListOf<Color>()
-
+    if (numShades < 3) {
+        return listOf(startColor, endColor)
+    }
     for (i in 0 until numShades) {
         val ratio = i.toFloat() / (numShades - 1)
         val color = blendColors(startColor, endColor, ratio)
