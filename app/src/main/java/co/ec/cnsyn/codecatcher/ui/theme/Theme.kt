@@ -169,9 +169,7 @@ fun schemaCalculator(
     phoneInDark: Boolean,
     darkTheme: Int = 0
 ): ColorScheme {
-
     if (dynamicColor != false && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-
         return when (darkTheme) {
             -1 -> dynamicDarkColorScheme(context)
             0 -> if (phoneInDark) dynamicDarkColorScheme(context) else dynamicLightColorScheme(

@@ -71,9 +71,7 @@ fun StatCard(
                 Icon(
                     icon,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurface.copy(
-                        alpha = .2F
-                    ),
+                    tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier
                         .size(height ?: (boxHeight / ratio).dp)
                         .rotate(10F)
@@ -81,7 +79,7 @@ fun StatCard(
                         .graphicsLayer {
                             translationX = size.width / 5F
                             translationY = size.height / 5F
-                        }
+                        },
                 )
             }
             Box(modifier = Modifier.fillMaxWidth()) {

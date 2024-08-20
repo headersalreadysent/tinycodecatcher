@@ -1,9 +1,11 @@
 package co.ec.cnsyn.codecatcher.pages.dashboard
 
+import androidx.compose.foundation.Image
 import com.google.accompanist.permissions.rememberPermissionState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -43,11 +45,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -101,42 +106,65 @@ fun Dashboard(model: DashboardViewModel = viewModel()) {
                 .map { (index, offset) -> index * 100 + offset }
                 .collect { position -> scrollPosition = position }
         }
-        SkewSquare(modifier = Modifier.zIndex(3F), skew = 30,
-            fill = MaterialTheme.colorScheme.primaryContainer) {
-            Row(
-                modifier = Modifier
-                    .statusBarsPadding()
-                    .fillMaxWidth()
-            ) {
-                FlowRow(
-                    modifier = Modifier
-                        .weight(1.6F)
-                        .padding(horizontal = 8.dp)
-                ) {
-                    MiniIconStat(
-                        modifier = Modifier.weight(1F),
-                        title = stringResource(R.string.dashboard_stat_catcher_count),
-                        content = (stat["catcher"] ?: 0).toString(),
-                        icon = Icons.Default.Phishing
-                    )
-                    MiniIconStat(
-                        modifier = Modifier.weight(1F),
-                        title = stringResource(R.string.dashboard_stat_code_count),
-                        icon = Icons.Default.DataObject,
-                        content = (stat["code"] ?: 0).toString()
+        SkewSquare(
+            modifier = Modifier.zIndex(3F), skew = 30,
+            fill = MaterialTheme.colorScheme.primaryContainer
+        ) {
+            var boxHeight by remember { mutableIntStateOf(0) }
+            Box(modifier = Modifier
+                .fillMaxWidth()
+                .onGloballyPositioned {
+                    boxHeight = it.size.height
+                }) {
+                if (boxHeight != 0) {
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_launcher_foreground),
+                        contentDescription = "",
+                        modifier = Modifier
+                            .height(with(LocalDensity.current) { boxHeight.toDp() })
+                            .align(Alignment.BottomEnd)
+                            .zIndex(1F)
+                            .alpha(.2F),
+                        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimaryContainer)
                     )
                 }
-                Row(modifier = Modifier.weight(2F)) {
-                    val calendar by model.calendar.observeAsState(listOf())
-                    Calendar(
-                        stats = calendar,
-                        numberInRow = 10,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                Row(
+                    modifier = Modifier
+                        .statusBarsPadding()
+                        .fillMaxWidth()
+                        .zIndex(3F)
+                ) {
+                    FlowRow(
+                        modifier = Modifier
+                            .weight(1.6F)
+                            .padding(horizontal = 8.dp)
                     ) {
+                        MiniIconStat(
+                            modifier = Modifier.weight(1F),
+                            title = stringResource(R.string.dashboard_stat_catcher_count),
+                            content = (stat["catcher"] ?: 0).toString(),
+                            icon = Icons.Default.Phishing
+                        )
+                        MiniIconStat(
+                            modifier = Modifier.weight(1F),
+                            title = stringResource(R.string.dashboard_stat_code_count),
+                            icon = Icons.Default.DataObject,
+                            content = (stat["code"] ?: 0).toString()
+                        )
+                    }
+                    Row(modifier = Modifier.weight(2F)) {
+                        val calendar by model.calendar.observeAsState(listOf())
+                        Calendar(
+                            stats = calendar,
+                            numberInRow = 10,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        ) {
 
+                        }
                     }
                 }
             }
+
 
         }
 
