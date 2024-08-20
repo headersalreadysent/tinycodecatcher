@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -58,6 +59,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -73,6 +75,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import co.ec.cnsyn.codecatcher.LocalNavigation
 import co.ec.cnsyn.codecatcher.LocalSnackbar
 import co.ec.cnsyn.codecatcher.R
+import co.ec.cnsyn.codecatcher.composables.AlertText
 import co.ec.cnsyn.codecatcher.composables.Calendar
 import co.ec.cnsyn.codecatcher.composables.DoughnutChart
 import co.ec.cnsyn.codecatcher.composables.IconName
@@ -87,6 +90,7 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlin.math.absoluteValue
 import kotlin.math.ceil
 import kotlin.random.Random
 
@@ -191,8 +195,9 @@ fun Dashboard(model: DashboardViewModel = viewModel()) {
                 Text(
                     text = stringResource(id = R.string.dashboard_list_catcher_stat),
                     modifier = Modifier
-                        .fillMaxWidth().padding(horizontal = 16.dp),
-                    style = MaterialTheme.typography.titleMedium.copy(
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    style = MaterialTheme.typography.titleSmall.copy(
                         textAlign = TextAlign.End,
                         color = MaterialTheme.colorScheme.onSecondaryContainer
                     )
@@ -208,7 +213,8 @@ fun Dashboard(model: DashboardViewModel = viewModel()) {
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     item {
-                        if (catcherStats.isNotEmpty()) {
+                        if (catcherStats.isNotEmpty() && catcherStats.size > 1) {
+                            //if there is stat
                             DoughnutChart(
                                 modifier = Modifier
                                     .fillParentMaxWidth(),
@@ -235,24 +241,44 @@ fun Dashboard(model: DashboardViewModel = viewModel()) {
 
             }
 
-            //calculate space for translate
-            Text(
-                text = stringResource(id = R.string.dashboard_list_last_codes),
-                modifier = Modifier
-                    .fillMaxWidth(),
-                style = MaterialTheme.typography.titleMedium.copy(
-                    textAlign = TextAlign.End,
-                    color = MaterialTheme.colorScheme.primary
-                )
-            )
-            val codes by model.codes.observeAsState(listOf())
 
-            codes.forEachIndexed { index, item ->
-                LatestCode(
-                    item,
-                    isLatest = index == codes.size - 1
-                )
+            val codes by model.codes.observeAsState(listOf())
+            if (codes.isEmpty()) {
+                var height= LocalConfiguration.current.screenHeightDp.absoluteValue*.5F
+                Column(
+                    modifier = Modifier.fillMaxWidth()
+                        .height(height.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.empty), contentDescription = "",
+                        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.secondary),
+                        modifier = Modifier.fillMaxWidth(.5F)
+                    )
+                    Text(text = stringResource(R.string.dashboard_no_code),
+                        style = MaterialTheme.typography.bodyMedium)
+                }
             }
+            if(codes.isNotEmpty()){
+                Text(
+                    text = stringResource(id = R.string.dashboard_list_last_codes),
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        textAlign = TextAlign.End,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                )
+                codes.forEachIndexed { index, item ->
+                    LatestCode(
+                        item,
+                        isLatest = index == codes.size - 1
+                    )
+                }
+            }
+
+
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -426,7 +452,7 @@ fun LatestCode(
                 latest.catcher?.let {
                     if (it.sender != "") {
                         Text(
-                            text = it.sender ?: "",
+                            text = it.sender,
                             modifier = Modifier.padding(bottom = 1.dp),
                             style = MaterialTheme.typography.bodySmall.copy(
                                 fontWeight = FontWeight.SemiBold,

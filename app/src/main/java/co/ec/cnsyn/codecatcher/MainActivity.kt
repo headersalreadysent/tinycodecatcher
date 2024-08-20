@@ -56,6 +56,7 @@ import androidx.navigation.navArgument
 import co.ec.cnsyn.codecatcher.database.AppDatabase
 import co.ec.cnsyn.codecatcher.database.DB
 import co.ec.cnsyn.codecatcher.helpers.Settings
+import co.ec.cnsyn.codecatcher.pages.about.About
 import co.ec.cnsyn.codecatcher.pages.add.Add
 import co.ec.cnsyn.codecatcher.pages.catcher.CatcherPage
 import co.ec.cnsyn.codecatcher.pages.dashboard.Dashboard
@@ -91,7 +92,7 @@ class MainActivity : ComponentActivity() {
 val LocalDB = compositionLocalOf<AppDatabase> { error("No NavController provided") }
 val LocalNavigation = compositionLocalOf<NavHostController> { error("No NavController provided") }
 val LocalSnackbar = compositionLocalOf<SnackbarHostState> { SnackbarHostState() }
-val LocalSettings = compositionLocalOf<Settings> { error("No LocalSettings provided") }
+val LocalSettings = compositionLocalOf<Settings> { Settings(App.context()) }
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -197,6 +198,7 @@ fun CodeCatcherApp(context: Context) {
                 }
                 composable("catchers") { CatcherPage() }
                 composable("add") { Add() }
+                composable("about") { About() }
             }
         }
 

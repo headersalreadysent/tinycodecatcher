@@ -18,6 +18,7 @@
     <string name="dashboard_list_last_codes">Last Codes</string>
     <string name="dashboard_list_last_codes_copied">copied to clipboard</string>
 
+    <string name="dashboard_no_code">There is no code yet.</string>
     <string name="dashboard_about">About CodeCatcher</string>
 
 
@@ -71,6 +72,13 @@
         <item>Light</item>
     </string-array>
 
+
+    <!-- about page-->
+
+    <string name="about_help_to_translate">Do you want to help to translate?</string>
+    <string name="about_translate_contact">Contact Us</string>
+
+    <string name="about_translate_mail_title">Translate CodeCatcher</string>
 
 
     <!-- actions settings -->
