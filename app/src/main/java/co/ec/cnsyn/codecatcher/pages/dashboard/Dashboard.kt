@@ -198,69 +198,68 @@ fun Dashboard(model: DashboardViewModel = viewModel()) {
                 skew = 30,
                 fill = MaterialTheme.colorScheme.secondaryContainer
             ) {
-                val graphListState = rememberLazyListState(initialFirstVisibleItemIndex = 0)
 
                 val graphStat by model.graphStat.observeAsState(mapOf())
                 val total = graphStat.keys.size
-                Column(modifier = Modifier.fillMaxWidth()) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(30.dp)
-                            .padding(horizontal = 16.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        LazyIndicator(total, graphListState, itemWidth)
-                        Text(
-                            text = stringResource(id = R.string.dashboard_list_catcher_stat),
-                            style = MaterialTheme.typography.titleSmall.copy(
-                                textAlign = TextAlign.End,
-                                color = MaterialTheme.colorScheme.onSecondaryContainer
-                            )
-                        )
-                    }
-                    var boxHeight by remember {
-                        mutableFloatStateOf(0F)
-                    }
-                    val density = LocalDensity.current
-                    Box(modifier = Modifier
-                        .fillMaxWidth()
-                        .onGloballyPositioned {
-                            boxHeight = with(density) { it.size.height.toDp().value }
-                        }) {
-
-                        LazyRow(
+                if(total>0){
+                    val graphListState = rememberLazyListState(initialFirstVisibleItemIndex = 0)
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        Row(
                             modifier = Modifier
-                                .fillMaxWidth(),
-                            state = graphListState,
-                            flingBehavior = rememberSnapFlingBehavior(lazyListState = graphListState),
-                            verticalAlignment = Alignment.CenterVertically,
+                                .fillMaxWidth()
+                                .height(30.dp)
+                                .padding(horizontal = 16.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            items(graphStat.keys.size) {
-                                val key = graphStat.keys.toList().get(it)
-                                DoughnutChart(
-                                    modifier = Modifier
-                                        .fillParentMaxWidth(),
-                                    data = graphStat[key] ?: listOf(),
-                                    title = translate("dashboard_graph_${key}_graph_title"),
-                                    formatter = "%.0f"
+                            LazyIndicator(total, graphListState, itemWidth)
+                            Text(
+                                text = stringResource(id = R.string.dashboard_list_catcher_stat),
+                                style = MaterialTheme.typography.titleSmall.copy(
+                                    textAlign = TextAlign.End,
+                                    color = MaterialTheme.colorScheme.onSecondaryContainer
                                 )
-                            }
+                            )
                         }
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .height(boxHeight.dp)
-                                .background(
-                                    brush = Brush.horizontalGradient(
-                                        Pair(0.0f, MaterialTheme.colorScheme.secondaryContainer),
-                                        Pair(0.1f, Color.Transparent),
-                                        Pair(0.9f, Color.Transparent),
-                                        Pair(1f, MaterialTheme.colorScheme.secondaryContainer),
+                        var boxHeight by remember { mutableFloatStateOf(0F) }
+                        Box(modifier = Modifier
+                            .fillMaxWidth()
+                            .onGloballyPositioned {
+                                boxHeight = with(density) { it.size.height.toDp().value }
+                            }) {
+
+                            LazyRow(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                state = graphListState,
+                                flingBehavior = rememberSnapFlingBehavior(lazyListState = graphListState),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                items(graphStat.keys.size) {
+                                    val key = graphStat.keys.toList().get(it)
+                                    DoughnutChart(
+                                        modifier = Modifier
+                                            .fillParentMaxWidth(),
+                                        data = graphStat[key] ?: listOf(),
+                                        title = translate("dashboard_graph_${key}_graph_title"),
+                                        formatter = "%.0f"
                                     )
-                                )
-                        )
+                                }
+                            }
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .height(boxHeight.dp)
+                                    .background(
+                                        brush = Brush.horizontalGradient(
+                                            Pair(0.0f, MaterialTheme.colorScheme.secondaryContainer),
+                                            Pair(0.1f, Color.Transparent),
+                                            Pair(0.9f, Color.Transparent),
+                                            Pair(1f, MaterialTheme.colorScheme.secondaryContainer),
+                                        )
+                                    )
+                            )
+                        }
                     }
                 }
 
@@ -342,7 +341,6 @@ fun Dashboard(model: DashboardViewModel = viewModel()) {
     }
 
 }
-
 
 
 /**

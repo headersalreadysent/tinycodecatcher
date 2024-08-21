@@ -131,9 +131,13 @@ fun CodeCatcherApp(
     var permissionModel by remember { mutableStateOf(false) }
     val permissions by appModel.requiredPerms.observeAsState(listOf())
     LaunchedEffect(permissions) {
-        val hiddenUntil = settings.getInt("permissionHidden", 0)
-        if (hiddenUntil < unix() || hiddenUntil == 0) {
-            permissionModel = permissions.isNotEmpty()
+        if(permissions.isEmpty()){
+            permissionModel=false
+        } else {
+            val hiddenUntil = settings.getInt("permissionHidden", 0)
+            if (hiddenUntil < unix() || hiddenUntil == 0) {
+                permissionModel = permissions.isNotEmpty()
+            }
         }
     }
     SideEffect {
@@ -248,7 +252,7 @@ fun CodeCatcherApp(
     }
 
 
-    if (permissionModel) {
+    if (permissionModel && permissions.isNotEmpty()) {
         SkewBottomSheet(onDismissRequest = {
             permissionModel = false
             settings.putInt("permissionHidden", unix().toInt() + 43200)
