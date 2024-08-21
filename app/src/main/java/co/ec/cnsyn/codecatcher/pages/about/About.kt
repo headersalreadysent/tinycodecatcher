@@ -41,6 +41,7 @@ fun About() {
         SkewSquare(
             cut = SkewSquareCut.BottomEnd,
             fill = MaterialTheme.colorScheme.primaryContainer,
+            skew = 30,
             modifier = Modifier
         ) {
             Column(

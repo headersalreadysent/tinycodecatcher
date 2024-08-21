@@ -73,6 +73,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
+import co.ec.cnsyn.codecatcher.AppViewModel
 import co.ec.cnsyn.codecatcher.CodeCatcherPreview
 import co.ec.cnsyn.codecatcher.LocalNavigation
 import co.ec.cnsyn.codecatcher.LocalSettings
@@ -339,102 +340,10 @@ fun Dashboard(model: DashboardViewModel = viewModel()) {
 
         }
     }
-    var settings = LocalSettings.current
-    var permissionModel by remember { mutableStateOf(false) }
-    val permissions by model.requiredPerms.observeAsState(listOf())
-    LaunchedEffect(permissions) {
-        val hiddenUntil = settings.getInt("permissionHidden", 0)
-        if (hiddenUntil < unix() || hiddenUntil == 0) {
-            permissionModel = permissions.isNotEmpty()
-        }
-    }
-
-    if (permissionModel) {
-        SkewBottomSheet(onDismissRequest = {
-            permissionModel = false
-            settings.putInt("permissionHidden", unix().toInt() + 43200)
-        }, cut = SkewSquareCut.TopStart) {
-            PermissionArea(permission = permissions) {
-                model.calculatePermissions()
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalPermissionsApi::class)
-@Composable
-fun PermissionArea(
-    permission: List<DashboardViewModel.PermissionInfo>,
-    then: (perm: String) -> Unit = { _ -> }
-) {
-
-    RealDevice {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 30.dp),
-            horizontalAlignment = Alignment.End
-        ) {
-            Text(
-                text = stringResource(id = R.string.dashboard_permission_needs_some_permission),
-                modifier = Modifier.padding(vertical = 8.dp),
-                style = MaterialTheme.typography.titleMedium
-            )
-            LazyRow(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End
-            ) {
-                items(permission.size) {
-                    val perm = permission[it]
-                    val permState = rememberPermissionState(
-                        permission = perm.permission,
-                        onPermissionResult = {
-                            then(perm.permission)
-                        }
-                    )
-                    Button(
-                        onClick = {
-                            permState.launchPermissionRequest()
-                        },
-                        contentPadding = PaddingValues(
-                            horizontal = 8.dp,
-                            vertical = 4.dp
-                        ),
-                        modifier = Modifier.padding(start = 4.dp),
-                        shape = RoundedCornerShape(5.dp)
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                perm.icon, contentDescription = perm.permission,
-                                modifier = Modifier
-                                    .background(
-                                        MaterialTheme.colorScheme.primaryContainer,
-                                        CircleShape
-                                    )
-                                    .scale(.8F),
-                                tint = MaterialTheme.colorScheme.primary
-
-                            )
-                            Text(
-                                text = perm.text,
-                                modifier = Modifier.padding(start = 5.dp),
-                                maxLines = 2
-                            )
-
-                        }
-                    }
-                }
-
-
-            }
-        }
-
-    }
-
 
 }
+
+
 
 /**
  * latest sms shower
