@@ -35,11 +35,19 @@ android {
             useSupportLibrary = true
         }
     }
-
+    signingConfigs {
+        create("release") {
+            keyAlias = "localRelease"
+            keyPassword = "codecatcher"
+            storeFile = file("../certificate/local.jks")
+            storePassword = "codecatcher"
+        }
+    }
     buildTypes {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
+            signingConfig = signingConfigs.getByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
