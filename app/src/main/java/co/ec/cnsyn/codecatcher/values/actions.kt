@@ -2,6 +2,8 @@ package co.ec.cnsyn.codecatcher.values
 
 import co.ec.cnsyn.codecatcher.database.action.Action
 import co.ec.cnsyn.codecatcher.helpers.translate
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 
 private var actions = listOf(
@@ -10,14 +12,25 @@ private var actions = listOf(
         key = "notification",
         icon = "Notifications",
         action = "NotificationAction",
-        defaultParams = "{\"notificationTitle\":\"\"}"
+        defaultParams = Json.encodeToString(
+            mapOf(
+                "notificationTitle" to translate("action_NotificationAction_notification_title"),
+                "notificationContent" to translate("action_NotificationAction_notification_content")
+            )
+        )
+
     ),
     Action(
         2,
         key = "sms",
         icon = "Textsms",
         action = "SmsAction",
-        defaultParams = "{\"no\":\"\",\"sendType\":\"code\"}"
+        defaultParams = Json.encodeToString(
+            mapOf(
+                "no" to "",
+                "sendType" to "code"
+            )
+        )
     ),
     Action(
         3,
@@ -30,22 +43,13 @@ private var actions = listOf(
         key = "tts",
         icon = "Mic",
         action = "TTSAction",
-        defaultParams = "{\"adjustVolume\":\"yes\"}"
+        defaultParams = Json.encodeToString(
+            mapOf(
+                "adjustVolume" to "yes",
+                "sendType" to "code"
+            )
+        )
     )
-)
-
-var actionLang = mapOf(
-    "tr_TR" to mapOf(
-        "notification" to "Bildirim",
-        "sms" to "Sms",
-        "copy" to "Kopyala",
-        "tts" to "Sesli Oku",
-
-        "notification-desc" to "Kodları bildirim olarak gösterir.",
-        "sms-desc" to "Kodları sms ile gönderir.",
-        "copy-desc" to "Kodları panoya kopyalar.",
-        "tts-desc" to "Kodları sesli olarak okur.",
-    ),
 )
 
 fun actionList(): List<Action> {

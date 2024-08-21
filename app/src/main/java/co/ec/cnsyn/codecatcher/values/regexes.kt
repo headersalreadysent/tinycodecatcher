@@ -28,18 +28,6 @@ private var regexes = listOf(
 
 )
 
-
-var regexLang = mapOf(
-    "tr_TR" to mapOf(
-        "4digit" to "4 karakter sayısal ifade",
-        "5digit" to "5 karakter sayısal ifade",
-        "6digit" to "6 karakter sayısal ifade",
-        "4digit-desc" to "4 karakterli sayısal ifadeleri yakalar.",
-        "5digit-desc" to "5 karakterli sayısal ifadeleri yakalar",
-        "6digit-desc" to "6 karakterli sayısal ifadeleri yakalar",
-    )
-)
-
 fun regexList(): List<Regex> {
     return regexes.map {
         it.name = translate("regexlist_${it.key}")
