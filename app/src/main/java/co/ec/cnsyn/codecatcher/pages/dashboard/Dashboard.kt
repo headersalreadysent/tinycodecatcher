@@ -41,10 +41,12 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -73,6 +75,7 @@ import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
 import co.ec.cnsyn.codecatcher.CodeCatcherPreview
 import co.ec.cnsyn.codecatcher.LocalNavigation
+import co.ec.cnsyn.codecatcher.LocalSettings
 import co.ec.cnsyn.codecatcher.LocalSnackbar
 import co.ec.cnsyn.codecatcher.R
 import co.ec.cnsyn.codecatcher.composables.Calendar
@@ -87,6 +90,7 @@ import co.ec.cnsyn.codecatcher.composables.SkewSquareCut
 import co.ec.cnsyn.codecatcher.database.code.CodeDao
 import co.ec.cnsyn.codecatcher.helpers.dateString
 import co.ec.cnsyn.codecatcher.helpers.translate
+import co.ec.cnsyn.codecatcher.helpers.unix
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
@@ -249,10 +253,10 @@ fun Dashboard(model: DashboardViewModel = viewModel()) {
                                 .height(boxHeight.dp)
                                 .background(
                                     brush = Brush.horizontalGradient(
-                                        Pair(0.0f,MaterialTheme.colorScheme.secondaryContainer),
-                                        Pair(0.1f,Color.Transparent),
-                                        Pair(0.9f,Color.Transparent),
-                                        Pair(1f,MaterialTheme.colorScheme.secondaryContainer),
+                                        Pair(0.0f, MaterialTheme.colorScheme.secondaryContainer),
+                                        Pair(0.1f, Color.Transparent),
+                                        Pair(0.9f, Color.Transparent),
+                                        Pair(1f, MaterialTheme.colorScheme.secondaryContainer),
                                     )
                                 )
                         )
@@ -335,13 +339,22 @@ fun Dashboard(model: DashboardViewModel = viewModel()) {
 
         }
     }
+    var settings = LocalSettings.current
+    var permissionModel by remember { mutableStateOf(false) }
+    val permissions by model.requiredPerms.observeAsState(listOf())
+    LaunchedEffect(permissions) {
+        val hiddenUntil = settings.getInt("permissionHidden", 0)
+        if (hiddenUntil < unix() || hiddenUntil == 0) {
+            permissionModel = permissions.isNotEmpty()
+        }
+    }
 
-
-    val permission by model.requiredPerms.observeAsState(listOf())
-    if (permission.isNotEmpty()) {
+    if (permissionModel) {
         SkewBottomSheet(onDismissRequest = {
+            permissionModel = false
+            settings.putInt("permissionHidden", unix().toInt() + 43200)
         }, cut = SkewSquareCut.TopStart) {
-            PermissionArea(permission = permission) {
+            PermissionArea(permission = permissions) {
                 model.calculatePermissions()
             }
         }
