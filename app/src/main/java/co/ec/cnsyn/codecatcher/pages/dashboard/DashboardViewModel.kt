@@ -38,7 +38,7 @@ open class DashboardViewModel : ViewModel() {
     var requiredPerms = MutableLiveData<List<PermissionInfo>>(listOf())
 
 
-    var graphStat = MutableLiveData<Map<String,List<Pair<String, Float>>>>(mapOf())
+    var graphStat = MutableLiveData<Map<String, List<Pair<String, Float>>>>(mapOf())
 
 
     init {
@@ -87,36 +87,44 @@ open class DashboardViewModel : ViewModel() {
      */
     private fun calculateCatcherStats() {
         async({ DB.get().code().catcherCountStats() }, {
-            val mutable=(graphStat.value ?: mapOf()).toMutableMap()
-            mutable["catcher"]=it.map {
-                return@map Pair(
-                    (if(it.sender!="") it.sender+"-" else "")+it.name,
-                    it.count.toFloat())
+            if (it.isNotEmpty()) {
+                val mutable = (graphStat.value ?: mapOf()).toMutableMap()
+                mutable["catcher"] = it.map {
+                    return@map Pair(
+                        (if (it.sender != "") it.sender + "-" else "") + it.name,
+                        it.count.toFloat()
+                    )
+                }
+                graphStat.value = mutable.toMap()
             }
-            graphStat.value=mutable.toMap()
         })
         async({ DB.get().code().senderCountStat() }, {
-            val mutable=(graphStat.value ?: mapOf()).toMutableMap()
-            mutable["sender"]=it.map {
-                return@map Pair(it.name, it.count.toFloat())
+            if (it.isNotEmpty()) {
+                val mutable = (graphStat.value ?: mapOf()).toMutableMap()
+                mutable["sender"] = it.map {
+                    return@map Pair(it.name, it.count.toFloat())
+                }
+                graphStat.value = mutable.toMap()
             }
-            graphStat.value=mutable.toMap()
         })
         async({ DB.get().action().actionCountStats() }, {
-            val mutable=(graphStat.value ?: mapOf()).toMutableMap()
-            mutable["action"]=it.map {
-                return@map Pair( it.name,it.count.toFloat())
+            if (it.isNotEmpty()) {
+                val mutable = (graphStat.value ?: mapOf()).toMutableMap()
+                mutable["action"] = it.map {
+                    return@map Pair(it.name, it.count.toFloat())
+                }
+                graphStat.value = mutable.toMap()
             }
-            graphStat.value=mutable.toMap()
         })
     }
 
 
     data class PermissionInfo(val permission: String, val icon: ImageVector, val text: String)
 
-    fun generateTestSms(){
-        val testSender= translate("dashboard_test_sms_sender")
-        val testContent= translate("dashboard_test_sms_content")+" "+Random.nextInt(100000,999999)
+    fun generateTestSms() {
+        val testSender = translate("dashboard_test_sms_sender")
+        val testContent =
+            translate("dashboard_test_sms_content") + " " + Random.nextInt(100000, 999999)
         ActionRunner().runSmsList(
             listOf(
                 SmsData(testSender, testContent, unix())
@@ -218,14 +226,14 @@ class MockDashboardViewModel : DashboardViewModel() {
             now = (now - 86400 * Random.nextFloat()).toLong()
             return@List now.toInt()
         }
-        graphStat.value= mapOf(
-            "catcher" to List(Random.nextInt(3,7)){
+        graphStat.value = mapOf(
+            "catcher" to List(Random.nextInt(3, 7)) {
                 Pair("Catcher $it", Random.nextFloat() * 10)
             },
-            "action" to List(Random.nextInt(3,7)){
+            "action" to List(Random.nextInt(3, 7)) {
                 Pair("Action $it", Random.nextFloat() * 10)
             },
-            "sender" to List(Random.nextInt(3,7)){
+            "sender" to List(Random.nextInt(3, 7)) {
                 Pair("Sender $it", Random.nextFloat() * 10)
             }
         )
