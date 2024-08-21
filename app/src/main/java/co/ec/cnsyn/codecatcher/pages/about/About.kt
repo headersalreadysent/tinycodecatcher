@@ -22,6 +22,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import co.ec.cnsyn.codecatcher.CodeCatcherPreview
 import co.ec.cnsyn.codecatcher.R
 import co.ec.cnsyn.codecatcher.composables.AutoText
 import co.ec.cnsyn.codecatcher.composables.SkewSquare
@@ -53,7 +54,7 @@ fun About() {
                 Image(
                     painter = painterResource(id = R.drawable.ic_launcher_foreground),
                     contentDescription = "",
-                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
+                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimaryContainer),
                     modifier = Modifier.fillMaxWidth(.6F)
                 )
 
@@ -63,7 +64,7 @@ fun About() {
                     key = "about-app-name",
                     style = MaterialTheme.typography.bodyLarge
                         .copy(
-                            color = MaterialTheme.colorScheme.primary
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
                 )
                 Text(text = "Developed with Jetpack Compose")
@@ -72,8 +73,9 @@ fun About() {
         val context = LocalContext.current
         Column(modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(text = stringResource(R.string.about_help_to_translate))
-            var title = stringResource(R.string.about_translate_mail_title)
+            Text(text = stringResource(R.string.about_help_to_translate),
+                style = MaterialTheme.typography.bodySmall)
+            val title = stringResource(R.string.about_translate_mail_title)
             OutlinedButton(onClick = {
                 val intent = Intent(Intent.ACTION_SENDTO).apply {
                     data = Uri.parse("mailto:")
@@ -84,7 +86,8 @@ fun About() {
                 context.startActivity(intent)
 
             }) {
-                Text(text = stringResource(R.string.about_translate_contact))
+                Text(text = stringResource(R.string.about_translate_contact),
+                    style = MaterialTheme.typography.bodySmall)
             }
         }
 
@@ -96,7 +99,7 @@ fun About() {
 @Preview(showBackground = true)
 @Composable
 fun AboutPreview() {
-    CodeCatcherTheme {
+    CodeCatcherPreview {
         About()
     }
 }

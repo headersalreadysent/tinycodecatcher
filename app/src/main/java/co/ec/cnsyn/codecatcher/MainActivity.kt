@@ -41,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -55,6 +56,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import co.ec.cnsyn.codecatcher.database.AppDatabase
 import co.ec.cnsyn.codecatcher.database.DB
+import co.ec.cnsyn.codecatcher.helpers.MockSettings
 import co.ec.cnsyn.codecatcher.helpers.Settings
 import co.ec.cnsyn.codecatcher.pages.about.About
 import co.ec.cnsyn.codecatcher.pages.add.Add
@@ -90,16 +92,17 @@ class MainActivity : ComponentActivity() {
 
 
 val LocalDB = compositionLocalOf<AppDatabase> { error("No DB provided") }
-val LocalNavigation = compositionLocalOf<NavHostController> { NavHostController(App.context()) }
-val LocalSnackbar = compositionLocalOf<SnackbarHostState> { SnackbarHostState() }
-val LocalSettings = compositionLocalOf<Settings> { Settings(App.context()) }
+val LocalNavigation = compositionLocalOf<NavHostController> { error("No navcontroller provided") }
+val LocalSnackbar = compositionLocalOf<SnackbarHostState> { error("No snackbarhost provided") }
+val LocalSettings = compositionLocalOf<Settings> { error("No settings provided") }
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun CodeCatcherApp(context: Context) {
+fun CodeCatcherApp(activity: Context) {
     val uiController = rememberSystemUiController()
     val surfaceColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
 
+    val context = LocalContext.current
     val navController = rememberNavController()
     val db = DB.getDatabase(context)
     val snackbarHostState = SnackbarHostState()
@@ -206,6 +209,28 @@ fun CodeCatcherApp(context: Context) {
     }
 
 
+}
+
+@Composable
+fun CodeCatcherPreview(
+    content: @Composable () -> Unit
+){
+    val context = LocalContext.current
+    val navController = rememberNavController()
+    val db = DB.getDatabase(context)
+    val snackbarHostState = SnackbarHostState()
+    val settings = MockSettings(context)
+
+    CompositionLocalProvider(
+        LocalNavigation provides navController,
+        LocalDB provides db,
+        LocalSnackbar provides snackbarHostState,
+        LocalSettings provides settings
+    ) {
+        CodeCatcherTheme {
+            content()
+        }
+    }
 }
 
 @Preview(showBackground = true)

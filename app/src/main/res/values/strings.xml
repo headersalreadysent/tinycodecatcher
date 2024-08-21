@@ -78,7 +78,7 @@
 
     <!-- about page-->
 
-    <string name="about_help_to_translate">Do you want to help to translate?</string>
+    <string name="about_help_to_translate">Do you want to help translate?</string>
     <string name="about_translate_contact">Contact Us</string>
 
     <string name="about_translate_mail_title">Translate CodeCatcher</string>
