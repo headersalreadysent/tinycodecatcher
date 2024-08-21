@@ -3,6 +3,7 @@ package co.ec.cnsyn.codecatcher.sms.actions
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.graphics.BitmapFactory
 import android.os.Build
 import android.speech.tts.TextToSpeech
 import android.text.TextUtils.replace
@@ -57,8 +58,10 @@ class NotificationAction : BaseAction {
             }
             //extract details
             var notificationBuilder = NotificationCompat.Builder(context, channelId)
+            val largeIcon = BitmapFactory.decodeResource(context.resources, R.drawable.ic_launcher_foreground)
 
             notificationBuilder = setupTexts(catcher, action, sms, notificationBuilder)
+                .setLargeIcon(largeIcon)
                 .setSmallIcon(R.mipmap.ic_launcher_round)
                 .setColor(secondaryLight.toArgb())
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
