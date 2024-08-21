@@ -69,11 +69,11 @@ class TTSAction : BaseAction {
                 if (result == TextToSpeech.LANG_MISSING_DATA ||
                     result == TextToSpeech.LANG_NOT_SUPPORTED
                 ) {
-                    Toast.makeText(
+                   /* Toast.makeText(
                         App.context(),
                         translate("action_TTSAction_language_error"),
                         Toast.LENGTH_LONG
-                    ).show()
+                    ).show()*/
 
                 }
                 //generate content

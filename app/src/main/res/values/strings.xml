@@ -17,7 +17,7 @@
     <string name="dashboard_graph_sender_graph_title">Sender Count</string>
 
     <string name="dashboard_list_last_codes">Last Codes</string>
-    <string name="dashboard_list_last_codes_copied">copied to clipboard</string>
+    <string name="dashboard_list_last_codes_copied">copied to clipboard.</string>
 
     <string name="dashboard_no_code">There is no code yet.</string>
     <string name="dashboard_no_code_run_sample">Generate Test Sms</string>
@@ -100,7 +100,7 @@
     <string name="action_NotificationAction_notification_title_title">Notification Title Template</string>
     <string name="action_NotificationAction_notification_title">_sender_ Verification Code</string>
     <string name="action_NotificationAction_notification_content_title">Notification Content Template</string>
-    <string name="action_NotificationAction_notification_content">_code_\n_message_</string>
+    <string name="action_NotificationAction_notification_content">_code_ _message_</string>
     <string name="action_NotificationAction_notification_hint">You can use _sender_, _code_ and _message_ placeholders</string>
 
     <string name="action_TTSAction_error">TTS failed.</string>

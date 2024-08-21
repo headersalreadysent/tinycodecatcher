@@ -46,6 +46,7 @@ open class DashboardViewModel : ViewModel() {
         viewModelScope.launch {
             EventBus.subscribe<SmsCaught> { _ ->
                 loadLatest()
+                calculateCatcherStats()
             }
         }
     }

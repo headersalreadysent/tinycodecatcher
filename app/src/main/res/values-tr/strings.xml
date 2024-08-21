@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">CodeCatcher</string>
+    <string name="global_calendar_title">Son %1$s Gün Grafiği</string>
+    <string name="dashboard_permission_RECEIVE_SMS">Sms Okuma</string>
+    <string name="dashboard_permission_POST_NOTIFICATIONS">Bildirim</string>
+    <string name="dashboard_permission_SEND_SMS">Sms Gönderim</string>
+    <string name="dashboard_permission_needs_some_permission">Code Catcher izinlere ihtiyaç duyuyor.</string>
+    <string name="dashboard_stat_catcher_count">Yakalayıcı Sayısı</string>
+    <string name="dashboard_stat_code_count">Kod Sayısı</string>
+    <string name="dashboard_list_catcher_stat">Yakalayıcı İstatistikleri</string>
+    <string name="dashboard_graph_catcher_graph_title">Yakalayıcı Çalışma Sayısı</string>
+    <string name="dashboard_graph_action_graph_title">Aksiyon Sayısı</string>
+    <string name="dashboard_graph_sender_graph_title">Gönderen Sayısı</string>
+    <string name="dashboard_list_last_codes">Son Kodlar</string>
+    <string name="dashboard_list_last_codes_copied">panoya kopyalandı.</string>
+    <string name="dashboard_no_code">Henüz yakalanmış kod bulunmuyor.</string>
+    <string name="dashboard_no_code_run_sample">Test SMS\'i Oluştur</string>
+    <string name="dashboard_test_sms_sender">CodeCatcher Test Gönderici</string>
+    <string name="dashboard_test_sms_content">Bu aksiyonları görmek için oluşturulmış test mesajıdır. Doğrulama kodu:</string>
+    <string name="dashboard_about">CodeCatcher Hakkında</string>
+    <string name="catchers_top_card_sender">Gönderen</string>
+    <string name="catchers_top_card_everybody">Tüm Göndericiler</string>
+    <string name="catchers_top_card_regex">İfade</string>
+    <string name="catchers_top_card_catch_count">Yakalanan</string>
+    <string name="catchers_top_card_description">Açıklama</string>
+    <string name="catchers_actions_add_action">Aksiyon Ekle</string>
+    <string name="catchers_stats_averages">Günlük Ortalamalar</string>
+    <string name="catchers_stats_day_average">%1$d Gün</string>
+    <string name="catchers_daily_caught">Günlük Yakalananlar</string>
+    <string name="catchers_deleted_last_action">Son aksiyonu sildiniz. Emin Misiniz?</string>
+    <string name="catchers_delete_catcher">Yakalayıcıyı Sil</string>
+    <string name="catchers_delete_catcher_message">Yakalayıcı silindi.</string>
+    <string name="catchers_no_catcher">Yakalayıcı bulunamadı.</string>
+    <string name="catchers_add_catcher_button">Yakalayıcı Ekle</string>
+
+    <string name="add_set_cather_title">Yakalayıcı Ayarla</string>
+    <string name="add_catcher_select_everybody">Herhangi Biri</string>
+    <string name="add_catcher_select_specific">Özel</string>
+    <string name="add_select_sender_type_alert"><![CDATA[
+    Belirli bir gönderici mesajlarını yakalamak için isim ya da telefon numarası girebilir, tüm göndericileri hedeflemek için <b>Herhangi Biri</b> olarakseçebilirsiniz.
+    ]]></string>
+    <string name="add_catcher_no_match">Eski yakalananlarda eşleşme bulunmuyor</string>
+    <string name="add_catcher_set_catcher_sender">Gönderen</string>
+    <string name="add_catcher_set_catcher_description">Açıklama</string>
+    <string name="add_catcher_set_catcher_regex">İfade</string>
+    <string name="add_catcher_set_catcher_test_area_description">İfadeyi test etmek için mesaj metni girin.</string>
+    <string name="add_catcher_set_catcher_test_area_text">Sms İçeriği</string>
+
+    <string name="add_set_actions_title">Aksiyonları Ayarla</string>
+    <string name="add_set_test_title">Test</string>
+    <string name="add_set_save_button">Yakalayıcı Kaydet</string>
+    <string name="add_set_save_message">Yakalayıcı Kaydedildi!</string>
+
+    <string name="settings_title">Ayarlar</string>
+    <string name="settings_copy_all_codes_to_clipboard">Tüm kodları panoya kopyala.</string>
+    <string name="settings_use_dynamic_template">Dinamik temayı kullan.</string>
+    <string name="settings_use_dark_mode">Karanlık modu kullan.</string>
+    <string-array name="settings_use_dark_options">
+        <item>Koyu</item>
+        <item>Otomatik</item>
+        <item>Aydınlık</item>
+    </string-array>
+
+    <string name="about_help_to_translate">Çeviriye yardım etmek ister misiniz?</string>
+    <string name="about_translate_contact">İletişime Geçin</string>
+    <string name="about_translate_mail_title">CodeCatcher\'ı tercüme et</string>
+
+
+    <string name="action_SmsAction_permission_error">CodeCatcher SMS gönderim izni bulunmuyor.</string>
+    <string name="action_SmsAction_forward_no_error">Yönlendirme numarası bulunmuyor.</string>
+    <string name="action_SmsAction_forward_number">Yönlendirme Numarası</string>
+    <string name="action_SmsAction_forward_send_type">Gönderim Türü</string>
+    <string name="action_SmsAction_forward_send_type_sms">Sms İçeriği</string>
+    <string name="action_SmsAction_forward_send_type_code">Yakalanan Kod</string>
+    <string name="action_SmsAction_error">Sms gönderimi başarısız.</string>
+
+    <string name="action_NotificationAction_permission_error">CodeCatcher bildirim gönderim izni bulunmuyor.</string>
+    <string name="action_NotificationAction_error">CodeCatcher bildirim hatası.</string>
+    <string name="action_NotificationAction_tts_content">_sender_ doğrulama kodu _code_</string>
+    <string name="action_NotificationAction_notification_title_title">Bildirim Başlık Şablonu</string>
+    <string name="action_NotificationAction_notification_title">_sender_ Doğrulama Kodu</string>
+    <string name="action_NotificationAction_notification_content_title">Bildirim İçerik Şablonu</string>
+    <string name="action_NotificationAction_notification_content">_code_ _message_</string>
+    <string name="action_NotificationAction_notification_hint">_sender_, _code_ ve _message_ ifadelerini şablonda kullanabilirsiniz.</string>
+
+    <string name="action_TTSAction_error">TTS hatası.</string>
+    <string name="action_TTSAction_language_error">TTS dil hatası.</string>
+    <string name="action_TTSAction_adjust_volume">Telefon sessizde ise sesi aç</string>
+    <string name="action_TTSAction_locale">TTS Dili</string>
+    <string name="action_TTSAction_locale_default">Varsayılan</string>
+    <string name="action_TTSAction_tts_content_title">TTS İçeriği</string>
+    <string name="action_TTSAction_tts_content_hint">_sender_ ve  _code_  ifadelerini şablonda kullanabilirsiniz.</string>
+    <string name="action_TTSAction_tts_content">_sender_ doğrulama kodu _code_</string>
+    <string-array name="action_TTSAction_adjust_volume_params">
+        <item>Evet</item>
+        <item>Hayır</item>
+    </string-array>
+
+
+    <string name="regexlist_4digit">4 basamaklı sayı</string>
+    <string name="regexlist_4digit_desc">4 basamaklı sayıları yakalar.</string>
+    <string name="regexlist_5digit">5 basamaklı sayı</string>
+    <string name="regexlist_5digit_desc">5 basamaklı sayıları yakalar.</string>
+    <string name="regexlist_6digit">6 basamaklı sayı</string>
+    <string name="regexlist_6digit_desc">6 basamaklı sayıları yakalar.</string>
+    <string name="regexlist_url">Url</string>
+    <string name="regexlist_url_desc">Geçerli bağlantıları yakalar.</string>
+    <string name="regexlist_any">Her şey</string>
+    <string name="regexlist_any_desc">Herhangi bir ifadeyi yakalar.</string>
+    <string name="actionlist_notification">Bildirim</string>
+    <string name="actionlist_notification_desc">Bildirim gösterir</string>
+    <string name="actionlist_sms">SMS</string>
+    <string name="actionlist_sms_desc">Yakalanan kodları sms ile gönderir.</string>
+    <string name="actionlist_copy">Kopyalama</string>
+    <string name="actionlist_copy_desc">Kodları panoya kopyalar.</string>
+    <string name="actionlist_tts">TTS</string>
+    <string name="actionlist_tts_desc">Kodları sesli olarak okur.</string>
+    <string name="doughnut_total_text">Toplam</string>
+</resources>
