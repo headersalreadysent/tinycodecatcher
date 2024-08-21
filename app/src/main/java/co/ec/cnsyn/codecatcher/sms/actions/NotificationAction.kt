@@ -58,11 +58,16 @@ class NotificationAction : BaseAction {
             }
             //extract details
             var notificationBuilder = NotificationCompat.Builder(context, channelId)
-            val largeIcon = BitmapFactory.decodeResource(context.resources, R.drawable.ic_launcher_foreground)
+            val largeIcon = BitmapFactory.decodeResource(context.resources, R.drawable.ic_launcher_foreground,
+                BitmapFactory.Options().apply {
+                    inScaled = true
+                    inDensity = 240
+                    inTargetDensity = 480
+                })
 
             notificationBuilder = setupTexts(catcher, action, sms, notificationBuilder)
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setLargeIcon(largeIcon)
-                .setSmallIcon(R.mipmap.ic_launcher_round)
                 .setColor(secondaryLight.toArgb())
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setAutoCancel(true)
