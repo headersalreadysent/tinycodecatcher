@@ -77,8 +77,6 @@ ORDER BY
     )
     fun getAverage(catcherId: Int, dayCount: Int = 7): Float
 
-    class Latest(var code: Code, var catcher: Catcher?, var actions: List<ActionDetail>)
-
     @Query(
         """
       SELECT *
@@ -111,6 +109,18 @@ GROUP BY c.catcherId
     """
     )
     fun catcherCountStats(): List<CatcherCountStat>
+
+    @Query(
+        """
+SELECT c.sender,c.sender as name,count(c.id) AS count 
+FROM Code c 
+GROUP BY c.sender ORDER BY count DESC LIMIT 5
+    """
+    )
+    fun senderCountStat(): List<CatcherCountStat>
+
+
+    class Latest(var code: Code, var catcher: Catcher?, var actions: List<ActionDetail>)
 
     /**
      * get latest

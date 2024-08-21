@@ -78,6 +78,7 @@ import co.ec.cnsyn.codecatcher.R
 import co.ec.cnsyn.codecatcher.composables.AutoText
 import co.ec.cnsyn.codecatcher.composables.Calendar
 import co.ec.cnsyn.codecatcher.composables.IconName
+import co.ec.cnsyn.codecatcher.composables.LazyIndicator
 import co.ec.cnsyn.codecatcher.composables.SkewBottomSheet
 import co.ec.cnsyn.codecatcher.composables.SkewDialog
 import co.ec.cnsyn.codecatcher.composables.SkewSquare
@@ -135,12 +136,7 @@ fun CatcherPage(model: CatcherPageViewModel = viewModel(), catcherId: Int? = nul
             }
         }
         var itemWidth by remember { mutableIntStateOf(1) }
-        val mostVisibleItem = remember(scrollState, itemWidth) {
-            derivedStateOf {
-                return@derivedStateOf if (itemWidth <= scrollState.firstVisibleItemScrollOffset) scrollState.firstVisibleItemIndex + 1
-                else scrollState.firstVisibleItemIndex
-            }
-        }
+        var activeItem by remember { mutableIntStateOf(0) }
         SkewSquare(
             skew = 30,
             modifier = Modifier
@@ -153,40 +149,18 @@ fun CatcherPage(model: CatcherPageViewModel = viewModel(), catcherId: Int? = nul
             cut = SkewSquareCut.TopStart,
             tonalElevate = 3.dp
         ) {
-            if(catchers.size>1){
 
-            Row(
+            LazyIndicator(
+                catchers.size,
+                scrollState,
+                itemWidth,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 86.dp, end = 16.dp),
-                horizontalArrangement = Arrangement.End
-            ) {
-                catchers.forEachIndexed { index, _ ->
-                    val animatedWidth by animateDpAsState(
-                        targetValue = if (mostVisibleItem.value == index) 30.dp else 10.dp,
-                        animationSpec = tween(durationMillis = 200, easing = FastOutSlowInEasing),
-                        label = "width"
-                    )
-                    val animatedColor by animateColorAsState(
-                        targetValue = if (mostVisibleItem.value == index) MaterialTheme.colorScheme.primary
-                        else MaterialTheme.colorScheme.secondary,
-                        animationSpec = tween(durationMillis = 200, easing = FastOutSlowInEasing),
-                        label = "color"
-                    )
-                    Box(
-                        modifier = Modifier
-                            .padding(start = 3.dp)
-                            .width(animatedWidth)
-                            .height(6.dp)
-                            .background(
-                                animatedColor, shape = RoundedCornerShape(2.dp)
-                            )
-                    ) {
-
-                    }
+                changed = {
+                    activeItem = it
                 }
-            }
-            }
+            )
         }
         val catcherDeletedMessage = stringResource(id = R.string.catchers_delete_catcher_message)
         if (catchers.isEmpty()) {
@@ -239,7 +213,7 @@ fun CatcherPage(model: CatcherPageViewModel = viewModel(), catcherId: Int? = nul
                     ) {
                         CatcherItem(catcherDetail = catchers[it],
                             allActions = actions,
-                            isActive = it == mostVisibleItem.value,
+                            isActive = it == activeItem,
                             addAction = { catcher ->
                                 selectedCatcher = catcher
                                 showAddActionSheet = true

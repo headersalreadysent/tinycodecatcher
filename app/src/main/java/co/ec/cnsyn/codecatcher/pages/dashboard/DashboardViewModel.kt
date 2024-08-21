@@ -37,8 +37,8 @@ open class DashboardViewModel : ViewModel() {
     var calendar = MutableLiveData<List<Int>>(listOf())
     var requiredPerms = MutableLiveData<List<PermissionInfo>>(listOf())
 
-    var catcherStat = MutableLiveData<List<Pair<String, Float>>>(listOf())
-    var actionStat = MutableLiveData<List<Pair<String, Float>>>(listOf())
+
+    var graphStat = MutableLiveData<Map<String,List<Pair<String, Float>>>>(mapOf())
 
 
     init {
@@ -86,18 +86,27 @@ open class DashboardViewModel : ViewModel() {
      */
     private fun calculateCatcherStats() {
         async({ DB.get().code().catcherCountStats() }, {
-            catcherStat.value=it.map {
+            val mutable=(graphStat.value ?: mapOf()).toMutableMap()
+            mutable["catcher"]=it.map {
                 return@map Pair(
                     (if(it.sender!="") it.sender+"-" else "")+it.name,
                     it.count.toFloat())
             }
+            graphStat.value=mutable.toMap()
+        })
+        async({ DB.get().code().senderCountStat() }, {
+            val mutable=(graphStat.value ?: mapOf()).toMutableMap()
+            mutable["sender"]=it.map {
+                return@map Pair(it.name, it.count.toFloat())
+            }
+            graphStat.value=mutable.toMap()
         })
         async({ DB.get().action().actionCountStats() }, {
-            actionStat.value=it.map {
-                return@map Pair(
-                    it.name,
-                    it.count.toFloat())
+            val mutable=(graphStat.value ?: mapOf()).toMutableMap()
+            mutable["action"]=it.map {
+                return@map Pair( it.name,it.count.toFloat())
             }
+            graphStat.value=mutable.toMap()
         })
     }
 
@@ -208,12 +217,16 @@ class MockDashboardViewModel : DashboardViewModel() {
             now = (now - 86400 * Random.nextFloat()).toLong()
             return@List now.toInt()
         }
-        catcherStat.value=List(Random.nextInt(3,7)){
-            Pair("Catcher $it", Random.nextFloat() * 10)
-        }
-
-        actionStat.value=List(Random.nextInt(3,7)){
-            Pair("Action $it", Random.nextFloat() * 10)
-        }
+        graphStat.value= mapOf(
+            "catcher" to List(Random.nextInt(3,7)){
+                Pair("Catcher $it", Random.nextFloat() * 10)
+            },
+            "action" to List(Random.nextInt(3,7)){
+                Pair("Action $it", Random.nextFloat() * 10)
+            },
+            "sender" to List(Random.nextInt(3,7)){
+                Pair("Sender $it", Random.nextFloat() * 10)
+            }
+        )
     }
 }

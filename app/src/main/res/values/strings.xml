@@ -10,10 +10,11 @@
     <string name="dashboard_permission_needs_some_permission">Code Catcher need some permissions:</string>
     <string name="dashboard_stat_catcher_count">Catcher Count</string>
     <string name="dashboard_stat_code_count">Code Count</string>
-    <string name="dashboard_list_catcher_stat">Catcher Stat</string>
+    <string name="dashboard_list_catcher_stat">Catcher Stats</string>
 
     <string name="dashboard_graph_catcher_graph_title">Catcher Run Count</string>
     <string name="dashboard_graph_action_graph_title">Action Count</string>
+    <string name="dashboard_graph_sender_graph_title">Sender Count</string>
 
     <string name="dashboard_list_last_codes">Last Codes</string>
     <string name="dashboard_list_last_codes_copied">copied to clipboard</string>

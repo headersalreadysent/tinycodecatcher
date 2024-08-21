@@ -14,7 +14,7 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -22,9 +22,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
@@ -35,7 +34,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DataObject
 import androidx.compose.material.icons.filled.Phishing
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -43,18 +41,20 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -70,15 +70,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
-import co.ec.cnsyn.codecatcher.ui.theme.CodeCatcherTheme
 import androidx.lifecycle.viewmodel.compose.viewModel
+import co.ec.cnsyn.codecatcher.CodeCatcherPreview
 import co.ec.cnsyn.codecatcher.LocalNavigation
 import co.ec.cnsyn.codecatcher.LocalSnackbar
 import co.ec.cnsyn.codecatcher.R
-import co.ec.cnsyn.codecatcher.composables.AlertText
 import co.ec.cnsyn.codecatcher.composables.Calendar
 import co.ec.cnsyn.codecatcher.composables.DoughnutChart
 import co.ec.cnsyn.codecatcher.composables.IconName
+import co.ec.cnsyn.codecatcher.composables.LazyIndicator
 import co.ec.cnsyn.codecatcher.composables.MiniIconStat
 import co.ec.cnsyn.codecatcher.composables.RealDevice
 import co.ec.cnsyn.codecatcher.composables.SkewBottomSheet
@@ -86,13 +86,10 @@ import co.ec.cnsyn.codecatcher.composables.SkewSquare
 import co.ec.cnsyn.codecatcher.composables.SkewSquareCut
 import co.ec.cnsyn.codecatcher.database.code.CodeDao
 import co.ec.cnsyn.codecatcher.helpers.dateString
+import co.ec.cnsyn.codecatcher.helpers.translate
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
-import kotlin.math.ceil
-import kotlin.random.Random
 
 @OptIn(
     ExperimentalLayoutApi::class,
@@ -168,6 +165,7 @@ fun Dashboard(model: DashboardViewModel = viewModel()) {
 
 
         }
+        var itemWidth by remember { mutableIntStateOf(1) }
         val verticalScrollState = rememberScrollState()
         val density = LocalDensity.current
         Column(
@@ -179,6 +177,9 @@ fun Dashboard(model: DashboardViewModel = viewModel()) {
                 .graphicsLayer {
                     translationY = with(density) { 45.dp.toPx() * -1 }
 
+                }
+                .onGloballyPositioned {
+                    itemWidth = (it.size.width * .8F).toInt()
                 }
                 .verticalScroll(verticalScrollState)
         ) {
@@ -192,63 +193,80 @@ fun Dashboard(model: DashboardViewModel = viewModel()) {
                 skew = 30,
                 fill = MaterialTheme.colorScheme.secondaryContainer
             ) {
-                Text(
-                    text = stringResource(id = R.string.dashboard_list_catcher_stat),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    style = MaterialTheme.typography.titleSmall.copy(
-                        textAlign = TextAlign.End,
-                        color = MaterialTheme.colorScheme.onSecondaryContainer
-                    )
-                )
-                val catcherStats by model.catcherStat.observeAsState(listOf())
-                val actionStats by model.actionStat.observeAsState(listOf())
                 val graphListState = rememberLazyListState(initialFirstVisibleItemIndex = 0)
-                LazyRow(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    state = graphListState,
-                    flingBehavior = rememberSnapFlingBehavior(lazyListState = graphListState),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    if (catcherStats.isNotEmpty()) {
-                        item {
-                            //if there is stat
-                            DoughnutChart(
-                                modifier = Modifier
-                                    .fillParentMaxWidth(),
-                                data = catcherStats,
-                                title = stringResource(id = R.string.dashboard_graph_catcher_graph_title),
-                                formatter = "%.0f"
-                            )
-                        }
-                    }
-                    if (actionStats.isNotEmpty()) {
-                        item {
-                            DoughnutChart(
-                                modifier = Modifier
-                                    .fillParentMaxWidth(),
-                                data = actionStats,
-                                title = stringResource(id = R.string.dashboard_graph_action_graph_title),
-                                formatter = "%.0f"
-                            )
-                        }
-                    }
 
+                val graphStat by model.graphStat.observeAsState(mapOf())
+                val total = graphStat.keys.size
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(30.dp)
+                            .padding(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        LazyIndicator(total, graphListState, itemWidth)
+                        Text(
+                            text = stringResource(id = R.string.dashboard_list_catcher_stat),
+                            style = MaterialTheme.typography.titleSmall.copy(
+                                textAlign = TextAlign.End,
+                                color = MaterialTheme.colorScheme.onSecondaryContainer
+                            )
+                        )
+                    }
+                    var boxHeight by remember {
+                        mutableFloatStateOf(0F)
+                    }
+                    val density = LocalDensity.current
+                    Box(modifier = Modifier
+                        .fillMaxWidth()
+                        .onGloballyPositioned {
+                            boxHeight = with(density) { it.size.height.toDp().value }
+                        }) {
+
+                        LazyRow(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            state = graphListState,
+                            flingBehavior = rememberSnapFlingBehavior(lazyListState = graphListState),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            items(graphStat.keys.size) {
+                                val key = graphStat.keys.toList().get(it)
+                                DoughnutChart(
+                                    modifier = Modifier
+                                        .fillParentMaxWidth(),
+                                    data = graphStat[key] ?: listOf(),
+                                    title = translate("dashboard_graph_${key}_graph_title"),
+                                    formatter = "%.0f"
+                                )
+                            }
+                        }
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .height(boxHeight.dp)
+                                .background(
+                                    brush = Brush.horizontalGradient(
+                                        Pair(0.0f,MaterialTheme.colorScheme.secondaryContainer),
+                                        Pair(0.1f,Color.Transparent),
+                                        Pair(0.9f,Color.Transparent),
+                                        Pair(1f,MaterialTheme.colorScheme.secondaryContainer),
+                                    )
+                                )
+                        )
+                    }
                 }
 
-
             }
-
-
             val codes by model.codes.observeAsState(listOf())
+            val height = LocalConfiguration.current.screenHeightDp.absoluteValue * .4F
             if (codes.isEmpty()) {
-                val height = LocalConfiguration.current.screenHeightDp.absoluteValue * .5F
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(height.dp),
+                        .defaultMinSize(0.dp, height.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
@@ -273,21 +291,28 @@ fun Dashboard(model: DashboardViewModel = viewModel()) {
                 }
             }
             if (codes.isNotEmpty()) {
-                Text(
-                    text = stringResource(id = R.string.dashboard_list_last_codes),
+                Column(
                     modifier = Modifier
-                        .fillMaxWidth(),
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        textAlign = TextAlign.End,
-                        color = MaterialTheme.colorScheme.primary
+                        .fillMaxWidth()
+                        .defaultMinSize(0.dp, height.dp),
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.dashboard_list_last_codes),
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            textAlign = TextAlign.End,
+                            color = MaterialTheme.colorScheme.primary
+                        )
                     )
-                )
-                codes.forEachIndexed { index, item ->
-                    LatestCode(
-                        item,
-                        isLatest = index == codes.size - 1
-                    )
+                    codes.forEachIndexed { index, item ->
+                        LatestCode(
+                            item,
+                            isLatest = index == codes.size - 1
+                        )
+                    }
                 }
+
             }
 
 
@@ -297,15 +322,15 @@ fun Dashboard(model: DashboardViewModel = viewModel()) {
                     .padding(bottom = 120.dp),
                 Alignment.Center
             ) {
-                  val nav = LocalNavigation.current
-                  OutlinedButton(
-                      onClick = {
-                          nav.navigate("about")
-                      },
-                      modifier = Modifier.fillMaxWidth(.7F)
-                  ) {
-                      Text(text = stringResource(id = R.string.dashboard_about))
-                  }
+                val nav = LocalNavigation.current
+                OutlinedButton(
+                    onClick = {
+                        nav.navigate("about")
+                    },
+                    modifier = Modifier.fillMaxWidth(.7F)
+                ) {
+                    Text(text = stringResource(id = R.string.dashboard_about))
+                }
             }
 
         }
@@ -512,7 +537,7 @@ fun LatestCode(
 @Preview(showBackground = true)
 @Composable
 fun DashboardPreview() {
-    CodeCatcherTheme {
+    CodeCatcherPreview {
         Dashboard(MockDashboardViewModel())
     }
 }
