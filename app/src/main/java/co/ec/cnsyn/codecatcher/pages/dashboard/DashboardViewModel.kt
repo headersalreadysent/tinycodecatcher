@@ -7,11 +7,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Message
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.ec.cnsyn.codecatcher.App
+import co.ec.cnsyn.codecatcher.MainActivity
 import co.ec.cnsyn.codecatcher.database.DB
 import co.ec.cnsyn.codecatcher.database.action.Action
 import co.ec.cnsyn.codecatcher.database.catcher.Catcher
@@ -26,11 +28,13 @@ import co.ec.cnsyn.codecatcher.helpers.translate
 import co.ec.cnsyn.codecatcher.helpers.unix
 import co.ec.cnsyn.codecatcher.sms.ActionRunner
 import co.ec.cnsyn.codecatcher.sms.SmsData
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
 open class DashboardViewModel : ViewModel() {
 
+    var loadStep = MutableLiveData<Int>(0)
 
     var stats = MutableLiveData(mapOf("catcher" to 0, "code" to 0))
     var codes = MutableLiveData<List<CodeDao.Latest>>(listOf())
@@ -47,6 +51,14 @@ open class DashboardViewModel : ViewModel() {
             EventBus.subscribe<SmsCaught> { _ ->
                 loadLatest()
                 calculateCatcherStats()
+            }
+        }
+        loadStep.observeForever {
+            if ((loadStep.value ?: 0) > 4) {
+                viewModelScope.launch {
+                    delay(1500)
+                    MainActivity.isLoading = false
+                }
             }
         }
     }
@@ -69,8 +81,11 @@ open class DashboardViewModel : ViewModel() {
         })
         async({ DB.get().code().getCalendar(unix() - 86400 * 30) }, {
             calendar.value = it.map { it.date }
+
+            loadStep.value = (loadStep.value ?: 0) + 1
         })
         calculatePermissions()
+
     }
 
     /**
@@ -79,6 +94,7 @@ open class DashboardViewModel : ViewModel() {
     private fun loadLatest() {
         async({ DB.get().code().getLatest() }, {
             codes.value = it
+            loadStep.value = (loadStep.value ?: 0) + 1
         })
     }
 
@@ -96,6 +112,8 @@ open class DashboardViewModel : ViewModel() {
                     )
                 }
                 graphStat.value = mutable.toMap()
+
+                loadStep.value = (loadStep.value ?: 0) + 1
             }
         })
         async({ DB.get().code().senderCountStat() }, {
@@ -105,6 +123,8 @@ open class DashboardViewModel : ViewModel() {
                     return@map Pair(it.name, it.count.toFloat())
                 }
                 graphStat.value = mutable.toMap()
+
+                loadStep.value = (loadStep.value ?: 0) + 1
             }
         })
         async({ DB.get().action().actionCountStats() }, {
@@ -114,6 +134,8 @@ open class DashboardViewModel : ViewModel() {
                     return@map Pair(it.name, it.count.toFloat())
                 }
                 graphStat.value = mutable.toMap()
+
+                loadStep.value = (loadStep.value ?: 0) + 1
             }
         })
     }

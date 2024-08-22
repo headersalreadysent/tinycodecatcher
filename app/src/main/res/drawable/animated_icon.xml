@@ -1,0 +1,37 @@
+<animated-vector
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt">
+    <aapt:attr name="android:drawable">
+        <vector
+            android:name="vector"
+            android:width="240dp"
+            android:height="240dp"
+            android:viewportWidth="240"
+            android:viewportHeight="240">
+            <path
+                android:name="icon"
+                android:pathData="M 86.645 140.833 C 89.604 141.817 92.216 143.199 94.956 144.659 C 89.165 131.577 87.172 119.656 87.173 105.347 L 87.041 105.347 C 83.409 117.879 78.09 130.15 73.633 142.416 C 71.322 148.778 68.164 155.321 68.05 162.204 C 67.817 176.208 78.572 190.685 93.241 191.623 C 95.819 191.847 98.574 191.728 100.629 191.623 C 106.751 191.231 112.908 187.886 117.24 183.68 C 118.931 182.038 120.102 179.513 121.94 178.105 C 125.489 175.386 131.781 174.17 135.983 172.626 L 135.983 172.494 C 132.223 172.753 128.287 172.409 124.638 171.439 C 125.629 169.191 126.053 165.476 127.737 163.679 C 130.256 160.989 137.638 159.591 141.128 158.379 L 141.128 158.247 C 137.321 158.247 133.633 158.098 129.915 157.191 C 130.697 154.609 131.638 149.797 133.508 147.835 C 136.026 145.192 143.441 143.609 146.933 142.548 L 146.933 142.416 C 143.057 142.416 139.397 142.06 135.588 141.361 C 142.892 122.857 148.232 103.465 156.037 85.171 C 156.808 83.363 159.479 83.189 161.048 82.226 C 163.756 80.563 165.688 77.831 166.408 74.742 C 169.316 62.246 152.409 54.316 144.843 64.848 C 142.694 67.838 142.048 71.725 143.016 75.269 C 143.736 77.902 145.685 79.332 144.676 82.129 C 137.119 103.077 129.471 123.992 121.868 144.923 C 118.604 153.908 116.306 166.705 110.097 174.076 C 101.176 184.668 83.626 180.495 80.242 167.085 C 78.049 158.395 83.938 148.874 86.645 140.833 M 153.924 67.174 C 160.153 66.258 161.511 75.915 155.244 76.756 C 149.171 77.57 147.816 68.072 153.924 67.174"
+                android:fillColor="#265d98"
+                android:strokeWidth="1"/>
+        </vector>
+    </aapt:attr>
+    <target android:name="icon">
+        <aapt:attr name="android:animation">
+            <set>
+                <objectAnimator
+                    android:propertyName="fillAlpha"
+                    android:duration="450"
+                    android:valueFrom="0"
+                    android:valueTo="1"
+                    android:valueType="floatType"/>
+                <objectAnimator
+                    android:propertyName="fillColor"
+                    android:startOffset="450"
+                    android:duration="550"
+                    android:valueFrom="#265d98"
+                    android:valueTo="#003a6a"
+                    android:valueType="colorType"/>
+            </set>
+        </aapt:attr>
+    </target>
+</animated-vector>

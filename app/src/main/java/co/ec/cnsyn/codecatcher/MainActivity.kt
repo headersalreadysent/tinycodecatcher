@@ -58,6 +58,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.ColorUtils
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -76,6 +78,7 @@ import co.ec.cnsyn.codecatcher.pages.about.About
 import co.ec.cnsyn.codecatcher.pages.add.Add
 import co.ec.cnsyn.codecatcher.pages.catcher.CatcherPage
 import co.ec.cnsyn.codecatcher.pages.dashboard.Dashboard
+import co.ec.cnsyn.codecatcher.pages.dashboard.DashboardViewModel
 import co.ec.cnsyn.codecatcher.pages.settings.SettingsModal
 import co.ec.cnsyn.codecatcher.sms.DebugSmsReceiver
 import co.ec.cnsyn.codecatcher.ui.theme.CodeCatcherTheme
@@ -85,8 +88,15 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 
 class MainActivity : ComponentActivity() {
+
+    companion object {
+        var isLoading:Boolean=true
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+
+
         DB.getDatabase(applicationContext)
         enableEdgeToEdge()
         setContent {
@@ -94,7 +104,9 @@ class MainActivity : ComponentActivity() {
                 CodeCatcherApp(applicationContext)
             }
         }
-
+        installSplashScreen().setKeepOnScreenCondition {
+            return@setKeepOnScreenCondition MainActivity.isLoading
+        }
 
         if (BuildConfig.DEBUG && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             registerReceiver(
@@ -131,8 +143,8 @@ fun CodeCatcherApp(
     var permissionModel by remember { mutableStateOf(false) }
     val permissions by appModel.requiredPerms.observeAsState(listOf())
     LaunchedEffect(permissions) {
-        if(permissions.isEmpty()){
-            permissionModel=false
+        if (permissions.isEmpty()) {
+            permissionModel = false
         } else {
             val hiddenUntil = settings.getInt("permissionHidden", 0)
             if (hiddenUntil < unix() || hiddenUntil == 0) {
@@ -150,6 +162,7 @@ fun CodeCatcherApp(
             darkIcons = ColorUtils.calculateLuminance(surfaceColor.toArgb()) > 0.5
         )
     }
+
 
 
     CompositionLocalProvider(

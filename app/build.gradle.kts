@@ -110,6 +110,8 @@ dependencies {
     implementation(libs.androidx.ui.text.google.fonts) // Update version as needed
     implementation(libs.accompanist.systemuicontroller)
 
+    implementation(libs.androidx.core.splashscreen)
+
 
 
 
