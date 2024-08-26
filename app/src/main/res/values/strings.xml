@@ -116,6 +116,12 @@
     <string name="action_TTSAction_tts_content_hint">You can use _sender and _code_ placeholders</string>
     <string name="action_TTSAction_tts_content">_sender_ verification code is _code_</string>
 
+    <!-- help -->
+    <string name="help_service_notification_title">Service Notification</string>
+    <string name="help_service_notification_content"><![CDATA[
+    Service notification visible for running catching service forever in system. You can disable from notification channels. <br/>
+    <br/>Just click button and set it to silent in settings window.
+    ]]></string>
 
 
     <!-- regex values languages-->

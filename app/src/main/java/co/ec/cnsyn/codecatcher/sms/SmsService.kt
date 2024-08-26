@@ -101,7 +101,7 @@ class SmsService : Service() {
         val content = applicationContext.getString(R.string.smsservice_notification_content)
 
         val notificationIntent = Intent(applicationContext, MainActivity::class.java)
-        notificationIntent.putExtra("destination", "help/service-notification")
+        notificationIntent.putExtra("destination", "help/service_notification")
         val pendingIntent = PendingIntent.getActivity(
             applicationContext,
             0, notificationIntent, PendingIntent.FLAG_IMMUTABLE
