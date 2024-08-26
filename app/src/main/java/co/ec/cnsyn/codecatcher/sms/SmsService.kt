@@ -13,17 +13,56 @@ import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
 import android.os.SystemClock
+import android.provider.Settings
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import co.ec.cnsyn.codecatcher.MainActivity
 import co.ec.cnsyn.codecatcher.R
 
 class SmsService : Service() {
 
-    private val channelName = "CodeCatcher-Service-Channel"
+
 
     private val handler = Handler(Looper.getMainLooper())
     private lateinit var runnable: Runnable
     private var runCount = 0
+
+
+    companion object {
+        val channelName = "CodeCatcher-Service-Channel"
+        //setup service with alarm manager
+        fun setupService(context: Context, timeout: Int = 0) {
+            Log.d("CodeCatcherService", "Set Alarm Manager")
+            val intent = Intent(context, BootReceiver::class.java)
+            val pendingIntent = PendingIntent.getBroadcast(
+                context, 0, intent, PendingIntent.FLAG_MUTABLE
+            )
+            val alarmManager =
+                context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                if (!alarmManager.canScheduleExactAlarms()) {
+                    // If your app does not have the permission, guide the user to the settings
+                    val scheduleIntent = Intent().apply {
+                        action = Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+                        data = android.net.Uri.parse("package:${context.packageName}")
+                    }
+                    context.startActivity(scheduleIntent)
+                } else {
+                    alarmManager.setExact(
+                        AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                        SystemClock.elapsedRealtime() + 1000 * timeout, pendingIntent
+                    )
+                }
+            } else {
+                alarmManager.setExact(
+                    AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                    SystemClock.elapsedRealtime() + 1000 * timeout, pendingIntent
+                )
+            }
+        }
+    }
 
     override fun onCreate() {
         super.onCreate()
@@ -60,12 +99,21 @@ class SmsService : Service() {
         //start service notification and show on app
         val title = applicationContext.getString(R.string.smsservice_notification_title)
         val content = applicationContext.getString(R.string.smsservice_notification_content)
+
+        val notificationIntent = Intent(applicationContext, MainActivity::class.java)
+        notificationIntent.putExtra("destination", "help/service-notification")
+        val pendingIntent = PendingIntent.getActivity(
+            applicationContext,
+            0, notificationIntent, PendingIntent.FLAG_IMMUTABLE
+        )
+
         val notification: Notification = NotificationCompat.Builder(this, channelName)
             .setContentTitle(title)
             .setContentText(content)
             .setSound(null)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setPriority(NotificationManager.IMPORTANCE_MIN)
+            .setContentIntent(pendingIntent)
             .build()
 
         // Start the service in the foreground
@@ -91,20 +139,4 @@ class SmsService : Service() {
         setupService(applicationContext)
     }
 
-    companion object {
-        //setup service with alarm manager
-        fun setupService(context: Context, timeout: Int = 0) {
-            Log.d("CodeCatcherService", "Set Alarm Manager")
-            val intent = Intent(context, BootReceiver::class.java)
-            val pendingIntent = PendingIntent.getBroadcast(
-                context, 0, intent, PendingIntent.FLAG_MUTABLE
-            )
-            val alarmManager =
-                context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-            alarmManager.setExact(
-                AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                SystemClock.elapsedRealtime() + 1000 * timeout, pendingIntent
-            )
-        }
-    }
 }

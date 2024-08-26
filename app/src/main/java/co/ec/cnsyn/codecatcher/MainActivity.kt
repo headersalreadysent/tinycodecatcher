@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.IntentFilter
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -76,6 +77,7 @@ import co.ec.cnsyn.codecatcher.pages.about.About
 import co.ec.cnsyn.codecatcher.pages.add.Add
 import co.ec.cnsyn.codecatcher.pages.catcher.CatcherPage
 import co.ec.cnsyn.codecatcher.pages.dashboard.Dashboard
+import co.ec.cnsyn.codecatcher.pages.help.Help
 import co.ec.cnsyn.codecatcher.pages.settings.SettingsModal
 import co.ec.cnsyn.codecatcher.sms.DebugSmsReceiver
 import co.ec.cnsyn.codecatcher.sms.SmsService
@@ -95,17 +97,24 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
 
+        val destination = intent.getStringExtra("destination") ?: "dashboard"
 
         DB.getDatabase(applicationContext)
         enableEdgeToEdge()
         setContent {
             CodeCatcherTheme {
-                CodeCatcherApp()
+                CodeCatcherApp(
+                    startDestination = destination
+                )
             }
         }
         installSplashScreen().setKeepOnScreenCondition {
-            return@setKeepOnScreenCondition MainActivity.isLoading
+            return@setKeepOnScreenCondition isLoading
         }
+        Handler(App.context().mainLooper).postDelayed({
+            isLoading = false
+        }, 3000)
+
 
         if (BuildConfig.DEBUG && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             registerReceiver(
@@ -130,6 +139,7 @@ val LocalSettings = compositionLocalOf<Settings> { error("No settings provided")
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun CodeCatcherApp(
+    startDestination: String = "dashboard",
     appModel: AppViewModel = viewModel()
 ) {
     val uiController = rememberSystemUiController()
@@ -244,9 +254,15 @@ fun CodeCatcherApp(
                 )
             }
         ) { _ ->
+            var destination = startDestination
+            var helpParam by remember { mutableStateOf("") }
+            if (startDestination.startsWith("help")) {
+                helpParam = startDestination.split("/")[1]
+                destination = "help"
+            }
             NavHost(
                 navController = navController,
-                startDestination = "dashboard"
+                startDestination = destination
             ) {
                 composable("dashboard") { Dashboard() }
                 composable(
@@ -259,6 +275,7 @@ fun CodeCatcherApp(
                 composable("catchers") { CatcherPage() }
                 composable("add") { Add() }
                 composable("about") { About() }
+                composable("help") { Help(helpType = helpParam) }
             }
         }
 
