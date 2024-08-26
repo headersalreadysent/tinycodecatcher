@@ -145,6 +145,11 @@
     <!--composibles-->
     <string name="doughnut_total_text">Total</string>
 
+    <!--services-->
+
+    <string name="smsservice_notification_title">CodeCatcher Service Running</string>
+    <string name="smsservice_notification_content">CodeCatcher service running for catching incoming sms messages.</string>
+
 
 
 </resources>

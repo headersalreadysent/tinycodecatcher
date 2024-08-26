@@ -116,5 +116,12 @@
     <string name="actionlist_copy_desc">Kodları panoya kopyalar.</string>
     <string name="actionlist_tts">TTS</string>
     <string name="actionlist_tts_desc">Kodları sesli olarak okur.</string>
+
+    <!-- composables -->
     <string name="doughnut_total_text">Toplam</string>
+
+
+    <!-- services -->
+    <string name="smsservice_notification_title">CodeCatcher Servisi Çalışıyor</string>
+    <string name="smsservice_notification_content">CodeCatcher servisi gelen sms mesajlarını yakalamak için çalışıyor.</string>
 </resources>

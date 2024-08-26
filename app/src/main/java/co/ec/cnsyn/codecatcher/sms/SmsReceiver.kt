@@ -1,11 +1,13 @@
 package co.ec.cnsyn.codecatcher.sms
 
-
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.telephony.SmsMessage
-import co.ec.cnsyn.codecatcher.helpers.dateString
+import android.util.Log
+import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.registerReceiver
 import co.ec.cnsyn.codecatcher.helpers.unix
 
 class SmsReceiver : BroadcastReceiver() {
@@ -16,6 +18,7 @@ class SmsReceiver : BroadcastReceiver() {
             val messages = getMessageFromIntent(intent)
             ActionRunner().runSmsList(messages)
         }
+
     }
 
     private fun getMessageFromIntent(intent: Intent): List<SmsData> {
@@ -28,6 +31,21 @@ class SmsReceiver : BroadcastReceiver() {
             messages.add(smsData)
         }
         return messages.toList()
+    }
+
+
+    companion object {
+        fun register(context: Context) {
+
+            Log.d("CodeCatcherService", "Receiver Register")
+            registerReceiver(
+                context,
+                SmsReceiver(),
+                IntentFilter("android.provider.Telephony.SMS_RECEIVED"),
+                ContextCompat.RECEIVER_EXPORTED
+            )
+
+        }
     }
 
 }
