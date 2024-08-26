@@ -2,6 +2,7 @@ package co.ec.cnsyn.codecatcher.sms.actions
 
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
 import android.telephony.SmsManager
 import android.widget.Toast
@@ -38,7 +39,7 @@ class SmsAction : BaseAction {
         action: CatcherWithActions,
         sms: SmsData
     ): Boolean {
-        val smsManager = SmsManager.getDefault()
+        val smsManager =  SmsManager.getDefault()
         val params = try {
             action.params()
         } catch (e: Exception) {

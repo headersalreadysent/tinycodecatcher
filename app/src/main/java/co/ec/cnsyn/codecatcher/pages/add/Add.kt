@@ -676,7 +676,7 @@ fun StepTest(
 
 @Preview(showBackground = true)
 @Composable
-fun AddPreview(modifier: Modifier = Modifier) {
+fun AddPreview() {
     CodeCatcherTheme {
         Add(MockAddViewModel())
     }

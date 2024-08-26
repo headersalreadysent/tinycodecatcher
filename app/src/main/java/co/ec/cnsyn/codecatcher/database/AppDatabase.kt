@@ -18,7 +18,8 @@ import co.ec.cnsyn.codecatcher.database.relations.CatcherWithActions
 @Database(
     entities = [Action::class, Catcher::class, CatcherAction::class, Code::class, Regex::class],
     views = [CatcherWithActions::class],
-    version = 1
+    version = 1,
+    exportSchema = false,
 )
 abstract class AppDatabase : RoomDatabase() {
 

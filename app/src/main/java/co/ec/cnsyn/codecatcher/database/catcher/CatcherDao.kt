@@ -32,6 +32,7 @@ interface CatcherDao : BaseDao<Catcher> {
     @Query("SELECT count(id) FROM catcher WHERE status=1")
     fun getActiveCount(): Int
 
+    @Transaction
     @Query("SELECT * FROM catcher WHERE status=1")
     fun getActiveCatchersWithRegexes(): List<CatcherWithRegex>
 

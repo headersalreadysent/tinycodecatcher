@@ -91,6 +91,7 @@ open class CatcherPageViewModel : ViewModel() {
             viewModelScope.launch {
                 catchers.value = map.values.toList()
             }
+            then()
         }, { err ->
             println(err)
         })
@@ -120,7 +121,7 @@ open class CatcherPageViewModel : ViewModel() {
             return@async DB.get().catcher().delete(catcherDetail.catcher)
         }, {
             loadcatchers()
-
+            then()
         })
     }
 }
@@ -165,9 +166,9 @@ class MockCatcherViewModel : CatcherPageViewModel() {
 
                     ),
                 regex = regexList()[0],
-                stat = List(60) {
+                stat = List(60)  {
                     now -= (Random.nextFloat() * 86400).toInt()
-                    return@List now.toInt()
+                    return@List now
                 },
                 avg = mapOf(
                     7 to Random.nextFloat(),
