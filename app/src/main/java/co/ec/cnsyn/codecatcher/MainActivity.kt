@@ -78,6 +78,7 @@ import co.ec.cnsyn.codecatcher.pages.add.Add
 import co.ec.cnsyn.codecatcher.pages.catcher.CatcherPage
 import co.ec.cnsyn.codecatcher.pages.dashboard.Dashboard
 import co.ec.cnsyn.codecatcher.pages.help.Help
+import co.ec.cnsyn.codecatcher.pages.history.History
 import co.ec.cnsyn.codecatcher.pages.settings.SettingsModal
 import co.ec.cnsyn.codecatcher.sms.DebugSmsReceiver
 import co.ec.cnsyn.codecatcher.sms.SmsService
@@ -98,13 +99,17 @@ class MainActivity : ComponentActivity() {
 
 
         val destination = intent.getStringExtra("destination") ?: "dashboard"
+        val destinationParam = intent.getStringExtra("destinationParam") ?: ""
+
+        println("start activity destination $destination")
 
         DB.getDatabase(applicationContext)
         enableEdgeToEdge()
         setContent {
             CodeCatcherTheme {
                 CodeCatcherApp(
-                    startDestination = destination
+                    startDestination = destination,
+                    destinationParam = destinationParam
                 )
             }
         }
@@ -140,6 +145,7 @@ val LocalSettings = compositionLocalOf<Settings> { error("No settings provided")
 @Composable
 fun CodeCatcherApp(
     startDestination: String = "dashboard",
+    destinationParam: String = "",
     appModel: AppViewModel = viewModel()
 ) {
     val uiController = rememberSystemUiController()
@@ -254,15 +260,11 @@ fun CodeCatcherApp(
                 )
             }
         ) { _ ->
-            var destination = startDestination
-            var helpParam by remember { mutableStateOf("") }
-            if (startDestination.startsWith("help")) {
-                helpParam = startDestination.split("/")[1]
-                destination = "help"
-            }
+
+            println("start destination $startDestination $destinationParam")
             NavHost(
                 navController = navController,
-                startDestination = destination
+                startDestination = startDestination
             ) {
                 composable("dashboard") { Dashboard() }
                 composable(
@@ -275,7 +277,8 @@ fun CodeCatcherApp(
                 composable("catchers") { CatcherPage() }
                 composable("add") { Add() }
                 composable("about") { About() }
-                composable("help") { Help(helpType = helpParam) }
+                composable("history") { History() }
+                composable("help") { Help(helpType = destinationParam) }
             }
         }
 

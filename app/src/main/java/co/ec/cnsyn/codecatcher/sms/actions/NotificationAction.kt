@@ -3,6 +3,8 @@ package co.ec.cnsyn.codecatcher.sms.actions
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.Intent
 import android.graphics.BitmapFactory
 import android.os.Build
 import android.speech.tts.TextToSpeech
@@ -20,6 +22,7 @@ import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.core.app.NotificationCompat
 import co.ec.cnsyn.codecatcher.App
+import co.ec.cnsyn.codecatcher.MainActivity
 import co.ec.cnsyn.codecatcher.R
 import co.ec.cnsyn.codecatcher.composables.ParamOptionBox
 import co.ec.cnsyn.codecatcher.composables.ParamValueBox
@@ -58,12 +61,20 @@ class NotificationAction : BaseAction {
             }
             //extract details
             var notificationBuilder = NotificationCompat.Builder(context, channelId)
-            val largeIcon = BitmapFactory.decodeResource(context.resources, R.drawable.ic_launcher_foreground,
-                BitmapFactory.Options().apply {
-                    inScaled = true
-                    inDensity = 240
-                    inTargetDensity = 480
-                })
+            val largeIcon =
+                BitmapFactory.decodeResource(context.resources, R.drawable.ic_launcher_foreground,
+                    BitmapFactory.Options().apply {
+                        inScaled = true
+                        inDensity = 240
+                        inTargetDensity = 480
+                    })
+
+            val historyIntent = Intent(context, MainActivity::class.java)
+            historyIntent.putExtra("destination", "history")
+
+            val pendingIntent = PendingIntent.getActivity(
+                context, 0, historyIntent, PendingIntent.FLAG_IMMUTABLE
+            )
 
             notificationBuilder = setupTexts(catcher, action, sms, notificationBuilder)
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
@@ -71,6 +82,7 @@ class NotificationAction : BaseAction {
                 .setColor(secondaryLight.toArgb())
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setAutoCancel(true)
+                .setContentIntent(pendingIntent)
             notificationManager?.notify(
                 action.actionId * Random.nextInt(1, 300),
                 notificationBuilder.build()

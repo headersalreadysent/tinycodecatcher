@@ -19,6 +19,10 @@
     <string name="dashboard_test_sms_sender">CodeCatcher Test Gönderici</string>
     <string name="dashboard_test_sms_content">Bu aksiyonları görmek için oluşturulmış test mesajıdır. Doğrulama kodu:</string>
     <string name="dashboard_about">CodeCatcher Hakkında</string>
+
+    <string name="dashboard_see_history">Tümünü Göster</string>
+
+    <!-- catchers -->
     <string name="catchers_top_card_sender">Gönderen</string>
     <string name="catchers_top_card_everybody">Tüm Göndericiler</string>
     <string name="catchers_top_card_regex">İfade</string>
@@ -75,6 +79,11 @@
 Bu hizmet, kesintisiz çalışmayı sağlamak için arka planda çalışıyor. Bu bildirimin görünürlüğünü, bildirim kanalı ayarlarını değiştirerek yönetebilirsiniz.
 \n\nAyarları açın ve <b>Bildirim Göster</b> kutucuğunu devre dışı bırakın. Bu, diğer bildirimleri etkilemeyecektir.
     ]]></string>
+
+
+    <!-- history -->
+    <string name="history_load_more">Daha Fazla Göster</string>
+    <string name="history_caught_count">%1$d adet</string>
 
 
     <string name="action_SmsAction_permission_error">CodeCatcher SMS gönderim izni bulunmuyor.</string>

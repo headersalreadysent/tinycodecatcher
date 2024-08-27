@@ -92,8 +92,8 @@ fun About() {
                 LaunchedEffect(Unit) {
                     while (true) {
                         //wait for delay and re run
-                        delay(SmsService.heartBeatDelay * 1000L)
                         heartBeat = settings.getInt("service-heartbeat", 0).toLong()
+                        delay(if(heartBeat == 0L) 1000L else SmsService.heartBeatDelay * 1000L)
                     }
                 }
                 if (heartBeat != 0L) {

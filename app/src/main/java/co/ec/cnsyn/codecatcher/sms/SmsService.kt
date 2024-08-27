@@ -19,6 +19,7 @@ import androidx.core.app.NotificationCompat
 import co.ec.cnsyn.codecatcher.MainActivity
 import co.ec.cnsyn.codecatcher.R
 import co.ec.cnsyn.codecatcher.helpers.unix
+import kotlinx.serialization.json.JsonNull.content
 import co.ec.cnsyn.codecatcher.helpers.Settings as AppSettings
 
 
@@ -106,20 +107,20 @@ class SmsService : Service() {
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
 
-        //start service notification and show on app
-        val title = applicationContext.getString(R.string.smsservice_notification_title)
-        val content = applicationContext.getString(R.string.smsservice_notification_content)
+
 
         val notificationIntent = Intent(applicationContext, MainActivity::class.java)
-        notificationIntent.putExtra("destination", "help/service_notification")
+        notificationIntent.putExtra("destination", "help")
+        notificationIntent.putExtra("destinationParam","service_notification")
+
         val pendingIntent = PendingIntent.getActivity(
             applicationContext,
             0, notificationIntent, PendingIntent.FLAG_IMMUTABLE
         )
 
         val notification: Notification = NotificationCompat.Builder(this, channelName)
-            .setContentTitle(title)
-            .setContentText(content)
+            .setContentTitle(applicationContext.getString(R.string.smsservice_notification_title))
+            .setContentText(applicationContext.getString(R.string.smsservice_notification_content))
             .setSound(null)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setPriority(NotificationManager.IMPORTANCE_MIN)

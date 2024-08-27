@@ -24,6 +24,7 @@
     <string name="dashboard_test_sms_sender">CodeCatcher Test Sender</string>
     <string name="dashboard_test_sms_content">This is the test sms for seeing actions in live. Sms catch code:</string>
     <string name="dashboard_about">About CodeCatcher</string>
+    <string name="dashboard_see_history">See All</string>
 
 
     <!-- catchers page -->
@@ -125,6 +126,9 @@ This service is running in the background to ensure continuous operation. You ca
 \n\nJust open settings and make <b>Show Notification</b> checkbox disabled. This will not affect any other notifications.
     ]]></string>
 
+    <!-- history -->
+    <string name="history_load_more">Load More</string>
+    <string name="history_caught_count">%1$d item</string>
 
     <!-- regex values languages-->
     <string name="regexlist_4digit">4 digit numeric</string>

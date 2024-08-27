@@ -40,6 +40,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -103,6 +104,7 @@ import kotlin.math.absoluteValue
 @Composable
 fun Dashboard(model: DashboardViewModel = viewModel()) {
 
+    val nav = LocalNavigation.current
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -201,7 +203,7 @@ fun Dashboard(model: DashboardViewModel = viewModel()) {
 
                 val graphStat by model.graphStat.observeAsState(mapOf())
                 val total = graphStat.keys.size
-                if(total>0){
+                if (total > 0) {
                     val graphListState = rememberLazyListState(initialFirstVisibleItemIndex = 0)
                     Column(modifier = Modifier.fillMaxWidth()) {
                         Row(
@@ -252,7 +254,10 @@ fun Dashboard(model: DashboardViewModel = viewModel()) {
                                     .height(boxHeight.dp)
                                     .background(
                                         brush = Brush.horizontalGradient(
-                                            Pair(0.0f, MaterialTheme.colorScheme.secondaryContainer),
+                                            Pair(
+                                                0.0f,
+                                                MaterialTheme.colorScheme.secondaryContainer
+                                            ),
                                             Pair(0.1f, Color.Transparent),
                                             Pair(0.9f, Color.Transparent),
                                             Pair(1f, MaterialTheme.colorScheme.secondaryContainer),
@@ -316,6 +321,21 @@ fun Dashboard(model: DashboardViewModel = viewModel()) {
                         )
                     }
                 }
+                Box(modifier = Modifier.fillMaxWidth(), Alignment.Center) {
+
+                    TextButton(
+                        onClick = {
+                            nav.navigate("history")
+                        },
+                        contentPadding = PaddingValues(4.dp, 1.dp),
+                        modifier = Modifier.padding(bottom = 10.dp)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.dashboard_see_history),
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                }
 
             }
 
@@ -326,7 +346,6 @@ fun Dashboard(model: DashboardViewModel = viewModel()) {
                     .padding(bottom = 120.dp),
                 Alignment.Center
             ) {
-                val nav = LocalNavigation.current
                 OutlinedButton(
                     onClick = {
                         nav.navigate("about")
