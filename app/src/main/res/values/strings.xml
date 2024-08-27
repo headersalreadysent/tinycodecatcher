@@ -128,7 +128,7 @@ This service is running in the background to ensure continuous operation. You ca
 
     <!-- history -->
     <string name="history_load_more">Load More</string>
-    <string name="history_caught_count">%1$d item</string>
+    <string name="history_caught_count">%1$d-%2$d / %3$d total</string>
 
     <!-- regex values languages-->
     <string name="regexlist_4digit">4 digit numeric</string>

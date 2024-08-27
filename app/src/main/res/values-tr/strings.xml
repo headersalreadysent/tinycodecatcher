@@ -83,7 +83,7 @@ Bu hizmet, kesintisiz çalışmayı sağlamak için arka planda çalışıyor. B
 
     <!-- history -->
     <string name="history_load_more">Daha Fazla Göster</string>
-    <string name="history_caught_count">%1$d adet</string>
+    <string name="history_caught_count">%%1$d-%2$d / %3$d toplam</string>
 
 
     <string name="action_SmsAction_permission_error">CodeCatcher SMS gönderim izni bulunmuyor.</string>

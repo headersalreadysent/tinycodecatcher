@@ -1,7 +1,5 @@
 package co.ec.cnsyn.codecatcher.pages.history
 
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import co.ec.cnsyn.codecatcher.database.DB
@@ -12,13 +10,14 @@ import co.ec.cnsyn.codecatcher.database.code.Code
 import co.ec.cnsyn.codecatcher.database.code.CodeDao
 import co.ec.cnsyn.codecatcher.database.relations.ActionDetail
 import co.ec.cnsyn.codecatcher.helpers.async
+import co.ec.cnsyn.codecatcher.helpers.dateString
 import co.ec.cnsyn.codecatcher.helpers.unix
 import kotlin.random.Random
 
 open class HistoryViewModel : ViewModel() {
 
-
-    var history = MutableLiveData<List<CodeDao.Latest>>(listOf())
+    var perPage=30
+    var history = MutableLiveData<List<Pair<String, List<CodeDao.Latest>>>>(listOf())
     var count = MutableLiveData(0)
 
     init {
@@ -36,15 +35,15 @@ open class HistoryViewModel : ViewModel() {
         async({ DB.get().code().getCount() }, {
             count.value = it
         })
-        async({ DB.get().code().getLatest(20) }, {
-            history.value = it
+        async({ DB.get().code().getLatest(perPage) }, {
+            history.value =it.groupBy { it.code.date.dateString("MMM-YYYY") }.toList()
         })
     }
 
-    fun loadMore(then: (res: Int) -> Unit = { _ -> }, err: (res: Throwable) -> Unit = { _ -> }) {
-        val size = (history.value?.size ?: 0) + 20
+    fun loadMore() {
+        val size = (history.value?.sumOf { it.second.size } ?: 0) + perPage
         async({ DB.get().code().getLatest(size) }, {
-            history.value = it
+            history.value =it.groupBy { it.code.date.dateString("MMM-YYYY") }.toList()
         })
     }
 }
@@ -52,7 +51,7 @@ open class HistoryViewModel : ViewModel() {
 class MockHistoryViewModel : HistoryViewModel() {
     override fun start() {
 
-        history.value = List(20) {
+        history.value = List(40) {
             var code = Random.nextInt(10000, 90000).toString()
             CodeDao.Latest(
                 code = Code(
@@ -80,7 +79,7 @@ class MockHistoryViewModel : HistoryViewModel() {
                     )
                 )
             )
-        }
+        }.groupBy { it.code.date.dateString("MMM-YYYY") }.toList()
 
     }
 }
