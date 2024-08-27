@@ -18,9 +18,11 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import co.ec.cnsyn.codecatcher.MainActivity
 import co.ec.cnsyn.codecatcher.R
+import co.ec.cnsyn.codecatcher.helpers.unix
+import co.ec.cnsyn.codecatcher.helpers.Settings as AppSettings
+
 
 class SmsService : Service() {
-
 
 
     private val handler = Handler(Looper.getMainLooper())
@@ -29,7 +31,11 @@ class SmsService : Service() {
 
 
     companion object {
-        val channelName = "CodeCatcher-Service-Channel"
+        const val channelName = "CodeCatcher-Service-Channel"
+        const val heartBeatDelay = 10
+
+        var receiver: SmsReceiver? = null
+
         //setup service with alarm manager
         fun setupService(context: Context, timeout: Int = 0) {
             Log.d("CodeCatcherService", "Set Alarm Manager")
@@ -66,14 +72,18 @@ class SmsService : Service() {
 
     override fun onCreate() {
         super.onCreate()
+        var settings = AppSettings(applicationContext)
+
         runCount = 0
         runnable = object : Runnable {
             override fun run() {
                 // Print the current run
                 runCount++;
                 Log.d("CodeCatcherService", "Service Running: $runCount times")
-                if (runCount < 864) {
-                    handler.postDelayed(this, 100000L)
+                settings.putInt("service-heartbeat", unix().toInt())
+                settings.putInt("service-pulse", runCount)
+                if (runCount < 86400 / heartBeatDelay) {
+                    handler.postDelayed(this, heartBeatDelay * 1000L)
                 } else {
                     //every day restart yourself
                     Log.d("CodeCatcherService", "self stop")
@@ -122,7 +132,7 @@ class SmsService : Service() {
 
 
         //re register sms receiver
-        SmsReceiver.register(applicationContext)
+        receiver = SmsReceiver.register(applicationContext)
 
         return START_STICKY
     }
@@ -136,6 +146,10 @@ class SmsService : Service() {
         super.onDestroy()
         //on destroy re setup
         Log.d("CodeCatcherService", "destroy")
+        receiver?.let {
+            applicationContext.unregisterReceiver(it)
+            receiver = null
+        }
         setupService(applicationContext)
     }
 

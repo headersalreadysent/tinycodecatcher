@@ -14,6 +14,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
@@ -23,12 +29,21 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import co.ec.cnsyn.codecatcher.CodeCatcherPreview
+import co.ec.cnsyn.codecatcher.LocalSettings
 import co.ec.cnsyn.codecatcher.R
 import co.ec.cnsyn.codecatcher.composables.AutoText
 import co.ec.cnsyn.codecatcher.composables.SkewSquare
 import co.ec.cnsyn.codecatcher.composables.SkewSquareCut
+import co.ec.cnsyn.codecatcher.helpers.dateString
+import co.ec.cnsyn.codecatcher.helpers.timeString
+import co.ec.cnsyn.codecatcher.sms.SmsService
 import co.ec.cnsyn.codecatcher.ui.theme.CodeCatcherTheme
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
+@OptIn(DelicateCoroutinesApi::class)
 @Composable
 fun About() {
     Column(
@@ -68,14 +83,39 @@ fun About() {
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
                 )
-                Text(text = "Developed with Jetpack Compose")
+                Text(
+                    text = stringResource(R.string.about_developed_with),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                var heartBeat by remember { mutableStateOf(0L) }
+                val settings = LocalSettings.current
+                LaunchedEffect(Unit) {
+                    while (true) {
+                        //wait for delay and re run
+                        delay(SmsService.heartBeatDelay * 1000L)
+                        heartBeat = settings.getInt("service-heartbeat", 0).toLong()
+                    }
+                }
+                if (heartBeat != 0L) {
+                    Text(
+                        text = stringResource(R.string.about_heartbeat) +
+                                " " + heartBeat.dateString() + " " + heartBeat.timeString(),
+                        modifier = Modifier.padding(top = 8.dp),
+                        style = MaterialTheme.typography.bodySmall
+
+                    )
+                }
             }
         }
         val context = LocalContext.current
-        Column(modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(text = stringResource(R.string.about_help_to_translate),
-                style = MaterialTheme.typography.bodySmall)
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = stringResource(R.string.about_help_to_translate),
+                style = MaterialTheme.typography.bodySmall
+            )
             val title = stringResource(R.string.about_translate_mail_title)
             OutlinedButton(onClick = {
                 val intent = Intent(Intent.ACTION_SENDTO).apply {
@@ -87,11 +127,12 @@ fun About() {
                 context.startActivity(intent)
 
             }) {
-                Text(text = stringResource(R.string.about_translate_contact),
-                    style = MaterialTheme.typography.bodySmall)
+                Text(
+                    text = stringResource(R.string.about_translate_contact),
+                    style = MaterialTheme.typography.bodySmall
+                )
             }
         }
-
 
 
     }

@@ -65,6 +65,8 @@
     <string name="about_help_to_translate">Çeviriye yardım etmek ister misiniz?</string>
     <string name="about_translate_contact">İletişime Geçin</string>
     <string name="about_translate_mail_title">CodeCatcher\'ı tercüme et</string>
+    <string name="about_developed_with">Jetpack Compose kullanarak 🗡 ile geliştirildi.</string>
+    <string name="about_heartbeat">Servis Zamanı:</string>
 
 
     <string name="action_SmsAction_permission_error">CodeCatcher SMS gönderim izni bulunmuyor.</string>
