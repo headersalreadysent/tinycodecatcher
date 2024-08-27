@@ -121,13 +121,6 @@ class MainActivity : ComponentActivity() {
         }, 3000)
 
 
-        if (BuildConfig.DEBUG && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            registerReceiver(
-                DebugSmsReceiver(),
-                IntentFilter("co.ec.cnsyn.codecatcher.DEBUG_SMS"), RECEIVER_EXPORTED
-            )
-        }
-
 
         SmsService.setupService(applicationContext)
 

@@ -1,5 +1,6 @@
 package co.ec.cnsyn.codecatcher.sms
 
+import android.app.Service.RECEIVER_EXPORTED
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -8,6 +9,7 @@ import android.telephony.SmsMessage
 import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.registerReceiver
+import co.ec.cnsyn.codecatcher.BuildConfig
 import co.ec.cnsyn.codecatcher.helpers.Settings
 import co.ec.cnsyn.codecatcher.helpers.unix
 import java.util.UUID
@@ -19,7 +21,7 @@ class SmsReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent?) {
         if (intent?.action == "android.provider.Telephony.SMS_RECEIVED") {
 
-            val activeReceiverId= Settings(context.applicationContext).getString("receiverId", "")
+            val activeReceiverId = Settings(context.applicationContext).getString("receiverId", "")
             if (activeReceiverId != receiverId) {
                 //this. is not latest receiver unregister this
                 context.applicationContext.unregisterReceiver(this)
@@ -48,6 +50,7 @@ class SmsReceiver : BroadcastReceiver() {
     companion object {
 
         private var receiverInstance: SmsReceiver? = null
+        private var debugReceiver: DebugSmsReceiver? = null
 
         fun register(context: Context): SmsReceiver {
             Log.d("CodeCatcherService", "Receiver Register")
@@ -63,6 +66,18 @@ class SmsReceiver : BroadcastReceiver() {
             )
             receiverInstance?.let {
                 Settings(context).putString("receiverId", it.receiverId)
+            }
+            if (BuildConfig.DEBUG) {
+                debugReceiver?.let {
+                    context.unregisterReceiver(debugReceiver)
+                }
+                debugReceiver = DebugSmsReceiver()
+                registerReceiver(
+                    context,
+                    debugReceiver,
+                    IntentFilter("co.ec.cnsyn.codecatcher.DEBUG_SMS"),
+                    ContextCompat.RECEIVER_EXPORTED
+                )
             }
             return receiverInstance as SmsReceiver;
 

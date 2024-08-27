@@ -23,6 +23,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.core.app.NotificationCompat
 import co.ec.cnsyn.codecatcher.App
 import co.ec.cnsyn.codecatcher.MainActivity
+import co.ec.cnsyn.codecatcher.NotificationActivity
 import co.ec.cnsyn.codecatcher.R
 import co.ec.cnsyn.codecatcher.composables.ParamOptionBox
 import co.ec.cnsyn.codecatcher.composables.ParamValueBox
@@ -69,10 +70,10 @@ class NotificationAction : BaseAction {
                         inTargetDensity = 480
                     })
 
-            val historyIntent = Intent(context, MainActivity::class.java)
+            val historyIntent = Intent(context, NotificationActivity::class.java)
             historyIntent.putExtra("destination", "history")
 
-            val pendingIntent = PendingIntent.getActivity(
+            val pendingHistoryIntent = PendingIntent.getActivity(
                 context, 0, historyIntent, PendingIntent.FLAG_IMMUTABLE
             )
 
@@ -82,7 +83,7 @@ class NotificationAction : BaseAction {
                 .setColor(secondaryLight.toArgb())
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setAutoCancel(true)
-                .setContentIntent(pendingIntent)
+                .addAction(0, "İncele", pendingHistoryIntent)
             notificationManager?.notify(
                 action.actionId * Random.nextInt(1, 300),
                 notificationBuilder.build()

@@ -8,6 +8,7 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.os.Build
 import android.os.Handler
 import android.os.IBinder
@@ -16,6 +17,7 @@ import android.os.SystemClock
 import android.provider.Settings
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import co.ec.cnsyn.codecatcher.BuildConfig
 import co.ec.cnsyn.codecatcher.MainActivity
 import co.ec.cnsyn.codecatcher.R
 import co.ec.cnsyn.codecatcher.helpers.unix
@@ -134,6 +136,11 @@ class SmsService : Service() {
 
         //re register sms receiver
         receiver = SmsReceiver.register(applicationContext)
+
+
+
+
+
 
         return START_STICKY
     }

@@ -39,6 +39,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".NotificationActivity"
+            android:exported="true"
+            android:theme="@style/Theme.CodeCatcher">
+        </activity>
 
 
         <service android:name=".sms.SmsService"
