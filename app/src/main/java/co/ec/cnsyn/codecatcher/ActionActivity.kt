@@ -18,7 +18,7 @@ class ActionActivity : ComponentActivity() {
         //in some android versions multiple notification make mistake on destination extra
         //To eliminate this problem i use a second activity. maybe my mistake
 
-        val action = intent.getStringExtra("action") ?: "redirect"
+        val action = intent.getStringExtra("action") ?: "history"
         val code = intent.getStringExtra("code") ?: ""
 
         println("actionlog action:$action code:$code")
@@ -32,7 +32,7 @@ class ActionActivity : ComponentActivity() {
                 println("actionlog copy and stop")
                 finish()
             }
-            "redirect"-> redirectToHistory()
+            "history"-> redirectToHistory()
             else -> redirectToHistory()
         }
 
@@ -40,9 +40,9 @@ class ActionActivity : ComponentActivity() {
     }
 
     fun redirectToHistory(){
-      /*  val redirectIntent = Intent(this, MainActivity::class.java)
+        val redirectIntent = Intent(this, MainActivity::class.java)
         redirectIntent.putExtra("destination","history")
-        startActivity(redirectIntent)*/
+        startActivity(redirectIntent)
     }
 }
 

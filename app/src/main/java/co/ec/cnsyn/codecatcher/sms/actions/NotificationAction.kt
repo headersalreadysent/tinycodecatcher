@@ -71,13 +71,6 @@ class NotificationAction : BaseAction {
                 context, 0, historyIntent, PendingIntent.FLAG_IMMUTABLE
             )
 
-            val copyIntent = Intent(context, ActionActivity::class.java)
-            copyIntent.putExtra("action", "copy")
-            copyIntent.putExtra("code", matches)
-            val pendingCopyIntent = PendingIntent.getActivity(
-                context, 0, copyIntent, PendingIntent.FLAG_IMMUTABLE
-            )
-
             notificationBuilder = setupTexts(catcher, action, sms, notificationBuilder)
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setLargeIcon(largeIcon)
@@ -85,10 +78,6 @@ class NotificationAction : BaseAction {
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setAutoCancel(true)
                 .setContentIntent(pendingHistoryIntent)
-                .addAction(
-                    0, context.getString(R.string.action_NotificationAction_copyButton),
-                    pendingCopyIntent
-                )
             notificationManager?.notify(
                 action.actionId * Random.nextInt(1, 300),
                 notificationBuilder.build()
