@@ -40,9 +40,9 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".NotificationActivity"
+            android:name=".ActionActivity"
             android:exported="true"
-            android:theme="@style/Theme.CodeCatcher">
+            android:theme="@style/Theme.Transparent">
         </activity>
 
 

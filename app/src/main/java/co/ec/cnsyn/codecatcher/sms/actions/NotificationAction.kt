@@ -7,25 +7,19 @@ import android.app.PendingIntent
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.os.Build
-import android.speech.tts.TextToSpeech
-import android.text.TextUtils.replace
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.core.app.NotificationCompat
 import co.ec.cnsyn.codecatcher.App
-import co.ec.cnsyn.codecatcher.MainActivity
-import co.ec.cnsyn.codecatcher.NotificationActivity
+import co.ec.cnsyn.codecatcher.ActionActivity
 import co.ec.cnsyn.codecatcher.R
-import co.ec.cnsyn.codecatcher.composables.ParamOptionBox
 import co.ec.cnsyn.codecatcher.composables.ParamValueBox
 import co.ec.cnsyn.codecatcher.database.relations.ActionDetail
 import co.ec.cnsyn.codecatcher.database.relations.CatcherWithActions
@@ -33,7 +27,6 @@ import co.ec.cnsyn.codecatcher.database.relations.CatcherWithRegex
 import co.ec.cnsyn.codecatcher.helpers.translate
 import co.ec.cnsyn.codecatcher.sms.SmsData
 import co.ec.cnsyn.codecatcher.ui.theme.secondaryLight
-import kotlinx.serialization.json.JsonNull.content
 import kotlin.random.Random
 
 
@@ -70,11 +63,19 @@ class NotificationAction : BaseAction {
                         inTargetDensity = 480
                     })
 
-            val historyIntent = Intent(context, NotificationActivity::class.java)
-            historyIntent.putExtra("destination", "history")
+            val matches = extractCode(catcher, sms)
 
+            val historyIntent = Intent(context, ActionActivity::class.java)
+            historyIntent.putExtra("action", "history")
             val pendingHistoryIntent = PendingIntent.getActivity(
                 context, 0, historyIntent, PendingIntent.FLAG_IMMUTABLE
+            )
+
+            val copyIntent = Intent(context, ActionActivity::class.java)
+            copyIntent.putExtra("action", "copy")
+            copyIntent.putExtra("code", matches)
+            val pendingCopyIntent = PendingIntent.getActivity(
+                context, 0, copyIntent, PendingIntent.FLAG_IMMUTABLE
             )
 
             notificationBuilder = setupTexts(catcher, action, sms, notificationBuilder)
@@ -83,7 +84,11 @@ class NotificationAction : BaseAction {
                 .setColor(secondaryLight.toArgb())
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setAutoCancel(true)
-                .addAction(0, "İncele", pendingHistoryIntent)
+                .setContentIntent(pendingHistoryIntent)
+                .addAction(
+                    0, context.getString(R.string.action_NotificationAction_copyButton),
+                    pendingCopyIntent
+                )
             notificationManager?.notify(
                 action.actionId * Random.nextInt(1, 300),
                 notificationBuilder.build()
@@ -137,6 +142,7 @@ class NotificationAction : BaseAction {
             builder.setContentTitle(sms.sender)
                 .setContentText(sms.body)
         }
+
         return builder
 
     }

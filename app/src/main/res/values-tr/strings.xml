@@ -103,6 +103,8 @@ Bu hizmet, kesintisiz çalışmayı sağlamak için arka planda çalışıyor. B
     <string name="action_NotificationAction_notification_content">_code_ _message_</string>
     <string name="action_NotificationAction_notification_hint">_sender_, _code_ ve _message_ ifadelerini şablonda kullanabilirsiniz.</string>
 
+    <string name="action_NotificationAction_copyButton">Kopyala</string>
+
     <string name="action_TTSAction_error">TTS hatası.</string>
     <string name="action_TTSAction_language_error">TTS dil hatası.</string>
     <string name="action_TTSAction_adjust_volume">Telefon sessizde ise sesi aç</string>

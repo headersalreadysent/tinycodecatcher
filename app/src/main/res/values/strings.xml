@@ -106,6 +106,8 @@
     <string name="action_NotificationAction_notification_content">_code_ _message_</string>
     <string name="action_NotificationAction_notification_hint">You can use _sender_, _code_ and _message_ placeholders</string>
 
+    <string name="action_NotificationAction_copyButton">Copy</string>
+
     <string name="action_TTSAction_error">TTS failed.</string>
     <string name="action_TTSAction_language_error">TTS language error.</string>
     <string name="action_TTSAction_adjust_volume">Increase volume if phone is silent</string>
