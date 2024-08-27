@@ -121,8 +121,8 @@
     <!-- help -->
     <string name="help_service_notification_title">Service Notification</string>
     <string name="help_service_notification_content"><![CDATA[
-    Service notification visible for running catching service forever in system. You can disable from notification channels. <br/>
-    <br/>Just click button and set it to silent in settings window.
+This service is running in the background to ensure continuous operation. You can manage the visibility of this notification by adjusting the settings of the notification channel.
+\n\nJust open settings and make <b>Show Notification</b> checkbox disabled. This will not affect any other notifications.
     ]]></string>
 
 
