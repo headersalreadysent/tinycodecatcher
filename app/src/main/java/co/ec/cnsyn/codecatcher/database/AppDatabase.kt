@@ -14,9 +14,12 @@ import co.ec.cnsyn.codecatcher.database.code.CodeDao
 import co.ec.cnsyn.codecatcher.database.regex.Regex
 import co.ec.cnsyn.codecatcher.database.regex.RegexDao
 import co.ec.cnsyn.codecatcher.database.relations.CatcherWithActions
+import co.ec.cnsyn.codecatcher.database.servicelog.ServiceLog
+import co.ec.cnsyn.codecatcher.database.servicelog.ServiceLogDao
 
 @Database(
-    entities = [Action::class, Catcher::class, CatcherAction::class, Code::class, Regex::class],
+    entities = [Action::class, Catcher::class, CatcherAction::class, Code::class, Regex::class,
+               ServiceLog::class],
     views = [CatcherWithActions::class],
     version = 1,
     exportSchema = false,
@@ -28,4 +31,5 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun action(): ActionDao
     abstract fun catcherAction(): CatcherActionDao
     abstract fun regex(): RegexDao
+    abstract fun service(): ServiceLogDao
 }

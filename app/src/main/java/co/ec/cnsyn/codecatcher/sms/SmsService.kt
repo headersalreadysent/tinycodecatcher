@@ -20,6 +20,10 @@ import androidx.core.app.NotificationCompat
 import co.ec.cnsyn.codecatcher.BuildConfig
 import co.ec.cnsyn.codecatcher.MainActivity
 import co.ec.cnsyn.codecatcher.R
+import co.ec.cnsyn.codecatcher.database.DB
+import co.ec.cnsyn.codecatcher.database.servicelog.ServiceLog
+import co.ec.cnsyn.codecatcher.database.servicelog.ServiceLogDao
+import co.ec.cnsyn.codecatcher.helpers.dateString
 import co.ec.cnsyn.codecatcher.helpers.unix
 import kotlinx.serialization.json.JsonNull.content
 import co.ec.cnsyn.codecatcher.helpers.Settings as AppSettings
@@ -80,11 +84,21 @@ class SmsService : Service() {
         runCount = 0
         runnable = object : Runnable {
             override fun run() {
-                // Print the current run
                 runCount++;
                 Log.d("CodeCatcherService", "Service Running: $runCount times")
+                // Print the current run
+                if(receiver==null){
+                    //if no receiver exists stop and restart yourself
+                    stopSelf()
+                    Log.d("CodeCatcherService", "self stop")
+                    return
+                }
+                //ad heartbeat
                 settings.putInt("service-heartbeat", unix().toInt())
                 settings.putInt("service-pulse", runCount)
+                receiver?.let {
+                    ServiceLogDao.beat(it.receiverId)
+                }
                 if (runCount < 86400 / heartBeatDelay) {
                     handler.postDelayed(this, heartBeatDelay * 1000L)
                 } else {
@@ -107,8 +121,7 @@ class SmsService : Service() {
         }
     }
 
-    override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
 
         val notificationIntent = Intent(applicationContext, MainActivity::class.java)

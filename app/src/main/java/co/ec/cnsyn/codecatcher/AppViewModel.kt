@@ -27,6 +27,7 @@ import co.ec.cnsyn.codecatcher.helpers.unix
 import co.ec.cnsyn.codecatcher.pages.dashboard.DashboardViewModel
 import co.ec.cnsyn.codecatcher.sms.ActionRunner
 import co.ec.cnsyn.codecatcher.sms.SmsData
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
@@ -35,7 +36,9 @@ open class AppViewModel : ViewModel() {
 
     var requiredPerms = MutableLiveData<List<PermissionInfo>>(listOf())
 
+    var debug = MutableLiveData<Map<String, Any>>(mapOf())
 
+    var debugRunning = false
 
     init {
         calculatePermissions()
@@ -90,6 +93,38 @@ open class AppViewModel : ViewModel() {
         }
         requiredPerms.value = permissions.toList()
 
+    }
+
+    fun calculateDebugInfos() {
+        debugRunning = true
+        viewModelScope.launch {
+            while (debugRunning) {
+                calculateCrashDebug()
+                calculateServiceDebug()
+                delay(1000)
+            }
+        }
+    }
+
+
+    fun stopDebugCalculate() {
+        debugRunning = false
+    }
+
+
+    private fun calculateServiceDebug() {
+        async({ DB.get().service().getAllItems() }, {
+            val old = debug.value?.toMutableMap() ?: mutableMapOf()
+            old["service"] = it
+            debug.value = old.toMap()
+        })
+    }
+
+    private fun calculateCrashDebug() {
+        val logs = ExceptionHandler.readExceptionLogs(App.context())
+        val old = debug.value?.toMutableMap() ?: mutableMapOf()
+        old["crash"] = logs
+        debug.value = old.toMap()
     }
 
 

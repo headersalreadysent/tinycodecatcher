@@ -86,11 +86,14 @@ import co.ec.cnsyn.codecatcher.ui.theme.CodeCatcherTheme
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 
 class MainActivity : ComponentActivity() {
 
     companion object {
+        val handler = Handler(App.context().mainLooper)
         var isLoading: Boolean = true
     }
 
@@ -116,14 +119,15 @@ class MainActivity : ComponentActivity() {
         installSplashScreen().setKeepOnScreenCondition {
             return@setKeepOnScreenCondition isLoading
         }
-        Handler(App.context().mainLooper).postDelayed({
+        handler.postDelayed({
             isLoading = false
         }, 3000)
 
-
-
+        handler.postDelayed({
+            //after 5 second make it restart 0
+            Settings(this).putInt("appRestartAfterError", 0)
+        },5000L)
         SmsService.setupService(applicationContext)
-
     }
 }
 
@@ -143,25 +147,6 @@ fun CodeCatcherApp(
 ) {
     val uiController = rememberSystemUiController()
     val surfaceColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
-
-    val context = LocalContext.current
-    val navController = rememberNavController()
-    val db = DB.getDatabase(context)
-    val snackbarHostState = SnackbarHostState()
-    val settings = Settings(context)
-
-    var permissionModel by remember { mutableStateOf(false) }
-    val permissions by appModel.requiredPerms.observeAsState(listOf())
-    LaunchedEffect(permissions) {
-        if (permissions.isEmpty()) {
-            permissionModel = false
-        } else {
-            val hiddenUntil = settings.getInt("permissionHidden", 0)
-            if (hiddenUntil < unix() || hiddenUntil == 0) {
-                permissionModel = permissions.isNotEmpty()
-            }
-        }
-    }
     SideEffect {
         uiController.setNavigationBarColor(
             color = surfaceColor,
@@ -172,15 +157,25 @@ fun CodeCatcherApp(
             darkIcons = ColorUtils.calculateLuminance(surfaceColor.toArgb()) > 0.5
         )
     }
+    CodeCatcherProviders {
+        var permissionModel by remember { mutableStateOf(false) }
+        val permissions by appModel.requiredPerms.observeAsState(listOf())
 
+        val navController = LocalNavigation.current
+        val snackbarHostState = LocalSnackbar.current
+        val settings = LocalSettings.current
 
+        LaunchedEffect(permissions) {
+            if (permissions.isEmpty()) {
+                permissionModel = false
+            } else {
+                val hiddenUntil = settings.getInt("permissionHidden", 0)
+                if (hiddenUntil < unix() || hiddenUntil == 0) {
+                    permissionModel = permissions.isNotEmpty()
+                }
+            }
+        }
 
-    CompositionLocalProvider(
-        LocalNavigation provides navController,
-        LocalDB provides db,
-        LocalSnackbar provides snackbarHostState,
-        LocalSettings provides settings
-    ) {
 
         var settingsVisible by remember { mutableStateOf(false) }
         if (settingsVisible) {
@@ -275,20 +270,19 @@ fun CodeCatcherApp(
             }
         }
 
-
-    }
-
-
-    if (permissionModel && permissions.isNotEmpty()) {
-        SkewBottomSheet(onDismissRequest = {
-            permissionModel = false
-            settings.putInt("permissionHidden", unix().toInt() + 43200)
-        }, cut = SkewSquareCut.TopStart) {
-            PermissionArea(permission = permissions) {
-                appModel.calculatePermissions()
+        if (permissionModel && permissions.isNotEmpty()) {
+            SkewBottomSheet(onDismissRequest = {
+                permissionModel = false
+                settings.putInt("permissionHidden", unix().toInt() + 43200)
+            }, cut = SkewSquareCut.TopStart) {
+                PermissionArea(permission = permissions) {
+                    appModel.calculatePermissions()
+                }
             }
         }
+
     }
+
 
 }
 
@@ -368,23 +362,39 @@ fun PermissionArea(
 }
 
 @Composable
-fun CodeCatcherPreview(
+fun CodeCatcherProviders(
     content: @Composable () -> Unit
 ) {
     val context = LocalContext.current
     val navController = rememberNavController()
     val db = DB.getDatabase(context)
     val snackbarHostState = SnackbarHostState()
-    val settings = MockSettings(context)
-
+    val settings = Settings(context)
     CompositionLocalProvider(
         LocalNavigation provides navController,
         LocalDB provides db,
         LocalSnackbar provides snackbarHostState,
         LocalSettings provides settings
     ) {
-        CodeCatcherTheme {
-            content()
+        content()
+    }
+}
+
+@Composable
+fun CodeCatcherPreview(
+    content: @Composable () -> Unit
+) {
+    val context = LocalContext.current
+    val settings = MockSettings(context)
+    CodeCatcherProviders {
+
+
+        CompositionLocalProvider(
+            LocalSettings provides settings
+        ) {
+            CodeCatcherTheme {
+                content()
+            }
         }
     }
 }
