@@ -34,20 +34,18 @@ class App : Application() {
         DB.getDatabase(this)
     }
 
-    @OptIn(DelicateCoroutinesApi::class)
     override fun onCreate() {
         super.onCreate()
         instance = this
 
-        val androidId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
-        Log.d("AndroidID", "Your Android ID: $androidId")
-
-        val packageManager = packageManager
-        val componentName = ComponentName(this, DebugActivity::class.java)
-
         Thread.setDefaultUncaughtExceptionHandler(ExceptionHandler(applicationContext))
 
-        if (androidId == "34d9b86b53ed2963") {
+        val androidId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
+        val componentName = ComponentName(this, DebugActivity::class.java)
+
+        if (androidId == "34d9b86b53ed2963" ||
+            androidId == "87763bec87590fb6"
+        ) {
             packageManager.setComponentEnabledSetting(
                 componentName,
                 PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
