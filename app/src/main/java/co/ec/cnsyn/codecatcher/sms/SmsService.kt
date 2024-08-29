@@ -1,5 +1,6 @@
 package co.ec.cnsyn.codecatcher.sms
 
+import android.app.ActivityManager
 import android.app.AlarmManager
 import android.app.Notification
 import android.app.NotificationChannel
@@ -7,8 +8,10 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
+import android.content.ContextWrapper
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Handler
 import android.os.IBinder
@@ -26,15 +29,16 @@ import co.ec.cnsyn.codecatcher.database.servicelog.ServiceLogDao
 import co.ec.cnsyn.codecatcher.helpers.dateString
 import co.ec.cnsyn.codecatcher.helpers.unix
 import kotlinx.serialization.json.JsonNull.content
+import java.util.UUID
 import co.ec.cnsyn.codecatcher.helpers.Settings as AppSettings
 
 
 class SmsService : Service() {
 
-
     private val handler = Handler(Looper.getMainLooper())
     private lateinit var runnable: Runnable
     private var runCount = 0
+    private var serviceId: String = UUID.randomUUID().toString()
 
 
     companion object {
@@ -43,8 +47,22 @@ class SmsService : Service() {
 
         var receiver: SmsReceiver? = null
 
+        fun isServiceRunning(context: Context, serviceClass: Class<out Any>): Boolean {
+            val activityManager =
+                context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+            for (service in activityManager.getRunningServices(Int.MAX_VALUE)) {
+                if (serviceClass.name == service.service.className) {
+                    return true
+                }
+            }
+            return false
+        }
+
         //setup service with alarm manager
         fun setupService(context: Context, timeout: Int = 0) {
+            if (isServiceRunning(context, SmsService::class.java)) {
+                return
+            }
             Log.d("CodeCatcherService", "Set Alarm Manager")
             val intent = Intent(context, BootReceiver::class.java)
             val pendingIntent = PendingIntent.getBroadcast(
@@ -85,9 +103,9 @@ class SmsService : Service() {
         runnable = object : Runnable {
             override fun run() {
                 runCount++;
-                Log.d("CodeCatcherService", "Service Running: $runCount times")
+                Log.d("CodeCatcherService", "Service Running: $runCount times [$serviceId]")
                 // Print the current run
-                if(receiver==null){
+                if (receiver == null) {
                     //if no receiver exists stop and restart yourself
                     stopSelf()
                     Log.d("CodeCatcherService", "self stop")
@@ -126,7 +144,7 @@ class SmsService : Service() {
 
         val notificationIntent = Intent(applicationContext, MainActivity::class.java)
         notificationIntent.putExtra("destination", "help")
-        notificationIntent.putExtra("destinationParam","service_notification")
+        notificationIntent.putExtra("destinationParam", "service_notification")
 
         val pendingIntent = PendingIntent.getActivity(
             applicationContext,
@@ -173,5 +191,6 @@ class SmsService : Service() {
         }
         setupService(applicationContext)
     }
+
 
 }

@@ -11,6 +11,7 @@ import android.os.Build
 import android.provider.Settings
 import android.util.Log
 import co.ec.cnsyn.codecatcher.database.DB
+import co.ec.cnsyn.codecatcher.sms.SmsService
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -37,23 +38,10 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
         instance = this
-
         Thread.setDefaultUncaughtExceptionHandler(ExceptionHandler(applicationContext))
 
-        val androidId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
-        val componentName = ComponentName(this, DebugActivity::class.java)
-        Log.d("CodeCatcher", "android_id: $androidId")
-        Log.d("CodeCatcher", "android_id: $androidId")
-        if (androidId == "34d9b86b53ed2963" ||
-            androidId == "08a4d23a4974162f"
-        ) {
-            packageManager.setComponentEnabledSetting(
-                componentName,
-                PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
-                PackageManager.DONT_KILL_APP
-            )
-        }
 
+        SmsService.setupService(applicationContext)
     }
 
 }

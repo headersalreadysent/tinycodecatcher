@@ -27,14 +27,12 @@ class SmsReceiver : BroadcastReceiver() {
         if (intent?.action == "android.provider.Telephony.SMS_RECEIVED") {
 
             val activeReceiverId = Settings(context.applicationContext).getString("receiverId", "")
-            if (activeReceiverId != receiverId) {
-                //this. is not latest receiver unregister this
-                context.applicationContext.unregisterReceiver(this)
-                return
+            if (activeReceiverId == receiverId) {
+                //this is last registered
+                val messages = getMessageFromIntent(intent)
+                ActionRunner().runSmsList(messages)
             }
 
-            val messages = getMessageFromIntent(intent)
-            ActionRunner().runSmsList(messages)
         }
 
     }
@@ -64,7 +62,7 @@ class SmsReceiver : BroadcastReceiver() {
             }
             receiverInstance = SmsReceiver()
             registerReceiver(
-                context,
+                context.applicationContext,
                 receiverInstance,
                 IntentFilter("android.provider.Telephony.SMS_RECEIVED"),
                 ContextCompat.RECEIVER_EXPORTED
@@ -80,7 +78,7 @@ class SmsReceiver : BroadcastReceiver() {
                 }
                 debugReceiver = DebugSmsReceiver()
                 registerReceiver(
-                    context,
+                    context.applicationContext,
                     debugReceiver,
                     IntentFilter("co.ec.cnsyn.codecatcher.DEBUG_SMS"),
                     ContextCompat.RECEIVER_EXPORTED

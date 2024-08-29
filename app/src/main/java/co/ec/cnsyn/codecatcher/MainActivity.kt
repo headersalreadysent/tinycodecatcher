@@ -1,8 +1,6 @@
 package co.ec.cnsyn.codecatcher
 
 import android.annotation.SuppressLint
-import android.content.IntentFilter
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import androidx.activity.ComponentActivity
@@ -80,14 +78,11 @@ import co.ec.cnsyn.codecatcher.pages.dashboard.Dashboard
 import co.ec.cnsyn.codecatcher.pages.help.Help
 import co.ec.cnsyn.codecatcher.pages.history.History
 import co.ec.cnsyn.codecatcher.pages.settings.SettingsModal
-import co.ec.cnsyn.codecatcher.sms.DebugSmsReceiver
 import co.ec.cnsyn.codecatcher.sms.SmsService
 import co.ec.cnsyn.codecatcher.ui.theme.CodeCatcherTheme
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 
 
 class MainActivity : ComponentActivity() {
@@ -127,7 +122,12 @@ class MainActivity : ComponentActivity() {
             //after 5 second make it restart 0
             Settings(this).putInt("appRestartAfterError", 0)
         },5000L)
-        SmsService.setupService(applicationContext)
+        handler.postDelayed({
+            //start after 5 second
+            SmsService.setupService(applicationContext)
+        },5000L)
+
+
     }
 }
 

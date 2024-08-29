@@ -43,6 +43,9 @@
             android:name=".ActionActivity"
             android:exported="true"
             android:theme="@style/Theme.Transparent">
+            <intent-filter>
+                <action android:name="co.ec.cnsyn.codecatcher.DEBUG" />
+            </intent-filter>
         </activity>
 
 
