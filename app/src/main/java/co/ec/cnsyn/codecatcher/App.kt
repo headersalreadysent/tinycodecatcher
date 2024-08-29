@@ -42,9 +42,10 @@ class App : Application() {
 
         val androidId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
         val componentName = ComponentName(this, DebugActivity::class.java)
-
+        Log.d("CodeCatcher", "android_id: $androidId")
+        Log.d("CodeCatcher", "android_id: $androidId")
         if (androidId == "34d9b86b53ed2963" ||
-            androidId == "87763bec87590fb6"
+            androidId == "08a4d23a4974162f"
         ) {
             packageManager.setComponentEnabledSetting(
                 componentName,
