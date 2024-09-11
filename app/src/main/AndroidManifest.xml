@@ -47,8 +47,6 @@
                 <action android:name="co.ec.cnsyn.codecatcher.DEBUG" />
             </intent-filter>
         </activity>
-
-
         <activity
             android:name=".DebugActivity"
             android:label="CodeCatcher Debug"

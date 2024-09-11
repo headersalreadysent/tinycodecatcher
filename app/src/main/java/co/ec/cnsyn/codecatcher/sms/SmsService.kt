@@ -26,6 +26,7 @@ import co.ec.cnsyn.codecatcher.R
 import co.ec.cnsyn.codecatcher.database.DB
 import co.ec.cnsyn.codecatcher.database.servicelog.ServiceLog
 import co.ec.cnsyn.codecatcher.database.servicelog.ServiceLogDao
+import co.ec.cnsyn.codecatcher.helpers.AppLogger
 import co.ec.cnsyn.codecatcher.helpers.dateString
 import co.ec.cnsyn.codecatcher.helpers.unix
 import kotlinx.serialization.json.JsonNull.content
@@ -63,15 +64,12 @@ class SmsService : Service() {
             if (isServiceRunning(context, SmsService::class.java)) {
                 return
             }
-            Log.d("CodeCatcherService", "Set Alarm Manager")
+            AppLogger.d("Setup Service with alarm manager", "service")
             val intent = Intent(context, BootReceiver::class.java)
-            val pendingIntent = PendingIntent.getBroadcast(
-                context, 0, intent, PendingIntent.FLAG_MUTABLE
-            )
-            val alarmManager =
-                context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            val pendingIntent =
+                PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_MUTABLE)
 
-
+            val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 if (!alarmManager.canScheduleExactAlarms()) {
                     // If your app does not have the permission, guide the user to the settings
@@ -83,13 +81,15 @@ class SmsService : Service() {
                 } else {
                     alarmManager.setExact(
                         AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                        SystemClock.elapsedRealtime() + 1000 * timeout, pendingIntent
+                        SystemClock.elapsedRealtime() + 1000 * timeout,
+                        pendingIntent
                     )
                 }
             } else {
                 alarmManager.setExact(
                     AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                    SystemClock.elapsedRealtime() + 1000 * timeout, pendingIntent
+                    SystemClock.elapsedRealtime() + 1000 * timeout,
+                    pendingIntent
                 )
             }
         }
@@ -97,31 +97,36 @@ class SmsService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        var settings = AppSettings(applicationContext)
+        val settings = AppSettings(applicationContext)
 
         runCount = 0
         runnable = object : Runnable {
             override fun run() {
                 runCount++;
-                Log.d("CodeCatcherService", "Service Running: $runCount times [$serviceId]")
+                if (runCount % 10 == 0) {
+                    //log to system
+                    var hashes=serviceId.split("-").last() + " - "+ (receiver?.receiverId?.split("-")?.last() ?: "")
+                    AppLogger.d("Service Running: $runCount times [$hashes]", "service")
+                }
                 // Print the current run
                 if (receiver == null) {
                     //if no receiver exists stop and restart yourself
+                    AppLogger.d("Stop service because no receiver exists", "service")
                     stopSelf()
-                    Log.d("CodeCatcherService", "self stop")
                     return
                 }
                 //ad heartbeat
                 settings.putInt("service-heartbeat", unix().toInt())
                 settings.putInt("service-pulse", runCount)
                 receiver?.let {
-                    ServiceLogDao.beat(it.receiverId)
+                    ServiceLogDao.beat(it.receiverId, heartBeatDelay)
                 }
                 if (runCount < 86400 / heartBeatDelay) {
+                    //if receiver is not null and 1 day still running
                     handler.postDelayed(this, heartBeatDelay * 1000L)
                 } else {
                     //every day restart yourself
-                    Log.d("CodeCatcherService", "self stop")
+                    AppLogger.d("Stop service because 1 day self stop", "service")
                     stopSelf()
                 }
             }
@@ -141,14 +146,13 @@ class SmsService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
-
+        //setup nutification
         val notificationIntent = Intent(applicationContext, MainActivity::class.java)
         notificationIntent.putExtra("destination", "help")
         notificationIntent.putExtra("destinationParam", "service_notification")
 
         val pendingIntent = PendingIntent.getActivity(
-            applicationContext,
-            0, notificationIntent, PendingIntent.FLAG_IMMUTABLE
+            applicationContext, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE
         )
 
         val notification: Notification = NotificationCompat.Builder(this, channelName)
@@ -162,16 +166,16 @@ class SmsService : Service() {
 
         // Start the service in the foreground
         // double start is hack for hiding notification
-        startForeground(45, notification)
-
-
-        //re register sms receiver
-        receiver = SmsReceiver.register(applicationContext)
-
-
-
-
-
+        try {
+            startForeground(45, notification)
+            //re register sms receiver
+            receiver = SmsReceiver.register(applicationContext)
+            AppLogger.d("Sms Service generated [$serviceId]","service")
+        } catch (e: Error) {
+            //re setup
+            AppLogger.e("Service starting error", e,"service")
+            stopSelf()
+        }
 
         return START_STICKY
     }
@@ -184,7 +188,7 @@ class SmsService : Service() {
     override fun onDestroy() {
         super.onDestroy()
         //on destroy re setup
-        Log.d("CodeCatcherService", "destroy")
+        AppLogger.d("Service destroyed", "service")
         receiver?.let {
             applicationContext.unregisterReceiver(it)
             receiver = null

@@ -15,8 +15,8 @@ interface ServiceLogDao : BaseDao<ServiceLog> {
     @Query("SELECT * FROM servicelog")
     fun getAllItems(): List<ServiceLog>
 
-    @Query("UPDATE servicelog SET heartbeatCount=heartbeatCount+1 WHERE receiverId = :serviceId")
-    fun heartBeat(serviceId: String)
+    @Query("UPDATE servicelog SET heartbeatCount=heartbeatCount+:beatCount WHERE receiverId = :serviceId")
+    fun heartBeat(serviceId: String,beatCount:Int=1)
 
     companion object {
         fun addNew(receiverId:String){
@@ -31,9 +31,9 @@ interface ServiceLogDao : BaseDao<ServiceLog> {
         }
 
 
-        fun beat(receiverId:String){
+        fun beat(receiverId:String,count:Int=1){
             async({
-                DB.get().service().heartBeat(receiverId)
+                DB.get().service().heartBeat(receiverId,count)
             })
         }
     }

@@ -13,6 +13,7 @@ import co.ec.cnsyn.codecatcher.BuildConfig
 import co.ec.cnsyn.codecatcher.database.DB
 import co.ec.cnsyn.codecatcher.database.servicelog.ServiceLog
 import co.ec.cnsyn.codecatcher.database.servicelog.ServiceLogDao
+import co.ec.cnsyn.codecatcher.helpers.AppLogger
 import co.ec.cnsyn.codecatcher.helpers.Settings
 import co.ec.cnsyn.codecatcher.helpers.async
 import co.ec.cnsyn.codecatcher.helpers.dateString
@@ -56,11 +57,11 @@ class SmsReceiver : BroadcastReceiver() {
         private var debugReceiver: DebugSmsReceiver? = null
 
         fun register(context: Context): SmsReceiver {
-            Log.d("CodeCatcherService", "Receiver Register")
             receiverInstance?.let {
                 context.unregisterReceiver(receiverInstance)
             }
             receiverInstance = SmsReceiver()
+            AppLogger.d( "Register Sms Receiver [${receiverInstance?.receiverId}]","Receiver")
             registerReceiver(
                 context.applicationContext,
                 receiverInstance,

@@ -7,8 +7,10 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -47,6 +49,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import co.ec.cnsyn.codecatcher.database.DB
@@ -75,7 +78,7 @@ class DebugActivity : ComponentActivity() {
 fun CodeCatcherDebug(
     model: AppViewModel = viewModel()
 ) {
-    val tabs = listOf("Crash", "Service","Service Day")
+    val tabs = listOf("Crash", "Service","Service Day","App Logs")
     var selectedTabIndex by remember { mutableStateOf(0) }
 
     DisposableEffect(Unit) {
@@ -111,6 +114,7 @@ fun CodeCatcherDebug(
                 0 -> CrashDebug(model)
                 1 -> ServiceDebug(model)
                 2 -> ServiceDebug(model,true)
+                3 -> AppLog(model)
                 else -> Text(text = "not-found")
             }
         }
@@ -191,6 +195,68 @@ fun ServiceDebug(model: AppViewModel,forDay:Boolean=false) {
         }
 
 }
+
+@Composable
+fun AppLog(model: AppViewModel) {
+
+    val debug by model.debug.observeAsState(mapOf())
+    if (debug.keys.contains("service"))
+        LazyColumn(modifier = Modifier.fillMaxSize()) {
+
+            var messages = debug["applog"]
+            if (messages is List<*>) {
+                items(messages.size) {
+                    val logItem = messages[it] as String
+                    var parts=logItem.split("#")
+                    ListItem(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(4.dp),
+                        colors = ListItemDefaults.colors(
+                            containerColor = MaterialTheme.colorScheme.secondaryContainer
+                        ),
+                        headlineContent = {
+                            if(parts.size==1){
+                                Text(
+                                    text = logItem,
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            } else {
+                                Row(modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween) {
+                                    Text(
+                                        text = parts[0],
+                                        style = MaterialTheme.typography.bodySmall.copy(
+                                            color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = .8F),
+                                            fontSize = 10.sp
+                                        )
+                                    )
+                                    Text(
+                                        text = parts[1],
+                                        style = MaterialTheme.typography.bodySmall.copy(
+                                            color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = .8F),
+                                            fontSize = 10.sp
+                                        )
+                                    )
+                                }
+                            }
+                        },
+                        supportingContent = {
+                            if(parts.size>1){
+                                Text(
+                                    text = parts[2],
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            }
+                        },
+                    )
+                }
+            }
+
+        }
+
+}
+
 
 
 @Composable

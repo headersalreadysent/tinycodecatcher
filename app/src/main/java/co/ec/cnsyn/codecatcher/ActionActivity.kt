@@ -6,12 +6,11 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_ENABLED
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
-import androidx.core.content.ContextCompat.startActivity
-import java.util.logging.Logger
+import co.ec.cnsyn.codecatcher.helpers.AppLogger
+import co.ec.cnsyn.codecatcher.helpers.Settings
 
 
 class ActionActivity : ComponentActivity() {
@@ -25,12 +24,12 @@ class ActionActivity : ComponentActivity() {
         //To eliminate this problem i use a second activity. maybe my mistake
 
         if (intent.action == "co.ec.cnsyn.codecatcher.DEBUG") {
+            val settings = Settings(applicationContext)
             val component = ComponentName(this, DebugActivity::class.java)
-            Log.d(
-                "codecatcher",
+            AppLogger.d(
                 "debugenabled ${packageManager.getComponentEnabledSetting(component)}"
             )
-            val state=packageManager.getComponentEnabledSetting(component)
+            val state = packageManager.getComponentEnabledSetting(component)
             if (state == PackageManager.COMPONENT_ENABLED_STATE_DISABLED
                 || state == PackageManager.COMPONENT_ENABLED_STATE_DEFAULT
             ) {
@@ -39,6 +38,7 @@ class ActionActivity : ComponentActivity() {
                     PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
                     PackageManager.DONT_KILL_APP
                 )
+                settings.putBoolean("debug-enabled", true)
 
             } else {
                 packageManager.setComponentEnabledSetting(
@@ -46,6 +46,7 @@ class ActionActivity : ComponentActivity() {
                     PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
                     PackageManager.DONT_KILL_APP
                 )
+                settings.putBoolean("debug-enabled", false)
             }
             finish()
             return
@@ -59,8 +60,7 @@ class ActionActivity : ComponentActivity() {
         when (action) {
             "copy" -> {
 
-                val clipboard =
-                    getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                 val clip = ClipData.newPlainText("code-catcher", code)
                 clipboard.setPrimaryClip(clip)
                 println("actionlog copy and stop")

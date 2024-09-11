@@ -5,15 +5,16 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import co.ec.cnsyn.codecatcher.helpers.AppLogger
 
 class BootReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context?, intent: Intent?) {
         if (intent?.action == "android.intent.action.BOOT_COMPLETED") {
-            Log.d("CodeCatcherService", "Boot Completed Receiver")
+            AppLogger.d( "Boot Receiver Start With Boot Complete","BootReceiver")
             context?.startService(Intent(context, SmsService::class.java))
         } else {
-            Log.d("CodeCatcherService", "Alarm Receiver")
+            AppLogger.d( "Boot Receiver Start With Alarm Receiver","BootReceiver")
             context?.startService(Intent(context, SmsService::class.java))
         }
     }

@@ -101,6 +101,7 @@ open class AppViewModel : ViewModel() {
             while (debugRunning) {
                 calculateCrashDebug()
                 calculateServiceDebug()
+                calculateAppLogDebug()
                 delay(1000)
             }
         }
@@ -124,6 +125,13 @@ open class AppViewModel : ViewModel() {
         val logs = ExceptionHandler.readExceptionLogs(App.context())
         val old = debug.value?.toMutableMap() ?: mutableMapOf()
         old["crash"] = logs
+        debug.value = old.toMap()
+    }
+
+    private fun calculateAppLogDebug() {
+        val logs = ExceptionHandler.readAppLogs(App.context())
+        val old = debug.value?.toMutableMap() ?: mutableMapOf()
+        old["applog"] = logs
         debug.value = old.toMap()
     }
 
