@@ -1,6 +1,7 @@
 package co.ec.cnsyn.codecatcher
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import androidx.activity.ComponentActivity
@@ -20,6 +21,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Dashboard
+import androidx.compose.material.icons.filled.DeveloperMode
 import androidx.compose.material.icons.filled.Key
 import androidx.compose.material.icons.filled.Phishing
 import androidx.compose.material.icons.filled.Settings
@@ -55,6 +57,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat.startActivity
 import androidx.core.graphics.ColorUtils
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -121,11 +124,11 @@ class MainActivity : ComponentActivity() {
         handler.postDelayed({
             //after 5 second make it restart 0
             Settings(this).putInt("appRestartAfterError", 0)
-        },5000L)
+        }, 5000L)
         handler.postDelayed({
             //start after 5 second
             SmsService.setupService(applicationContext)
-        },5000L)
+        }, 5000L)
 
 
     }
@@ -237,6 +240,21 @@ fun CodeCatcherApp(
                                 Icon(Icons.Default.Key, contentDescription = "")
                             }
                         }
+                        if (settings.getBoolean("debug-enabled", false)) {
+                            val context = LocalContext.current
+                            IconButton(
+                                onClick = {
+                                    val debugActivity = Intent(context, DebugActivity::class.java)
+                                    context.startActivity(debugActivity)
+                                },
+                                colors = IconButtonDefaults.iconButtonColors(
+                                    containerColor = MaterialTheme.colorScheme.surface
+                                )
+                            ) {
+                                Icon(Icons.Filled.DeveloperMode, contentDescription = "")
+                            }
+                        }
+
                     },
                     floatingActionButton = {
                         FloatingActionButton(onClick = {

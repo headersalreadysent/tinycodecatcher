@@ -1,5 +1,6 @@
 package co.ec.cnsyn.codecatcher
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -21,9 +22,14 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
@@ -102,6 +108,15 @@ fun CodeCatcherDebug(
                         text = { Text(title) }
                     )
                 }
+            }
+        },
+        floatingActionButton = {
+            val context= LocalContext.current
+            FloatingActionButton(onClick = {
+                val debugActivity = Intent(context, MainActivity::class.java)
+                context.startActivity(debugActivity)
+            }) {
+                Icon(Icons.Filled.Replay, contentDescription = "")
             }
         }
     ) { _ ->
@@ -222,7 +237,9 @@ fun AppLog(model: AppViewModel) {
                                     style = MaterialTheme.typography.bodyMedium
                                 )
                             } else {
-                                Row(modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp),
+                                Row(modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(bottom = 4.dp),
                                     horizontalArrangement = Arrangement.SpaceBetween) {
                                     Text(
                                         text = parts[0],
