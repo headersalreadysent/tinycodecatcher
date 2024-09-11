@@ -24,9 +24,13 @@ import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BasicAlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -84,7 +88,7 @@ class DebugActivity : ComponentActivity() {
 fun CodeCatcherDebug(
     model: AppViewModel = viewModel()
 ) {
-    val tabs = listOf("Crash", "Service","Service Day","App Logs")
+    val tabs = listOf("Crash", "Service", "Service Day", "App Logs")
     var selectedTabIndex by remember { mutableStateOf(0) }
 
     DisposableEffect(Unit) {
@@ -111,7 +115,7 @@ fun CodeCatcherDebug(
             }
         },
         floatingActionButton = {
-            val context= LocalContext.current
+            val context = LocalContext.current
             FloatingActionButton(onClick = {
                 val debugActivity = Intent(context, MainActivity::class.java)
                 context.startActivity(debugActivity)
@@ -128,7 +132,7 @@ fun CodeCatcherDebug(
             when (selectedTabIndex) {
                 0 -> CrashDebug(model)
                 1 -> ServiceDebug(model)
-                2 -> ServiceDebug(model,true)
+                2 -> ServiceDebug(model, true)
                 3 -> AppLog(model)
                 else -> Text(text = "not-found")
             }
@@ -146,7 +150,7 @@ fun CodeCatcherDebugPreview() {
 
 
 @Composable
-fun ServiceDebug(model: AppViewModel,forDay:Boolean=false) {
+fun ServiceDebug(model: AppViewModel, forDay: Boolean = false) {
 
     val debug by model.debug.observeAsState(mapOf())
     if (debug.keys.contains("service"))
@@ -154,23 +158,39 @@ fun ServiceDebug(model: AppViewModel,forDay:Boolean=false) {
 
             var services = debug["service"]
             if (services is List<*>) {
-                services = services.reversed()
-                if(forDay){
-                    var map= mutableMapOf<String,ServiceLog>()
-                    services.forEach { it ->
-                        var service=it as ServiceLog
-                        var date=service.date.substring(0..10)
-                        if(map.keys.contains(date)){
-                            map[date]=ServiceLog(
-                                date=date,
-                                receiverId = map[date]?.receiverId+"\n"+service.receiverId,
-                                heartbeatCount = (map[date]?.heartbeatCount?:0)+service.heartbeatCount,
+                if (services.isNotEmpty()) {
+                    item {
+                        OutlinedButton(modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 8.dp),
+                            onClick = {
+                                model.clearServiceRecords()
+                            }) {
+                            Icon(Icons.Filled.Delete, contentDescription = "")
+                            Text(
+                                text = "Clean Log", textAlign = TextAlign.Center
                             )
-                        } else {
-                            map[date]=service
                         }
                     }
-                    services=map.values.toList()
+                }
+                services = services.reversed()
+                if (forDay) {
+                    var map = mutableMapOf<String, ServiceLog>()
+                    services.forEach { it ->
+                        var service = it as ServiceLog
+                        var date = service.date.substring(0..10)
+                        if (map.keys.contains(date)) {
+                            map[date] = ServiceLog(
+                                date = date,
+                                receiverId = map[date]?.receiverId + "\n" + service.receiverId,
+                                heartbeatCount = (map[date]?.heartbeatCount
+                                    ?: 0) + service.heartbeatCount,
+                            )
+                        } else {
+                            map[date] = service
+                        }
+                    }
+                    services = map.values.toList()
                 }
                 services as List<*>
                 items(services.size) {
@@ -220,9 +240,24 @@ fun AppLog(model: AppViewModel) {
 
             var messages = debug["applog"]
             if (messages is List<*>) {
+                if (messages.isNotEmpty()) {
+                    item {
+                        OutlinedButton(modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 8.dp),
+                            onClick = {
+                                ExceptionHandler.clearAppLogs(App.context())
+                            }) {
+                            Icon(Icons.Filled.Delete, contentDescription = "")
+                            Text(
+                                text = "Clean Log", textAlign = TextAlign.Center
+                            )
+                        }
+                    }
+                }
                 items(messages.size) {
                     val logItem = messages[it] as String
-                    var parts=logItem.split("#")
+                    var parts = logItem.split("#")
                     ListItem(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -231,27 +266,33 @@ fun AppLog(model: AppViewModel) {
                             containerColor = MaterialTheme.colorScheme.secondaryContainer
                         ),
                         headlineContent = {
-                            if(parts.size==1){
+                            if (parts.size == 1) {
                                 Text(
                                     text = logItem,
                                     style = MaterialTheme.typography.bodyMedium
                                 )
                             } else {
-                                Row(modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(bottom = 4.dp),
-                                    horizontalArrangement = Arrangement.SpaceBetween) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(bottom = 4.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
                                     Text(
                                         text = parts[0],
                                         style = MaterialTheme.typography.bodySmall.copy(
-                                            color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = .8F),
+                                            color = MaterialTheme.colorScheme.onSecondaryContainer.copy(
+                                                alpha = .8F
+                                            ),
                                             fontSize = 10.sp
                                         )
                                     )
                                     Text(
                                         text = parts[1],
                                         style = MaterialTheme.typography.bodySmall.copy(
-                                            color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = .8F),
+                                            color = MaterialTheme.colorScheme.onSecondaryContainer.copy(
+                                                alpha = .8F
+                                            ),
                                             fontSize = 10.sp
                                         )
                                     )
@@ -259,7 +300,7 @@ fun AppLog(model: AppViewModel) {
                             }
                         },
                         supportingContent = {
-                            if(parts.size>1){
+                            if (parts.size > 1) {
                                 Text(
                                     text = parts[2],
                                     style = MaterialTheme.typography.bodyMedium
@@ -275,26 +316,25 @@ fun AppLog(model: AppViewModel) {
 }
 
 
-
 @Composable
 fun CrashDebug(model: AppViewModel) {
 
     val debug by model.debug.observeAsState(mapOf())
-    if (debug.keys.contains("crash"))
-        LazyColumn(modifier = Modifier.fillMaxSize()) {
+    if (debug.keys.contains("crash")) {
+        val crashes = debug["crash"] as List<*>
+        if (crashes.isEmpty()) {
+            Box(modifier = Modifier.fillMaxSize(), Alignment.Center) {
+                Text(
+                    text = "No Crash Yet",
+                    textAlign = TextAlign.Center
+                )
+            }
+        } else {
 
-            val crashes = debug["crash"]
-            if (crashes is List<*>) {
-                if (crashes.isEmpty()) {
-                    item {
-                        Box(modifier = Modifier.fillMaxSize(), Alignment.Center) {
-                            Text(
-                                text = "No Crash Yet",
-                                textAlign = TextAlign.Center
-                            )
-                        }
-                    }
-                } else {
+            LazyColumn(modifier = Modifier.fillMaxSize()) {
+
+                if (crashes.isNotEmpty()) {
+
                     item {
                         val context = LocalContext.current
                         OutlinedButton(
@@ -354,8 +394,10 @@ fun CrashDebug(model: AppViewModel) {
                         },
                     )
                 }
-            }
 
+
+            }
         }
+    }
 
 }

@@ -18,6 +18,9 @@ interface ServiceLogDao : BaseDao<ServiceLog> {
     @Query("UPDATE servicelog SET heartbeatCount=heartbeatCount+:beatCount WHERE receiverId = :serviceId")
     fun heartBeat(serviceId: String,beatCount:Int=1)
 
+    @Query("DELETE from servicelog WHERE id > 0")
+    fun clean()
+
     companion object {
         fun addNew(receiverId:String){
             async({

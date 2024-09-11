@@ -135,5 +135,12 @@ open class AppViewModel : ViewModel() {
         debug.value = old.toMap()
     }
 
+    fun clearServiceRecords() {
+
+        async({ DB.get().service().clean()},{
+
+        })
+    }
+
 
 }

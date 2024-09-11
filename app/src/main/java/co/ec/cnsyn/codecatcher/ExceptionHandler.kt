@@ -134,5 +134,11 @@ class ExceptionHandler(private val context: Context) : Thread.UncaughtExceptionH
             }
         }
 
+        fun clearAppLogs(context: Context) {
+
+            val logFile = File(context.filesDir, "app_logs.txt")
+            logFile.writeText("")
+        }
+
     }
 }
