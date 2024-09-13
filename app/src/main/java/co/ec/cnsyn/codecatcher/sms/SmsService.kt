@@ -28,6 +28,7 @@ import co.ec.cnsyn.codecatcher.database.servicelog.ServiceLog
 import co.ec.cnsyn.codecatcher.database.servicelog.ServiceLogDao
 import co.ec.cnsyn.codecatcher.helpers.AppLogger
 import co.ec.cnsyn.codecatcher.helpers.dateString
+import co.ec.cnsyn.codecatcher.helpers.formatTime
 import co.ec.cnsyn.codecatcher.helpers.unix
 import kotlinx.serialization.json.JsonNull.content
 import java.util.UUID
@@ -46,9 +47,14 @@ class SmsService : Service() {
         const val channelName = "CodeCatcher-Service-Channel"
         const val heartBeatDelay = 10
 
+        const val serviceLifeInSecond = 1800
+
         var receiver: SmsReceiver? = null
 
-        fun isServiceRunning(context: Context, serviceClass: Class<out Any>): Boolean {
+        /**
+         * check service runnin in android
+         */
+        private fun isServiceRunning(context: Context, serviceClass: Class<out Any>): Boolean {
             val activityManager =
                 context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
             for (service in activityManager.getRunningServices(Int.MAX_VALUE)) {
@@ -62,23 +68,29 @@ class SmsService : Service() {
         //setup service with alarm manager
         fun setupService(context: Context, timeout: Int = 0) {
             if (isServiceRunning(context, SmsService::class.java)) {
+                //if already running return
                 return
             }
             AppLogger.d("Setup Service with alarm manager", "service")
-            val intent = Intent(context, BootReceiver::class.java)
             val pendingIntent =
-                PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_MUTABLE)
+                PendingIntent.getBroadcast(
+                    context, 0,
+                    Intent(context, BootReceiver::class.java),
+                    PendingIntent.FLAG_MUTABLE
+                )
 
             val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 if (!alarmManager.canScheduleExactAlarms()) {
                     // If your app does not have the permission, guide the user to the settings
+                    AppLogger.d("Setup service request alarm", "service")
                     val scheduleIntent = Intent().apply {
                         action = Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
                         data = android.net.Uri.parse("package:${context.packageName}")
                     }
                     context.startActivity(scheduleIntent)
                 } else {
+                    AppLogger.d("Setup service schedule", "service")
                     alarmManager.setExact(
                         AlarmManager.ELAPSED_REALTIME_WAKEUP,
                         SystemClock.elapsedRealtime() + 1000 * timeout,
@@ -86,6 +98,8 @@ class SmsService : Service() {
                     )
                 }
             } else {
+
+                AppLogger.d("Setup service old version", "service")
                 alarmManager.setExact(
                     AlarmManager.ELAPSED_REALTIME_WAKEUP,
                     SystemClock.elapsedRealtime() + 1000 * timeout,
@@ -102,18 +116,21 @@ class SmsService : Service() {
         runCount = 0
         runnable = object : Runnable {
             override fun run() {
-                runCount++;
-                if (runCount % 10 == 0) {
-                    //log to system
-                    var hashes=serviceId.split("-").last() + " - "+ (receiver?.receiverId?.split("-")?.last() ?: "")
-                    AppLogger.d("Service Running: $runCount times [$hashes]", "service")
-                }
-                // Print the current run
                 if (receiver == null) {
                     //if no receiver exists stop and restart yourself
                     AppLogger.d("Stop service because no receiver exists", "service")
                     stopSelf()
                     return
+                }
+                runCount++;
+                if (runCount % 10 == 0) {
+                    //log to system if 10 times of run
+                    val hashes = serviceId.split("-").last() + " - " + (receiver?.receiverId?.split("-")
+                        ?.last() ?: "")
+                    AppLogger.d(
+                        "Service Running Time: ${(runCount * heartBeatDelay).formatTime()}  [$hashes]",
+                        "service"
+                    )
                 }
                 //ad heartbeat
                 settings.putInt("service-heartbeat", unix().toInt())
@@ -121,12 +138,15 @@ class SmsService : Service() {
                 receiver?.let {
                     ServiceLogDao.beat(it.receiverId, heartBeatDelay)
                 }
-                if (runCount < 86400 / heartBeatDelay) {
+                if (runCount < serviceLifeInSecond / heartBeatDelay) {
                     //if receiver is not null and 1 day still running
                     handler.postDelayed(this, heartBeatDelay * 1000L)
                 } else {
                     //every day restart yourself
-                    AppLogger.d("Stop service because 1 day self stop", "service")
+                    AppLogger.d(
+                        "Service Life ${serviceLifeInSecond.formatTime()} is finish self stop",
+                        "service"
+                    )
                     stopSelf()
                 }
             }
@@ -146,7 +166,7 @@ class SmsService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
-        //setup nutification
+        //setup notification
         val notificationIntent = Intent(applicationContext, MainActivity::class.java)
         notificationIntent.putExtra("destination", "help")
         notificationIntent.putExtra("destinationParam", "service_notification")
@@ -169,11 +189,11 @@ class SmsService : Service() {
         try {
             startForeground(45, notification)
             //re register sms receiver
+            AppLogger.d("Sms Service generated [$serviceId]", "service")
             receiver = SmsReceiver.register(applicationContext)
-            AppLogger.d("Sms Service generated [$serviceId]","service")
         } catch (e: Error) {
             //re setup
-            AppLogger.e("Service starting error", e,"service")
+            AppLogger.e("Service starting error", e, "service")
             stopSelf()
         }
 

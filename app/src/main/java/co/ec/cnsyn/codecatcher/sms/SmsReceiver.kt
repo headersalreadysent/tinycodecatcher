@@ -32,6 +32,11 @@ class SmsReceiver : BroadcastReceiver() {
                 //this is last registered
                 val messages = getMessageFromIntent(intent)
                 ActionRunner().runSmsList(messages)
+            } else {
+                if (activeReceiverId != "") {
+                    AppLogger.d("Wrong receiverId unregister [$receiverId] active: [$activeReceiverId]", "Receiver")
+                    context.unregisterReceiver(this)
+                }
             }
 
         }
@@ -56,15 +61,19 @@ class SmsReceiver : BroadcastReceiver() {
         private var receiverInstance: SmsReceiver? = null
         private var debugReceiver: DebugSmsReceiver? = null
 
+        /**
+         * generate and register a receiver
+         */
         fun register(context: Context): SmsReceiver {
             receiverInstance?.let {
+                //if already has receiver un register it
                 context.unregisterReceiver(receiverInstance)
             }
+            //generate new receiver and register it
             receiverInstance = SmsReceiver()
-            AppLogger.d( "Register Sms Receiver [${receiverInstance?.receiverId}]","Receiver")
+            AppLogger.d("Register Sms Receiver [${receiverInstance?.receiverId}]", "Receiver")
             registerReceiver(
-                context.applicationContext,
-                receiverInstance,
+                context.applicationContext, receiverInstance,
                 IntentFilter("android.provider.Telephony.SMS_RECEIVED"),
                 ContextCompat.RECEIVER_EXPORTED
             )
@@ -73,14 +82,14 @@ class SmsReceiver : BroadcastReceiver() {
                 ServiceLogDao.addNew(it.receiverId)
             }
 
+            //if debug version register debug receiver too
             if (BuildConfig.DEBUG) {
                 debugReceiver?.let {
                     context.unregisterReceiver(debugReceiver)
                 }
                 debugReceiver = DebugSmsReceiver()
                 registerReceiver(
-                    context.applicationContext,
-                    debugReceiver,
+                    context.applicationContext, debugReceiver,
                     IntentFilter("co.ec.cnsyn.codecatcher.DEBUG_SMS"),
                     ContextCompat.RECEIVER_EXPORTED
                 )

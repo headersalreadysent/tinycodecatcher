@@ -30,7 +30,7 @@ class ExceptionHandler(private val context: Context) : Thread.UncaughtExceptionH
         // Record the exception to a file
         recordExceptionToFile(throwable)
 
-        var restartCount = Settings(context).getInt("appRestartAfterError", 0)
+        val restartCount = Settings(context).getInt("appRestartAfterError", 0)
         if (restartCount < 3) {
             //try only 3 time
             AppLogger.w("try to restart for $restartCount", "exception")
@@ -42,10 +42,11 @@ class ExceptionHandler(private val context: Context) : Thread.UncaughtExceptionH
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
                 context.startActivity(intent)
             }
+        } else {
+            // Pass the exception to the default handler (optional)
+            defaultExceptionHandler?.uncaughtException(thread, throwable)
         }
 
-        // Pass the exception to the default handler (optional)
-        defaultExceptionHandler?.uncaughtException(thread, throwable)
     }
 
 
