@@ -12,7 +12,7 @@ fun unix(): Long = (System.currentTimeMillis() / 1000F).toLong()
 fun Long.dateString(format: String? = null): String {
     val date = Date(this * 1000) // Convert seconds to milliseconds
 
-    return if (format!=null){
+    return if (format != null) {
         val formatter = SimpleDateFormat(format, Locale.getDefault())
         formatter.format(date)
     } else {
@@ -29,9 +29,18 @@ fun Long.timeString(): String {
 
 
 fun Int.formatTime(): String {
+    val days = this / 86400
     val hours = this / 3600
     val minutes = (this % 3600) / 60
     val secs = this % 60
-    return String.format("%02d:%02d:%02d", hours, minutes, secs)
+    val builder = StringBuilder()
+    if (days > 0) {
+        builder.append(String.format(Locale.getDefault(), "%02d:", days))
+    }
+    if (hours > 0) {
+        builder.append(String.format(Locale.getDefault(), "%02d:", hours))
+    }
+    builder.append(String.format(Locale.getDefault(), "%02d:%02d", minutes, secs))
+    return builder.toString()
 }
 

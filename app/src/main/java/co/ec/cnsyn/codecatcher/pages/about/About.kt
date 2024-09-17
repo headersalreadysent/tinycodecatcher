@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.MaterialTheme
@@ -15,7 +14,6 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,11 +35,8 @@ import co.ec.cnsyn.codecatcher.composables.SkewSquareCut
 import co.ec.cnsyn.codecatcher.helpers.dateString
 import co.ec.cnsyn.codecatcher.helpers.timeString
 import co.ec.cnsyn.codecatcher.sms.SmsService
-import co.ec.cnsyn.codecatcher.ui.theme.CodeCatcherTheme
 import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 @OptIn(DelicateCoroutinesApi::class)
 @Composable
@@ -93,7 +88,7 @@ fun About() {
                     while (true) {
                         //wait for delay and re run
                         heartBeat = settings.getInt("service-heartbeat", 0).toLong()
-                        delay(if(heartBeat == 0L) 1000L else SmsService.heartBeatDelay * 1000L)
+                        delay(if(heartBeat == 0L) 1000L else SmsService.HEART_BEAT_DELAY * 1000L)
                     }
                 }
                 if (heartBeat != 0L) {

@@ -1,22 +1,16 @@
 package co.ec.cnsyn.codecatcher.sms
 
-import android.app.Service.RECEIVER_EXPORTED
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.telephony.SmsMessage
-import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.registerReceiver
 import co.ec.cnsyn.codecatcher.BuildConfig
-import co.ec.cnsyn.codecatcher.database.DB
-import co.ec.cnsyn.codecatcher.database.servicelog.ServiceLog
 import co.ec.cnsyn.codecatcher.database.servicelog.ServiceLogDao
 import co.ec.cnsyn.codecatcher.helpers.AppLogger
 import co.ec.cnsyn.codecatcher.helpers.Settings
-import co.ec.cnsyn.codecatcher.helpers.async
-import co.ec.cnsyn.codecatcher.helpers.dateString
 import co.ec.cnsyn.codecatcher.helpers.unix
 import java.util.UUID
 
@@ -34,8 +28,10 @@ class SmsReceiver : BroadcastReceiver() {
                 ActionRunner().runSmsList(messages)
             } else {
                 if (activeReceiverId != "") {
-                    AppLogger.d("Wrong receiverId unregister [$receiverId] active: [$activeReceiverId]", "Receiver")
-                    context.unregisterReceiver(this)
+                    AppLogger.d(
+                        "Wrong receiverId unregister [$receiverId] active: [$activeReceiverId]",
+                        "Receiver"
+                    )
                 }
             }
 
@@ -58,43 +54,34 @@ class SmsReceiver : BroadcastReceiver() {
 
     companion object {
 
-        private var receiverInstance: SmsReceiver? = null
-        private var debugReceiver: DebugSmsReceiver? = null
 
         /**
          * generate and register a receiver
          */
         fun register(context: Context): SmsReceiver {
-            receiverInstance?.let {
-                //if already has receiver un register it
-                context.unregisterReceiver(receiverInstance)
-            }
+
             //generate new receiver and register it
-            receiverInstance = SmsReceiver()
-            AppLogger.d("Register Sms Receiver [${receiverInstance?.receiverId}]", "Receiver")
+            val receiverInstance = SmsReceiver()
+            AppLogger.d("Register Sms Receiver [${receiverInstance.receiverId}]", "Receiver")
             registerReceiver(
-                context.applicationContext, receiverInstance,
+                context, receiverInstance,
                 IntentFilter("android.provider.Telephony.SMS_RECEIVED"),
                 ContextCompat.RECEIVER_EXPORTED
             )
-            receiverInstance?.let {
-                Settings(context).putString("receiverId", it.receiverId)
-                ServiceLogDao.addNew(it.receiverId)
-            }
+            Settings(context).putString("receiverId", receiverInstance.receiverId)
+            ServiceLogDao.addNew(receiverInstance.receiverId)
+
 
             //if debug version register debug receiver too
             if (BuildConfig.DEBUG) {
-                debugReceiver?.let {
-                    context.unregisterReceiver(debugReceiver)
-                }
-                debugReceiver = DebugSmsReceiver()
+                val debugReceiver = DebugSmsReceiver()
                 registerReceiver(
-                    context.applicationContext, debugReceiver,
+                    context, debugReceiver,
                     IntentFilter("co.ec.cnsyn.codecatcher.DEBUG_SMS"),
                     ContextCompat.RECEIVER_EXPORTED
                 )
             }
-            return receiverInstance as SmsReceiver;
+            return receiverInstance
 
         }
     }

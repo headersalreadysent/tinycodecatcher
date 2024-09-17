@@ -18,7 +18,7 @@ class HelpViewModel : ViewModel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val intent = Intent(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS,).apply {
                 putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
-                putExtra(Settings.EXTRA_CHANNEL_ID, SmsService.channelName)
+                putExtra(Settings.EXTRA_CHANNEL_ID, SmsService.CHANNEL_NAME)
             }
             intent.addFlags(FLAG_ACTIVITY_NEW_TASK)
             context.startActivity(intent)

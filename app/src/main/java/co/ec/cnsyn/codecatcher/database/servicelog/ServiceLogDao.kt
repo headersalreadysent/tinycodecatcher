@@ -8,6 +8,7 @@ import co.ec.cnsyn.codecatcher.database.DB
 import co.ec.cnsyn.codecatcher.helpers.async
 import co.ec.cnsyn.codecatcher.helpers.dateString
 import co.ec.cnsyn.codecatcher.helpers.unix
+import co.ec.cnsyn.codecatcher.sms.SmsReceiver
 
 @Dao
 interface ServiceLogDao : BaseDao<ServiceLog> {
@@ -44,20 +45,24 @@ interface ServiceLogDao : BaseDao<ServiceLog> {
         /**
          * beat run count
          */
-        fun beat(receiverId: String, count: Int = 1) {
-            async({
-                val record = DB.get().service().getById(receiverId)
-                if (record == null) {
-                    //if null add new
-                    val log = ServiceLog(
-                        receiverId = receiverId,
-                        date = unix().dateString("dd-MM-yyyy HH.mm"),
-                        heartbeatCount = 0
-                    )
-                    DB.get().service().insert(log)
-                }
-                DB.get().service().heartBeat(receiverId, count)
-            })
+        fun beat(receiver: SmsReceiver?, count: Int = 1) {
+            receiver?.let {
+                //if receiver exists
+                async({
+                    val record = DB.get().service().getById(receiver.receiverId)
+                    if (record == null) {
+                        //if null add new
+                        val log = ServiceLog(
+                            receiverId = receiver.receiverId,
+                            date = unix().dateString("dd-MM-yyyy HH.mm"),
+                            heartbeatCount = 0
+                        )
+                        DB.get().service().insert(log)
+                    }
+                    DB.get().service().heartBeat(receiver.receiverId, count)
+                })
+            }
+
         }
     }
 
