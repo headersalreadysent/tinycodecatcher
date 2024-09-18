@@ -4,7 +4,6 @@ import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import kotlin.time.Duration.Companion.seconds
 
 
 fun unix(): Long = (System.currentTimeMillis() / 1000F).toLong()

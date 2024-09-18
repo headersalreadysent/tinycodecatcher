@@ -15,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -38,7 +39,6 @@ import co.ec.cnsyn.codecatcher.sms.SmsService
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.delay
 
-@OptIn(DelicateCoroutinesApi::class)
 @Composable
 fun About() {
     Column(
@@ -82,7 +82,7 @@ fun About() {
                     text = stringResource(R.string.about_developed_with),
                     style = MaterialTheme.typography.bodyMedium
                 )
-                var heartBeat by remember { mutableStateOf(0L) }
+                var heartBeat by remember { mutableLongStateOf(0L) }
                 val settings = LocalSettings.current
                 LaunchedEffect(Unit) {
                     while (true) {

@@ -29,11 +29,11 @@ object DB {
     }
 
     fun get(): AppDatabase {
-        return INSTANCE!!;
+        return INSTANCE!!
     }
 
 
-    fun fillDatabase() {
+    private fun fillDatabase() {
         thread {
 
             val list = get().action().getAllItems()
@@ -45,7 +45,7 @@ object DB {
 
                 if (BuildConfig.DEBUG) {
                     //if debug generate some records to testing
-                    val catchers = List(regexes.size) { it ->
+                    val catchers = List(regexes.size) {
                         Catcher(
                             id = it + 1,
                             sender = "",
@@ -161,11 +161,11 @@ object DB {
         return randomNumbers.toList()
     }
 
-    fun generateVerificationCode(length: Int): String {
+    private fun generateVerificationCode(length: Int): String {
         return (1..length).map { Random.nextInt(0, 10) }.joinToString("")
     }
 
-    fun getRandomTemplateWithCode(smsTemplates: Map<String, String>): Triple<String, String, String> {
+    private fun getRandomTemplateWithCode(smsTemplates: Map<String, String>): Triple<String, String, String> {
         val randomSender = smsTemplates.keys.random()
         val template = smsTemplates[randomSender] ?: "Template not found"
 

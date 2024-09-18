@@ -4,8 +4,6 @@ package co.ec.cnsyn.codecatcher.sms
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.telephony.SmsMessage
-import co.ec.cnsyn.codecatcher.helpers.dateString
 import co.ec.cnsyn.codecatcher.helpers.unix
 
 class DebugSmsReceiver : BroadcastReceiver() {

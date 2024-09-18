@@ -41,7 +41,7 @@ class TTSAction : BaseAction {
     override fun run(catcher: CatcherWithRegex, action: CatcherWithActions, sms: SmsData): Boolean {
 
         val context = App.context()
-        var actionParams = action.params()
+        val actionParams = action.params()
         val setupVolume =
             actionParams.keys.contains("adjustVolume") && actionParams["adjustVolume"] == "yes"
         if (setupVolume) {
@@ -225,7 +225,7 @@ class TTSAction : BaseAction {
         }
     }
 
-    fun splitText(text: String): Pair<String, String> {
+    private fun splitText(text: String): Pair<String, String> {
         val halfLength = text.length / 2
         return text.substring(0, halfLength) to text.substring(halfLength)
     }

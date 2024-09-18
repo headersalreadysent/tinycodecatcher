@@ -27,13 +27,13 @@ fun ToggleButton(
     modifier:Modifier = Modifier,
     onChange: (res: Any) -> Unit = { _ -> }
 ) {
-    var selected by remember { mutableStateOf<Any>(value) }
+    var selected by remember { mutableStateOf(value) }
     Row(
         modifier = Modifier.then(modifier)
     ) {
         values.toList().forEachIndexed { index,it ->
             val shape=if(index==0){
-                RoundedCornerShape(6.dp, 0.dp, 0.dp, 6.dp);
+                RoundedCornerShape(6.dp, 0.dp, 0.dp, 6.dp)
             } else {
                 if(index==values.size-1){
                     RoundedCornerShape(0.dp, 6.dp, 6.dp, 0.dp)

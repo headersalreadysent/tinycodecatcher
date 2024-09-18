@@ -1,7 +1,6 @@
 package co.ec.cnsyn.codecatcher.helpers
 
 import android.util.Log
-import android.content.Context
 import co.ec.cnsyn.codecatcher.App
 import java.io.File
 import java.io.FileWriter

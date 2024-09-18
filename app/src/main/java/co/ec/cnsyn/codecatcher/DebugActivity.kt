@@ -5,7 +5,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -19,19 +18,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Replay
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.BasicAlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
@@ -45,9 +36,9 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -89,7 +80,7 @@ fun CodeCatcherDebug(
     model: AppViewModel = viewModel()
 ) {
     val tabs = listOf("Crash", "Service", "Service Day", "App Logs")
-    var selectedTabIndex by remember { mutableStateOf(0) }
+    var selectedTabIndex by remember { mutableIntStateOf(0) }
 
     DisposableEffect(Unit) {
         model.calculateDebugInfos()
@@ -175,10 +166,10 @@ fun ServiceDebug(model: AppViewModel, forDay: Boolean = false) {
                 }
                 services = services.reversed()
                 if (forDay) {
-                    var map = mutableMapOf<String, ServiceLog>()
-                    services.forEach { it ->
-                        var service = it as ServiceLog
-                        var date = service.date.substring(0..10)
+                    val map = mutableMapOf<String, ServiceLog>()
+                    services.forEach {
+                        val service = it as ServiceLog
+                        val date = service.date.substring(0..10)
                         if (map.keys.contains(date)) {
                             map[date] = ServiceLog(
                                 date = date,
@@ -194,7 +185,7 @@ fun ServiceDebug(model: AppViewModel, forDay: Boolean = false) {
                 }
                 services as List<*>
                 items(services.size) {
-                    var serviceLog = services[it] as ServiceLog
+                    val serviceLog = services[it] as ServiceLog
                     ListItem(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -238,7 +229,7 @@ fun AppLog(model: AppViewModel) {
     if (debug.keys.contains("service"))
         LazyColumn(modifier = Modifier.fillMaxSize()) {
 
-            var messages = debug["applog"]
+            val messages = debug["applog"]
             if (messages is List<*>) {
                 if (messages.isNotEmpty()) {
                     item {
@@ -257,7 +248,7 @@ fun AppLog(model: AppViewModel) {
                 }
                 items(messages.size) {
                     val logItem = messages[it] as String
-                    var parts = logItem.split("#")
+                    val parts = logItem.split("#")
                     ListItem(
                         modifier = Modifier
                             .fillMaxWidth()

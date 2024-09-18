@@ -103,7 +103,7 @@ fun Calendar(
                     horizontalArrangement = Arrangement.Start
                 ) {
                     if (width > 0) {
-                        dayList.toList().forEach { it ->
+                        dayList.toList().forEach {
                             val dateValue = it.first
                             var count = 0
                             var boxColor=color

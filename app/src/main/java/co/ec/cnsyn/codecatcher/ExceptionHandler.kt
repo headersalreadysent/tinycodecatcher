@@ -3,7 +3,6 @@ package co.ec.cnsyn.codecatcher
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import androidx.core.content.ContextCompat.startActivity
 import co.ec.cnsyn.codecatcher.helpers.AppLogger
 import co.ec.cnsyn.codecatcher.helpers.Settings
 import co.ec.cnsyn.codecatcher.helpers.dateString
@@ -83,8 +82,8 @@ class ExceptionHandler(private val context: Context) : Thread.UncaughtExceptionH
 
             logFiles.forEach { file ->
                 file.bufferedReader().use { reader ->
-                    var date = file.name.replace("crash_report_", "").replace(".txt", "").toLong()
-                    var name = date.dateString() + " " + date.timeString()
+                    val date = file.name.replace("crash_report_", "").replace(".txt", "").toLong()
+                    val name = date.dateString() + " " + date.timeString()
                     logs[name] = reader.readText()
                 }
             }

@@ -8,7 +8,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -18,7 +17,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -51,7 +49,7 @@ fun LazyIndicator(
                 .then(modifier),
             horizontalArrangement = arrangement
         ) {
-            (0..(size -1)).forEach { index ->
+            (0..<size).forEach { index ->
                 val animatedWidth by animateDpAsState(
                     targetValue = if (mostVisibleItem == index) 30.dp else 10.dp,
                     animationSpec = tween(

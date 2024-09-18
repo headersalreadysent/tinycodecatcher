@@ -5,7 +5,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import android.util.Log
 import co.ec.cnsyn.codecatcher.helpers.AppLogger
 
 class BootReceiver : BroadcastReceiver() {
@@ -17,9 +16,9 @@ class BootReceiver : BroadcastReceiver() {
             AppLogger.d( "Boot Receiver Start With Alarm Receiver","BootReceiver")
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            context?.startForegroundService(Intent(context, SmsService::class.java));
+            context?.startForegroundService(Intent(context, SmsService::class.java))
         } else {
-            context?.startService(Intent(context, SmsService::class.java));
+            context?.startService(Intent(context, SmsService::class.java))
         }
     }
 

@@ -5,7 +5,6 @@ import android.content.SharedPreferences
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlin.concurrent.thread
 
 open class Settings(context: Context) {
 

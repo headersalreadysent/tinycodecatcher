@@ -7,7 +7,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Message
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -34,12 +33,12 @@ import kotlin.random.Random
 
 open class DashboardViewModel : ViewModel() {
 
-    var loadStep = MutableLiveData<Int>(0)
+    private var loadStep = MutableLiveData(0)
 
     var stats = MutableLiveData(mapOf("catcher" to 0, "code" to 0))
     var codes = MutableLiveData<List<CodeDao.Latest>>(listOf())
     var calendar = MutableLiveData<List<Int>>(listOf())
-    var requiredPerms = MutableLiveData<List<PermissionInfo>>(listOf())
+    private var requiredPerms = MutableLiveData<List<PermissionInfo>>(listOf())
 
 
     var graphStat = MutableLiveData<Map<String, List<Pair<String, Float>>>>(mapOf())
@@ -79,8 +78,8 @@ open class DashboardViewModel : ViewModel() {
         }, {
             stats.value = it
         })
-        async({ DB.get().code().getCalendar(unix() - 86400 * 30) }, {
-            calendar.value = it.map { it.date }
+        async({ DB.get().code().getCalendar(unix() - 86400 * 30) }, { it ->
+            calendar.value = it.map { it2 -> it2.date }
 
             loadStep.value = (loadStep.value ?: 0) + 1
         })
@@ -105,10 +104,10 @@ open class DashboardViewModel : ViewModel() {
         async({ DB.get().code().catcherCountStats() }, {
             if (it.isNotEmpty()) {
                 val mutable = (graphStat.value ?: mapOf()).toMutableMap()
-                mutable["catcher"] = it.map {
+                mutable["catcher"] = it.map { it2 ->
                     return@map Pair(
-                        (if (it.sender != "") it.sender + "-" else "") + it.name,
-                        it.count.toFloat()
+                        (if (it2.sender != "") it2.sender + "-" else "") + it2.name,
+                        it2.count.toFloat()
                     )
                 }
                 graphStat.value = mutable.toMap()
@@ -119,8 +118,8 @@ open class DashboardViewModel : ViewModel() {
         async({ DB.get().code().senderCountStat() }, {
             if (it.isNotEmpty()) {
                 val mutable = (graphStat.value ?: mapOf()).toMutableMap()
-                mutable["sender"] = it.map {
-                    return@map Pair(it.name, it.count.toFloat())
+                mutable["sender"] = it.map { it2 ->
+                    return@map Pair(it2.name, it2.count.toFloat())
                 }
                 graphStat.value = mutable.toMap()
 
@@ -130,8 +129,8 @@ open class DashboardViewModel : ViewModel() {
         async({ DB.get().action().actionCountStats() }, {
             if (it.isNotEmpty()) {
                 val mutable = (graphStat.value ?: mapOf()).toMutableMap()
-                mutable["action"] = it.map {
-                    return@map Pair(it.name, it.count.toFloat())
+                mutable["action"] = it.map { it2 ->
+                    return@map Pair(it2.name, it2.count.toFloat())
                 }
                 graphStat.value = mutable.toMap()
 
@@ -158,8 +157,8 @@ open class DashboardViewModel : ViewModel() {
     /**
      * calculate permission list
      */
-    fun calculatePermissions() {
-        val permissions = mutableListOf<PermissionInfo>();
+    private fun calculatePermissions() {
+        val permissions = mutableListOf<PermissionInfo>()
         val context = App.context()
         if (context.checkSelfPermission(Manifest.permission.RECEIVE_SMS)
             != PackageManager.PERMISSION_GRANTED
@@ -215,7 +214,7 @@ class MockDashboardViewModel : DashboardViewModel() {
                 "code" to Random.nextInt(589, 795)
             )
         codes.value = List(20) {
-            var code = Random.nextInt(10000, 90000).toString()
+            val code = Random.nextInt(10000, 90000).toString()
             CodeDao.Latest(
                 code = Code(
                     date = unix() - (it * 86400),

@@ -20,6 +20,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -87,13 +88,9 @@ fun SkewSwitch(
     passiveTextColor: Color = MaterialTheme.colorScheme.onSecondaryContainer,
     animateTime: Int = 200
 ) {
-    var width by remember {
-        mutableStateOf(selectedItem)
-    }
     val density = LocalDensity.current
-    var selected by remember {
-        mutableStateOf(0)
-    }
+    var width by remember { mutableIntStateOf(selectedItem) }
+    var selected by remember { mutableStateOf(0) }
     val leftActiveColor by animateColorAsState(
         targetValue = if (selected == 0) activeColor else passiveColor,
         animationSpec = tween(animateTime, easing = LinearEasing),

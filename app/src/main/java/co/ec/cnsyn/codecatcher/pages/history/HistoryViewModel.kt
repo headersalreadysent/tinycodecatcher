@@ -36,14 +36,14 @@ open class HistoryViewModel : ViewModel() {
             count.value = it
         })
         async({ DB.get().code().getLatest(perPage) }, {
-            history.value =it.groupBy { it.code.date.dateString("MMM-YYYY") }.toList()
+            history.value =it.groupBy { it2 -> it2.code.date.dateString("MMM-YYYY") }.toList()
         })
     }
 
     fun loadMore() {
         val size = (history.value?.sumOf { it.second.size } ?: 0) + perPage
         async({ DB.get().code().getLatest(size) }, {
-            history.value =it.groupBy { it.code.date.dateString("MMM-YYYY") }.toList()
+            history.value =it.groupBy { it2 -> it2.code.date.dateString("MMM-YYYY") }.toList()
         })
     }
 }
@@ -52,7 +52,7 @@ class MockHistoryViewModel : HistoryViewModel() {
     override fun start() {
 
         history.value = List(40) {
-            var code = Random.nextInt(10000, 90000).toString()
+            val code = Random.nextInt(10000, 90000).toString()
             CodeDao.Latest(
                 code = Code(
                     date = unix() - (it * 86400),

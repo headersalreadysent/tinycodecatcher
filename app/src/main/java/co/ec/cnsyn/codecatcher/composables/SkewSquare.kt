@@ -40,7 +40,7 @@ fun SkewSquare(
     tonalElevate: Dp = 0.dp,
     content: @Composable () -> Unit = {},
 ) {
-    var fillColor = fill ?: MaterialTheme.colorScheme.surface
+    val fillColor = fill ?: MaterialTheme.colorScheme.surface
 
     Column(
         modifier = Modifier

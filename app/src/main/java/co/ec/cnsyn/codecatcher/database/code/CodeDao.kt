@@ -8,10 +8,6 @@ import co.ec.cnsyn.codecatcher.database.DB
 import co.ec.cnsyn.codecatcher.database.catcher.Catcher
 import co.ec.cnsyn.codecatcher.database.relations.ActionDetail
 import co.ec.cnsyn.codecatcher.database.relations.CodeWithCatcher
-import co.ec.cnsyn.codecatcher.helpers.async
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.launch
 
 @Dao
 interface CodeDao : BaseDao<Code> {
@@ -135,7 +131,7 @@ GROUP BY c.sender ORDER BY count DESC LIMIT 5
         return codes.map { code ->
             return@map Latest(
                 code = code,
-                catcher = catchers.get(code.catcherId),
+                catcher = catchers[code.catcherId],
                 actions = action.filter { it.action.catcherId == code.catcherId }
                     .sortedBy { it.action.actionId }
             )

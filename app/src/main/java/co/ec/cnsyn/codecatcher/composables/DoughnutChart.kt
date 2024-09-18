@@ -64,7 +64,7 @@ fun DoughnutChart(
     //inner content area
     val totalText = stringResource(R.string.doughnut_total_text)
     var textValue by remember { mutableStateOf(defaultText ?: totalText) }
-    var numberValue by remember { mutableStateOf(defaultNumber ?: total) }
+    var numberValue by remember { mutableFloatStateOf(defaultNumber ?: total) }
 
 
     var graphHeight by remember { mutableFloatStateOf(0F) }

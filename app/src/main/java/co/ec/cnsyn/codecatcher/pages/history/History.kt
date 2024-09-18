@@ -31,7 +31,6 @@ import co.ec.cnsyn.codecatcher.R
 import co.ec.cnsyn.codecatcher.composables.SkewSquare
 import co.ec.cnsyn.codecatcher.composables.SkewSquareCut
 import co.ec.cnsyn.codecatcher.pages.dashboard.LatestCode
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable

@@ -1,8 +1,6 @@
 package co.ec.cnsyn.codecatcher.composables
 
-import android.widget.Toast
 import androidx.compose.foundation.border
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,7 +19,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
@@ -35,7 +32,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import co.ec.cnsyn.codecatcher.App
 import co.ec.cnsyn.codecatcher.LocalSettings
 import kotlin.math.absoluteValue
 
@@ -122,7 +118,7 @@ fun AutoTextPreview() {
             .verticalScroll(rememberScrollState())
     ) {
         for (i in 1..10) {
-            var j = 10 - i
+            val j = 10 - i
             Box(
                 modifier = Modifier
                     .fillMaxWidth(j * 0.1.toFloat())

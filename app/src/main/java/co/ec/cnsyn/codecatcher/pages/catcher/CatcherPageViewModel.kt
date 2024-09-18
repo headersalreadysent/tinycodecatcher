@@ -7,18 +7,14 @@ import androidx.lifecycle.viewModelScope
 import co.ec.cnsyn.codecatcher.database.DB
 import co.ec.cnsyn.codecatcher.database.action.Action
 import co.ec.cnsyn.codecatcher.database.catcher.Catcher
-import co.ec.cnsyn.codecatcher.database.catcher.CatcherDao
 import co.ec.cnsyn.codecatcher.database.catcher.CatcherDao.CatcherDetail
 import co.ec.cnsyn.codecatcher.database.catcheraction.CatcherAction
 import co.ec.cnsyn.codecatcher.database.code.Code
-import co.ec.cnsyn.codecatcher.database.code.CodeDao
 import co.ec.cnsyn.codecatcher.database.relations.ActionDetail
 import co.ec.cnsyn.codecatcher.helpers.async
-import co.ec.cnsyn.codecatcher.helpers.dateString
 import co.ec.cnsyn.codecatcher.helpers.unix
 import co.ec.cnsyn.codecatcher.values.actionList
 import co.ec.cnsyn.codecatcher.values.regexList
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
@@ -44,7 +40,7 @@ open class CatcherPageViewModel : ViewModel() {
         })
     }
 
-    fun loadcatchers() {
+    private fun loadcatchers() {
         DB.get().catcher().getCatchersWithDetails({
             catchers.value = it
         }, { err ->
@@ -115,7 +111,7 @@ open class CatcherPageViewModel : ViewModel() {
     /**
      * delete catcher from page
      */
-    fun deleteCatcher(catcherDetail: CatcherDetail, then: () -> Unit = { -> }) {
+    fun deleteCatcher(catcherDetail: CatcherDetail, then: () -> Unit = {  }) {
         async({
             DB.get().catcherAction().deleteCatcher(catcherDetail.catcher.id)
             return@async DB.get().catcher().delete(catcherDetail.catcher)

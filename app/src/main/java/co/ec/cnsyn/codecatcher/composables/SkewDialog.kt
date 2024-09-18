@@ -70,7 +70,6 @@ fun SkewDialog(
 
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true)
 @Composable
 fun SkewDialogPreview() {

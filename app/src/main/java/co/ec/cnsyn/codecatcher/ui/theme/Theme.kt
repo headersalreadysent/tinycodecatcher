@@ -15,6 +15,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -110,9 +111,6 @@ data class ColorFamily(
     val onColorContainer: Color
 )
 
-val unspecified_scheme = ColorFamily(
-    Color.Unspecified, Color.Unspecified, Color.Unspecified, Color.Unspecified
-)
 
 
 @Composable
@@ -126,7 +124,7 @@ fun CodeCatcherTheme(
     val darkTheme = isSystemInDarkTheme()
 
     var dynamicColor by remember { mutableStateOf(settings.getBoolean("dynamicColor", true)) }
-    var useDarkMode by remember { mutableStateOf(settings.getInt("darkModeSelection", 0)) }
+    var useDarkMode by remember { mutableIntStateOf(settings.getInt("darkModeSelection", 0)) }
 
     var colorScheme by remember {
         mutableStateOf(

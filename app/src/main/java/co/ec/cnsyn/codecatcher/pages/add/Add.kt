@@ -47,6 +47,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -100,7 +102,7 @@ fun Add(model: AddViewModel = viewModel()) {
     Box(modifier = Modifier.fillMaxSize()) {
         val isKeyboardVisible by rememberKeyboardVisibility()
         val scrollState = rememberScrollState()
-        var completeRatio by remember { mutableStateOf(0F) }
+        var completeRatio by remember { mutableFloatStateOf(0F) }
 
         LinearProgressIndicator(
             modifier = Modifier.fillMaxWidth()
@@ -246,7 +248,7 @@ fun StepSender(
             LaunchedEffect(catcher, selectedRegex) {
                 update(catcher, selectedRegex)
             }
-            var senderType by remember { mutableStateOf(0) }
+            var senderType by remember { mutableIntStateOf(0) }
             AlertText(
                 text = stringResource(id = R.string.add_select_sender_type_alert),
                 isHtml = true,
@@ -484,7 +486,7 @@ fun StepActions(
 fun StepTest(
     olderMessages: List<String>,
     selectedRegex: Regex? = null,
-    scrollToEnd: () -> Unit = { -> }
+    scrollToEnd: () -> Unit = {  }
 ) {
     Card(
         modifier = Modifier
@@ -505,7 +507,7 @@ fun StepTest(
                     .fillMaxWidth()
                     .padding(bottom = 16.dp)
             )
-            var tabIndex by remember { mutableStateOf(0) }
+            var tabIndex by remember { mutableIntStateOf(0) }
 
             val tabs = listOf("Older", "Test")
             var matchedMessages by remember { mutableStateOf<List<AnnotatedString>?>(null) }
@@ -513,11 +515,11 @@ fun StepTest(
             LaunchedEffect(selectedRegex) {
                 selectedRegex?.let {
                     val searchPattern = it.regex.toPattern().toRegex()
-                    val filtered = olderMessages.filter {
-                        return@filter searchPattern.containsMatchIn(it)
-                    }.map {
-                        val matches = searchPattern.findAll(it).toList().first().value
-                        return@map htmlToAnnotatedString(it.replace(matches, "<b>$matches</b>"))
+                    val filtered = olderMessages.filter { it2 ->
+                        return@filter searchPattern.containsMatchIn(it2)
+                    }.map { it3 ->
+                        val matches = searchPattern.findAll(it3).toList().first().value
+                        return@map htmlToAnnotatedString(it3.replace(matches, "<b>$matches</b>"))
                     }
                     matchedMessages = filtered
                 }

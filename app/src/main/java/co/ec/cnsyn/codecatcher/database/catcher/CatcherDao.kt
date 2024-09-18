@@ -5,17 +5,11 @@ import androidx.room.Query
 import androidx.room.Transaction
 import co.ec.cnsyn.codecatcher.database.BaseDao
 import co.ec.cnsyn.codecatcher.database.DB
-import co.ec.cnsyn.codecatcher.database.code.Code
-import co.ec.cnsyn.codecatcher.database.code.CodeDao
-import co.ec.cnsyn.codecatcher.database.code.CodeDao.Latest
 import co.ec.cnsyn.codecatcher.database.regex.Regex
 import co.ec.cnsyn.codecatcher.database.relations.ActionDetail
-import co.ec.cnsyn.codecatcher.database.relations.CatcherWithActions
 import co.ec.cnsyn.codecatcher.database.relations.CatcherWithRegex
 import co.ec.cnsyn.codecatcher.helpers.async
 import co.ec.cnsyn.codecatcher.helpers.unix
-import co.ec.cnsyn.codecatcher.pages.catcher.CatcherPage
-import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface CatcherDao : BaseDao<Catcher> {

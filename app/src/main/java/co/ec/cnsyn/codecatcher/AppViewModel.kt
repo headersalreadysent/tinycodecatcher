@@ -11,25 +11,11 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import co.ec.cnsyn.codecatcher.App
 import co.ec.cnsyn.codecatcher.database.DB
-import co.ec.cnsyn.codecatcher.database.action.Action
-import co.ec.cnsyn.codecatcher.database.catcher.Catcher
-import co.ec.cnsyn.codecatcher.database.catcheraction.CatcherAction
-import co.ec.cnsyn.codecatcher.database.code.Code
-import co.ec.cnsyn.codecatcher.database.code.CodeDao
-import co.ec.cnsyn.codecatcher.database.relations.ActionDetail
-import co.ec.cnsyn.codecatcher.helpers.EventBus
-import co.ec.cnsyn.codecatcher.helpers.SmsCaught
 import co.ec.cnsyn.codecatcher.helpers.async
 import co.ec.cnsyn.codecatcher.helpers.translate
-import co.ec.cnsyn.codecatcher.helpers.unix
-import co.ec.cnsyn.codecatcher.pages.dashboard.DashboardViewModel
-import co.ec.cnsyn.codecatcher.sms.ActionRunner
-import co.ec.cnsyn.codecatcher.sms.SmsData
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlin.random.Random
 
 open class AppViewModel : ViewModel() {
 
@@ -38,7 +24,7 @@ open class AppViewModel : ViewModel() {
 
     var debug = MutableLiveData<Map<String, Any>>(mapOf())
 
-    var debugRunning = false
+    private var debugRunning = false
 
     init {
         calculatePermissions()
@@ -51,7 +37,7 @@ open class AppViewModel : ViewModel() {
      * calculate permission list
      */
     fun calculatePermissions() {
-        val permissions = mutableListOf<PermissionInfo>();
+        val permissions = mutableListOf<PermissionInfo>()
         val context = App.context()
         if (context.checkSelfPermission(Manifest.permission.RECEIVE_SMS)
             != PackageManager.PERMISSION_GRANTED

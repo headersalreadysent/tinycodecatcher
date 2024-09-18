@@ -45,7 +45,7 @@ class SmsService : Service() {
         var receiver: SmsReceiver? = null
 
         /**
-         * check service runnin in android
+         * check service running in android
          */
         private fun isServiceRunning(context: Context, serviceClass: Class<out Any>): Boolean {
             val activityManager =
@@ -123,7 +123,7 @@ class SmsService : Service() {
                         //if no receiver exists stop and restart yourself
                         throw Error("Stop service because no receiver exists")
                     }
-                    runCount++;
+                    runCount++
                     //ad heartbeat
                     settings.putInt("service-heartbeat", unix().toInt())
                     settings.putInt("service-pulse", runCount)
