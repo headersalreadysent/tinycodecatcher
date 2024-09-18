@@ -5,10 +5,8 @@ import android.content.Context
 import android.content.res.Resources
 import android.media.AudioManager
 import android.speech.tts.TextToSpeech
-import android.text.TextUtils.replace
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -16,8 +14,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.core.content.ContextCompat.getSystemService
 import co.ec.cnsyn.codecatcher.App
 import co.ec.cnsyn.codecatcher.R
 import co.ec.cnsyn.codecatcher.composables.ParamOptionBox
@@ -25,6 +21,7 @@ import co.ec.cnsyn.codecatcher.composables.ParamValueBox
 import co.ec.cnsyn.codecatcher.database.relations.ActionDetail
 import co.ec.cnsyn.codecatcher.database.relations.CatcherWithActions
 import co.ec.cnsyn.codecatcher.database.relations.CatcherWithRegex
+import co.ec.cnsyn.codecatcher.helpers.AppLogger
 import co.ec.cnsyn.codecatcher.helpers.translate
 import co.ec.cnsyn.codecatcher.sms.SmsData
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -32,14 +29,13 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.Locale
-import kotlin.concurrent.thread
 
 
 class TTSAction : BaseAction {
     private lateinit var textToSpeech: TextToSpeech
 
-    var mode: Int = 0
-    var volume: Int = 0
+    private var mode: Int = 0
+    private var volume: Int = 0
 
     @OptIn(DelicateCoroutinesApi::class)
     override fun run(catcher: CatcherWithRegex, action: CatcherWithActions, sms: SmsData): Boolean {
@@ -69,12 +65,7 @@ class TTSAction : BaseAction {
                 if (result == TextToSpeech.LANG_MISSING_DATA ||
                     result == TextToSpeech.LANG_NOT_SUPPORTED
                 ) {
-                   /* Toast.makeText(
-                        App.context(),
-                        translate("action_TTSAction_language_error"),
-                        Toast.LENGTH_LONG
-                    ).show()*/
-
+                    AppLogger.d("TTS land is missing or not sported")
                 }
                 //generate content
                 val messageContent = setupTexts(catcher, action, sms)
@@ -118,10 +109,15 @@ class TTSAction : BaseAction {
         return try {
             //get values from map
             val map = action.params()
-            val matches = extractCode(catcher, sms)
+            var matches = extractCode(catcher, sms)
             val messageContent =
                 (if (map.keys.contains("ttsContent")) map["ttsContent"] else App.context()
                     .getString(R.string.action_TTSAction_tts_content)) ?: "_sender_   _code_"
+            if (matches.all { it.isDigit() }) {
+                //if digits split it
+                val pair = splitText(matches)
+                matches = "${pair.first} ${pair.second}"
+            }
             messageContent
                 .replace("_code_", matches)
                 .replace("_sender_", sms.sender)
@@ -148,7 +144,7 @@ class TTSAction : BaseAction {
         //open sound
         audioManager.ringerMode = AudioManager.RINGER_MODE_NORMAL
         val maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
-        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, (maxVolume * .8).toInt(), 0)
+        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, (maxVolume * .7).toInt(), 0)
     }
 
 
@@ -170,7 +166,7 @@ class TTSAction : BaseAction {
         var params by remember { mutableStateOf(action.action.params()) }
 
         Column {
-            var labels = stringArrayResource(id = R.array.action_TTSAction_adjust_volume_params)
+            val labels = stringArrayResource(id = R.array.action_TTSAction_adjust_volume_params)
             ParamOptionBox(
                 stringResource(id = R.string.action_TTSAction_adjust_volume),
                 params["adjustVolume"] ?: "yes",
@@ -227,5 +223,10 @@ class TTSAction : BaseAction {
 
 
         }
+    }
+
+    fun splitText(text: String): Pair<String, String> {
+        val halfLength = text.length / 2
+        return text.substring(0, halfLength) to text.substring(halfLength)
     }
 }
