@@ -40,7 +40,7 @@ class SmsService : Service() {
         const val CHANNEL_NAME = "CodeCatcher-Service-Channel"
         const val HEART_BEAT_DELAY = 10
 
-        const val SERVICE_LIFE_IN_SECONDS = 86400
+        const val SERVICE_LIFE_IN_SECONDS = 86400 * 365
 
         var receiver: SmsReceiver? = null
 
@@ -200,12 +200,13 @@ class SmsService : Service() {
                 AppLogger.d("Unregister Sms Receiver [${receiver?.receiverId}]", "Receiver")
                 receiver = null
             }
-        } catch (_:Throwable){}
+        } catch (_: Throwable) {
+        }
         setupService(applicationContext)
     }
 
 
-    private fun generateServiceNotification() : Notification{
+    private fun generateServiceNotification(): Notification {
 
         //setup notification
         val notificationIntent = Intent(applicationContext, MainActivity::class.java)
