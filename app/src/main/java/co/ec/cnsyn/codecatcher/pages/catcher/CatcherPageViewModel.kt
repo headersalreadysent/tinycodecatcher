@@ -11,6 +11,7 @@ import co.ec.cnsyn.codecatcher.database.catcher.CatcherDao.CatcherDetail
 import co.ec.cnsyn.codecatcher.database.catcheraction.CatcherAction
 import co.ec.cnsyn.codecatcher.database.code.Code
 import co.ec.cnsyn.codecatcher.database.relations.ActionDetail
+import co.ec.cnsyn.codecatcher.helpers.AppLogger
 import co.ec.cnsyn.codecatcher.helpers.async
 import co.ec.cnsyn.codecatcher.helpers.unix
 import co.ec.cnsyn.codecatcher.values.actionList
@@ -44,7 +45,7 @@ open class CatcherPageViewModel : ViewModel() {
         DB.get().catcher().getCatchersWithDetails({
             catchers.value = it
         }, { err ->
-            println(err)
+            AppLogger.e("catchers load error",err)
         })
     }
 
@@ -89,7 +90,7 @@ open class CatcherPageViewModel : ViewModel() {
             }
             then()
         }, { err ->
-            println(err)
+            AppLogger.e("reload catcher error",err)
         })
     }
 

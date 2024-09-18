@@ -45,7 +45,6 @@ class TTSAction : BaseAction {
         val setupVolume =
             actionParams.keys.contains("adjustVolume") && actionParams["adjustVolume"] == "yes"
         if (setupVolume) {
-            println("tts: sound open")
             openSound()
         }
         //get text to speech engine
@@ -78,7 +77,6 @@ class TTSAction : BaseAction {
                 if (setupVolume) {
                     GlobalScope.launch {
                         delay(15000)
-                        println("tts: sound close")
                         restoreVolume()
                     }
                 }

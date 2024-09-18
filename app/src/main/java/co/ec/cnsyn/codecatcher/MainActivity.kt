@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
@@ -71,6 +72,7 @@ import co.ec.cnsyn.codecatcher.composables.SkewBottomSheet
 import co.ec.cnsyn.codecatcher.composables.SkewSquareCut
 import co.ec.cnsyn.codecatcher.database.AppDatabase
 import co.ec.cnsyn.codecatcher.database.DB
+import co.ec.cnsyn.codecatcher.helpers.AppLogger
 import co.ec.cnsyn.codecatcher.helpers.MockSettings
 import co.ec.cnsyn.codecatcher.helpers.Settings
 import co.ec.cnsyn.codecatcher.helpers.unix
@@ -102,7 +104,7 @@ class MainActivity : ComponentActivity() {
         val destination = intent.getStringExtra("destination") ?: "dashboard"
         val destinationParam = intent.getStringExtra("destinationParam") ?: ""
 
-        println("start activity destination $destination")
+        AppLogger.d("start activity destination $destination")
 
         DB.getDatabase(applicationContext)
         enableEdgeToEdge()
@@ -112,7 +114,11 @@ class MainActivity : ComponentActivity() {
                     startDestination = destination,
                     destinationParam = destinationParam
                 )
-                HorizontalDivider()
+                HorizontalDivider(
+                    modifier = Modifier.height(0.dp),
+                    color = Color.Transparent,
+                    thickness = 0.dp
+                )
             }
         }
         installSplashScreen().setKeepOnScreenCondition {
@@ -268,7 +274,6 @@ fun CodeCatcherApp(
             }
         ) { _ ->
 
-            println("start destination $startDestination $destinationParam")
             NavHost(
                 navController = navController,
                 startDestination = startDestination

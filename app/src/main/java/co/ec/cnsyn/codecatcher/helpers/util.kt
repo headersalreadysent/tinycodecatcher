@@ -42,6 +42,7 @@ fun <T : Any?> async(
                 //send to main thread with error
                 err(e)
             }
+            AppLogger.e("Async error",e,"async")
         }
     }
 }
