@@ -16,6 +16,7 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -96,7 +97,7 @@ fun ParamOptionBox(
             OutlinedTextField(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .menuAnchor(),
+                    .menuAnchor(MenuAnchorType.PrimaryEditable, true),
                 readOnly = true,
                 value = textValue,
                 textStyle = MaterialTheme.typography.bodyMedium,
@@ -112,8 +113,7 @@ fun ParamOptionBox(
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = dropDownExpanded) }
             )
             ExposedDropdownMenu(
-                modifier = Modifier
-                    .fillMaxWidth(.88F),
+                modifier = Modifier,
                 expanded = dropDownExpanded,
                 onDismissRequest = { dropDownExpanded = false },
             ) {

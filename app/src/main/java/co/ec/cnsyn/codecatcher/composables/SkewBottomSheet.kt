@@ -41,7 +41,7 @@ fun SkewBottomSheet(
         shape = RoundedCornerShape(0.dp),
         containerColor = Color.Transparent,
         tonalElevation = 0.dp,
-        windowInsets = WindowInsets.Companion.ime,
+        contentWindowInsets = { WindowInsets.Companion.ime },
         dragHandle = {
             SkewSquare(
                 skew = skew,
