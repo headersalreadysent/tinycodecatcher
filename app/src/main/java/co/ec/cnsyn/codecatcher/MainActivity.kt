@@ -27,8 +27,10 @@ import androidx.compose.material.icons.filled.Phishing
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
@@ -112,6 +114,7 @@ class MainActivity : ComponentActivity() {
                     startDestination = destination,
                     destinationParam = destinationParam
                 )
+                HorizontalDivider()
             }
         }
         installSplashScreen().setKeepOnScreenCondition {
