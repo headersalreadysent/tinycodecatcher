@@ -114,7 +114,7 @@ fun CodeCatcherDebug(
                 Icon(Icons.Filled.Replay, contentDescription = "return to main")
             }
         }
-    ) { _ ->
+    ) { padding ->
         Surface(
             modifier = Modifier
                 .fillMaxSize()

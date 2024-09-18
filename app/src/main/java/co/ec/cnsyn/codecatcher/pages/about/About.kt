@@ -16,7 +16,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -36,7 +35,6 @@ import co.ec.cnsyn.codecatcher.composables.SkewSquareCut
 import co.ec.cnsyn.codecatcher.helpers.dateString
 import co.ec.cnsyn.codecatcher.helpers.timeString
 import co.ec.cnsyn.codecatcher.sms.SmsService
-import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.delay
 
 @Composable
