@@ -63,7 +63,6 @@ class NotificationAction : BaseAction {
                         inTargetDensity = 480
                     })
 
-            val matches = extractCode(catcher, sms)
 
             val historyIntent = Intent(context, ActionActivity::class.java)
             historyIntent.putExtra("action", "history")
