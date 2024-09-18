@@ -120,7 +120,7 @@ fun CodeCatcherDebug(
                 val debugActivity = Intent(context, MainActivity::class.java)
                 context.startActivity(debugActivity)
             }) {
-                Icon(Icons.Filled.Replay, contentDescription = "")
+                Icon(Icons.Filled.Replay, contentDescription = "return to main")
             }
         }
     ) { _ ->
@@ -166,7 +166,7 @@ fun ServiceDebug(model: AppViewModel, forDay: Boolean = false) {
                             onClick = {
                                 model.clearServiceRecords()
                             }) {
-                            Icon(Icons.Filled.Delete, contentDescription = "")
+                            Icon(Icons.Filled.Delete, contentDescription = "delete logs")
                             Text(
                                 text = "Clean Log", textAlign = TextAlign.Center
                             )
@@ -248,7 +248,7 @@ fun AppLog(model: AppViewModel) {
                             onClick = {
                                 ExceptionHandler.clearAppLogs(App.context())
                             }) {
-                            Icon(Icons.Filled.Delete, contentDescription = "")
+                            Icon(Icons.Filled.Delete, contentDescription = "delete logs")
                             Text(
                                 text = "Clean Log", textAlign = TextAlign.Center
                             )

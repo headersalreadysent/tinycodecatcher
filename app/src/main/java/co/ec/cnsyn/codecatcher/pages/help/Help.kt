@@ -70,7 +70,7 @@ fun Help(
                     style = MaterialTheme.typography.titleLarge
                 )
                 Icon(
-                    Icons.AutoMirrored.Filled.HelpCenter, contentDescription = "",
+                    Icons.AutoMirrored.Filled.HelpCenter, contentDescription = "help center",
                     tint = MaterialTheme.colorScheme.onPrimary
                 )
             }
@@ -147,7 +147,7 @@ fun HelpImage(fileName: String) {
     val imageBitmap: ImageBitmap? = loadBitmapFromAssets(LocalContext.current, fileName)
     imageBitmap?.let {
         Image(
-            bitmap = it, contentDescription = null,
+            bitmap = it, contentDescription = "help image $fileName",
             modifier = Modifier
                 .fillMaxSize()
                 .padding(8.dp)

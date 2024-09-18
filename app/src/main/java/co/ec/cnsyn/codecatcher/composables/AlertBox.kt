@@ -61,7 +61,7 @@ fun AlertText(
             children = {
                 Icon(
                     imageVector = pair.second,
-                    contentDescription = null,
+                    contentDescription = text,
                     modifier = Modifier.size(12.dp), // size of the icon
                 )
             }

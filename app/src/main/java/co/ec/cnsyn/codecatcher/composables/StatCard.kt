@@ -70,7 +70,7 @@ fun StatCard(
             ) {
                 Icon(
                     icon,
-                    contentDescription = null,
+                    contentDescription = title,
                     tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier
                         .size(height ?: (boxHeight / ratio).dp)

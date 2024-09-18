@@ -64,7 +64,7 @@ fun About() {
 
                 Image(
                     painter = painterResource(id = R.drawable.ic_launcher_foreground),
-                    contentDescription = "",
+                    contentDescription = "code catcher hook logo",
                     colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimaryContainer),
                     modifier = Modifier.fillMaxWidth(.6F)
                 )

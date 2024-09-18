@@ -207,7 +207,7 @@ fun CodeCatcherApp(
                                 containerColor = MaterialTheme.colorScheme.surface
                             )
                         ) {
-                            Icon(Icons.Default.Dashboard, contentDescription = "")
+                            Icon(Icons.Default.Dashboard, contentDescription = "dashboard")
                         }
 
                         IconButton(
@@ -218,7 +218,7 @@ fun CodeCatcherApp(
                                 containerColor = MaterialTheme.colorScheme.surface
                             )
                         ) {
-                            Icon(Icons.Default.Phishing, contentDescription = "")
+                            Icon(Icons.Default.Phishing, contentDescription = "catchers page")
                         }
 
                         IconButton(
@@ -229,7 +229,7 @@ fun CodeCatcherApp(
                                 containerColor = MaterialTheme.colorScheme.surface
                             )
                         ) {
-                            Icon(Icons.Default.Settings, contentDescription = "")
+                            Icon(Icons.Default.Settings, contentDescription = "toggle settings")
                         }
                         if (permissions.isNotEmpty() && !permissionModel) {
                             IconButton(
@@ -240,7 +240,7 @@ fun CodeCatcherApp(
                                     containerColor = MaterialTheme.colorScheme.surface
                                 )
                             ) {
-                                Icon(Icons.Default.Key, contentDescription = "")
+                                Icon(Icons.Default.Key, contentDescription = "permission screen")
                             }
                         }
                         if (settings.getBoolean("debug-enabled", false)) {
@@ -254,7 +254,7 @@ fun CodeCatcherApp(
                                     containerColor = MaterialTheme.colorScheme.surface
                                 )
                             ) {
-                                Icon(Icons.Filled.DeveloperMode, contentDescription = "")
+                                Icon(Icons.Filled.DeveloperMode, contentDescription = "debug screen")
                             }
                         }
 
@@ -263,7 +263,7 @@ fun CodeCatcherApp(
                         FloatingActionButton(onClick = {
                             navController.navigate("add")
                         }) {
-                            Icon(Icons.Default.AddCircle, contentDescription = "")
+                            Icon(Icons.Default.AddCircle, contentDescription = "add button")
                         }
                     },
                 )

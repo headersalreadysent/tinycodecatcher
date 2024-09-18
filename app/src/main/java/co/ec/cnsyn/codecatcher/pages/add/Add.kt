@@ -188,7 +188,7 @@ fun Add(model: AddViewModel = viewModel()) {
                         )
                     }) {
                     Icon(
-                        Icons.Default.Save, contentDescription = "",
+                        Icons.Default.Save, contentDescription = "catcher save icon",
                         modifier = Modifier.padding(end = 8.dp)
                     )
                     Text(text = stringResource(id = R.string.add_set_save_button))
@@ -275,7 +275,7 @@ fun StepSender(
                         catcher = catcher.copy(sender = it)
                     },
                     label = { Text(text = senderText) },
-                    trailingIcon = { Icon(Icons.Default.Person, contentDescription = "") },
+                    trailingIcon = { Icon(Icons.Default.Person, contentDescription = "person") },
                     placeholder = { Text(text = senderText) }
                 )
             }
@@ -429,7 +429,7 @@ fun StepActions(
                                 Text(text = if (action.name == "") action.key else action.name)
                                 if (isHasParams) {
                                     Icon(
-                                        Icons.Filled.Settings, contentDescription = "",
+                                        Icons.Filled.Settings, contentDescription = "add action",
                                         modifier = Modifier
                                             .height(16.dp)
                                             .padding(start = 5.dp),
@@ -642,7 +642,7 @@ fun StepTest(
                                     Icon(
                                         if (matches.isNotEmpty())
                                             Icons.Filled.CheckCircle else Icons.Filled.Error,
-                                        contentDescription = "",
+                                        contentDescription = "matches indicator",
                                         tint =
                                         if (matches.isNotEmpty())
                                             MaterialTheme.colorScheme.primary

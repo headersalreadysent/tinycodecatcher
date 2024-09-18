@@ -61,7 +61,7 @@ fun IconCard(
             ) {
                 Icon(
                     icon,
-                    contentDescription = null,
+                    contentDescription = "icon card for showing",
                     tint = MaterialTheme.colorScheme.onSurface.copy(
                         alpha = .2F
                     ),

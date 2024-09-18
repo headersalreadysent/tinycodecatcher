@@ -145,7 +145,7 @@ fun SkewSwitch(
                 ) {
                     if (icons.isNotEmpty()) {
                         Icon(
-                            icons[0], contentDescription = "",
+                            icons[0], contentDescription = value[0].first,
                             modifier = Modifier.padding(end = 8.dp),
                             tint = leftTextColor
                         )
@@ -186,7 +186,7 @@ fun SkewSwitch(
                     )
                     if (icons.size > 1) {
                         Icon(
-                            icons[1], contentDescription = "",
+                            icons[1], contentDescription = value[1].first,
                             modifier = Modifier.padding(start = 8.dp),
                             tint = rightTextColor
                         )

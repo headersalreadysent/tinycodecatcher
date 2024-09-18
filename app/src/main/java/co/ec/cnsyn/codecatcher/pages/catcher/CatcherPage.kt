@@ -336,7 +336,7 @@ fun CatcherItem(
                             if (isHasParams) {
                                 Icon(
                                     Icons.Filled.Settings,
-                                    contentDescription = "",
+                                    contentDescription = "action settings",
                                     modifier = Modifier
                                         .height(16.dp)
                                         .padding(start = 5.dp),

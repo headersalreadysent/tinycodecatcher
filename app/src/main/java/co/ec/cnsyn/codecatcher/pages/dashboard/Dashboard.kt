@@ -124,7 +124,7 @@ fun Dashboard(model: DashboardViewModel = viewModel()) {
                 if (boxHeight != 0) {
                     Image(
                         painter = painterResource(id = R.drawable.ic_launcher_foreground),
-                        contentDescription = "",
+                        contentDescription = "indicator",
                         modifier = Modifier
                             .height(with(LocalDensity.current) { boxHeight.toDp() })
                             .align(Alignment.BottomEnd)
@@ -280,7 +280,7 @@ fun Dashboard(model: DashboardViewModel = viewModel()) {
                     verticalArrangement = Arrangement.Center
                 ) {
                     Image(
-                        painter = painterResource(id = R.drawable.empty), contentDescription = "",
+                        painter = painterResource(id = R.drawable.empty), contentDescription = "emty codes icon",
                         colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.secondary),
                         modifier = Modifier.fillMaxWidth(.5F)
                     )
