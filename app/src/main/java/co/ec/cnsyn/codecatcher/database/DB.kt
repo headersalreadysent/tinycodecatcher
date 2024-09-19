@@ -43,7 +43,7 @@ object DB {
                 get().regex().insertAll(*regexes.toTypedArray())
                 get().action().insertAll(*actionList().toTypedArray())
 
-                if (BuildConfig.DEBUG) {
+                if (BuildConfig.DEBUG && false) {
                     //if debug generate some records to testing
                     val catchers = List(regexes.size) {
                         Catcher(
