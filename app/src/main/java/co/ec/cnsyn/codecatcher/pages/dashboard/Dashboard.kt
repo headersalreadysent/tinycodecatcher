@@ -173,19 +173,19 @@ fun Dashboard(model: DashboardViewModel = viewModel()) {
                 .verticalScroll(verticalScrollState)
         ) {
 
-            SkewSquare(
-                modifier = Modifier
-                    .padding(bottom = 16.dp)
-                    .padding(top = 30.dp)
-                    .fillMaxWidth(),
-                cut = SkewSquareCut.TopStart,
-                skew = 30,
-                fill = MaterialTheme.colorScheme.secondaryContainer
-            ) {
+            val graphStat by model.graphStat.observeAsState(mapOf())
+            val total = graphStat.keys.size
+            if (total > 0) {
+                SkewSquare(
+                    modifier = Modifier
+                        .padding(bottom = 16.dp)
+                        .padding(top = 30.dp)
+                        .fillMaxWidth(),
+                    cut = SkewSquareCut.TopStart,
+                    skew = 30,
+                    fill = MaterialTheme.colorScheme.secondaryContainer
+                ) {
 
-                val graphStat by model.graphStat.observeAsState(mapOf())
-                val total = graphStat.keys.size
-                if (total > 0) {
                     val graphListState = rememberLazyListState(initialFirstVisibleItemIndex = 0)
                     Column(modifier = Modifier.fillMaxWidth()) {
                         Row(
@@ -262,7 +262,8 @@ fun Dashboard(model: DashboardViewModel = viewModel()) {
                     verticalArrangement = Arrangement.Center
                 ) {
                     Image(
-                        painter = painterResource(id = R.drawable.empty), contentDescription = "emty codes icon",
+                        painter = painterResource(id = R.drawable.empty),
+                        contentDescription = "emty codes icon",
                         colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.secondary),
                         modifier = Modifier.fillMaxWidth(.5F)
                     )
