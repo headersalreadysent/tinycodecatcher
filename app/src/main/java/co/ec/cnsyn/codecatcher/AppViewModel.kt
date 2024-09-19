@@ -1,11 +1,15 @@
 package co.ec.cnsyn.codecatcher
 
 import android.Manifest
+import android.app.AlarmManager
+import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Message
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.MutableLiveData
@@ -26,11 +30,23 @@ open class AppViewModel : ViewModel() {
 
     private var debugRunning = false
 
+    var hasExactTimePermission = MutableLiveData(true)
+
     init {
         calculatePermissions()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val alarmManager = App.context().getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            hasExactTimePermission.value = alarmManager.canScheduleExactAlarms()
+        }
     }
 
-    data class PermissionInfo(val permission: String, val icon: ImageVector, val text: String)
+
+    data class PermissionInfo(
+        val permission: String?,
+        val icon: ImageVector,
+        val text: String,
+        val click:  (() -> Unit)? = null
+    )
 
 
     /**
@@ -75,6 +91,26 @@ open class AppViewModel : ViewModel() {
                     Icons.AutoMirrored.Filled.Send,
                     translate("dashboard_permission_SEND_SMS")
                 )
+            )
+        }
+        val alarmManager = App.context().getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
+            !alarmManager.canScheduleExactAlarms()
+        ) {
+            //send sms permission
+            permissions.add(
+                PermissionInfo(
+                    null,
+                    Icons.Filled.Alarm,
+                    translate("dashboard_permission_SET_ALARM")
+                ) {
+                    val scheduleIntent = Intent().apply {
+                        action = android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+                        data = android.net.Uri.parse("package:${context.packageName}")
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                    }
+                    context.startActivity(scheduleIntent)
+                }
             )
         }
         requiredPerms.value = permissions.toList()
@@ -123,7 +159,7 @@ open class AppViewModel : ViewModel() {
 
     fun clearServiceRecords() {
 
-        async({ DB.get().service().clean()},{
+        async({ DB.get().service().clean() }, {
 
         })
     }

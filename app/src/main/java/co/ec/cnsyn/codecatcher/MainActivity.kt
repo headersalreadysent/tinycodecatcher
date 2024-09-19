@@ -8,6 +8,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -20,11 +21,14 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.HelpCenter
 import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.Dashboard
 import androidx.compose.material.icons.filled.DeveloperMode
 import androidx.compose.material.icons.filled.Key
 import androidx.compose.material.icons.filled.Phishing
+import androidx.compose.material.icons.filled.QuestionMark
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
@@ -42,6 +46,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.compositionLocalOf
@@ -86,8 +91,10 @@ import co.ec.cnsyn.codecatcher.pages.settings.SettingsModal
 import co.ec.cnsyn.codecatcher.sms.SmsService
 import co.ec.cnsyn.codecatcher.ui.theme.CodeCatcherTheme
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import kotlinx.coroutines.delay
 
 
 class MainActivity : ComponentActivity() {
@@ -170,7 +177,6 @@ fun CodeCatcherApp(
     CodeCatcherProviders {
         var permissionModel by remember { mutableStateOf(false) }
         val permissions by appModel.requiredPerms.observeAsState(listOf())
-
         val navController = LocalNavigation.current
         val snackbarHostState = LocalSnackbar.current
         val settings = LocalSettings.current
@@ -184,8 +190,15 @@ fun CodeCatcherApp(
                     permissionModel = permissions.isNotEmpty()
                 }
             }
+
         }
 
+        DisposableEffect(Unit) {
+            appModel.calculatePermissions()
+            onDispose {
+
+            }
+        }
 
         var settingsVisible by remember { mutableStateOf(false) }
         if (settingsVisible) {
@@ -258,7 +271,10 @@ fun CodeCatcherApp(
                                     containerColor = MaterialTheme.colorScheme.surface
                                 )
                             ) {
-                                Icon(Icons.Filled.DeveloperMode, contentDescription = "debug screen")
+                                Icon(
+                                    Icons.Filled.DeveloperMode,
+                                    contentDescription = "debug screen"
+                                )
                             }
                         }
 
@@ -291,6 +307,13 @@ fun CodeCatcherApp(
                 composable("about") { About() }
                 composable("history") { History() }
                 composable("help") { Help(helpType = destinationParam) }
+                composable(
+                    "help/{type}",
+                    arguments = listOf(navArgument("type") { nullable = true })
+                ) { backStackEntry ->
+                    val helpType = backStackEntry.arguments?.getString("type") ?: ""
+                    Help(helpType = helpType)
+                }
             }
         }
 
@@ -304,6 +327,7 @@ fun CodeCatcherApp(
                 }
             }
         }
+
 
     }
 
@@ -324,26 +348,51 @@ fun PermissionArea(
                 .padding(bottom = 30.dp),
             horizontalAlignment = Alignment.End
         ) {
-            Text(
-                text = stringResource(id = R.string.dashboard_permission_needs_some_permission),
-                modifier = Modifier.padding(vertical = 8.dp),
-                style = MaterialTheme.typography.titleMedium
-            )
+            Row(modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically) {
+                val navigator= LocalNavigation.current
+                Text(
+                    text = stringResource(id = R.string.dashboard_permission_needs_some_permission),
+                    modifier = Modifier.padding(vertical = 8.dp),
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Icon(Icons.AutoMirrored.Filled.HelpCenter,
+                    contentDescription ="why need permissions",
+                    modifier = Modifier
+                        .padding(start = 8.dp)
+                        .clickable {
+                            navigator.navigate("help/permission")
+                        },
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
+
             LazyRow(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End
+                horizontalArrangement = Arrangement.End,
             ) {
                 items(permission.size) {
                     val perm = permission[it]
-                    val permState = rememberPermissionState(
-                        permission = perm.permission,
-                        onPermissionResult = {
-                            then(perm.permission)
-                        }
-                    )
+                    var permState: PermissionState? = null
+                    perm.permission?.let {
+                        permState = rememberPermissionState(
+                            permission = perm.permission,
+                            onPermissionResult = {
+                                then(perm.permission)
+                            }
+                        )
+                    }
+
                     Button(
                         onClick = {
-                            permState.launchPermissionRequest()
+                            if(permState==null){
+                                perm.click?.let {
+                                    it()
+                                }
+                            } else {
+                                permState?.launchPermissionRequest()
+                            }
                         },
                         contentPadding = PaddingValues(
                             horizontal = 8.dp,
@@ -384,6 +433,7 @@ fun PermissionArea(
 
 
 }
+
 
 @Composable
 fun CodeCatcherProviders(

@@ -5,6 +5,7 @@
     <string name="dashboard_permission_RECEIVE_SMS">Sms Okuma</string>
     <string name="dashboard_permission_POST_NOTIFICATIONS">Bildirim</string>
     <string name="dashboard_permission_SEND_SMS">Sms Gönderim</string>
+    <string name="dashboard_permission_SET_ALARM">Zamanlayıcı</string>
     <string name="dashboard_permission_needs_some_permission">Code Catcher izinlere ihtiyaç duyuyor.</string>
     <string name="dashboard_stat_catcher_count">Yakalayıcı Sayısı</string>
     <string name="dashboard_stat_code_count">Kod Sayısı</string>
@@ -74,12 +75,17 @@
     <string name="about_heartbeat">Servis Zamanı:</string>
 
     <!-- help -->
+
+    <string name="help_open_settings">Ayarları Göster</string>
     <string name="help_service_notification_title">Service Notification</string>
     <string name="help_service_notification_content"><![CDATA[
 Bu hizmet, kesintisiz çalışmayı sağlamak için arka planda çalışıyor. Bu bildirimin görünürlüğünü, bildirim kanalı ayarlarını değiştirerek yönetebilirsiniz.
 \n\nAyarları açın ve <b>Bildirim Göster</b> kutucuğunu devre dışı bırakın. Bu, diğer bildirimleri etkilemeyecektir.
     ]]></string>
 
+    <string name="help_permission_title">İzinler</string>
+    <string name="help_permission_content"><![CDATA[
+<b>SMS Alma (Manifest.permission.RECEIVE_SMS)</b>\nCodeCatcher, gelen SMS mesajlarını dinleyerek bunları otomatik olarak filtreler ve SMS yönlendirme veya panoya kopyalama gibi işlemler gerçekleştirir. Bu, kullanıcının her SMS ile manuel olarak etkileşimde bulunmasını gerektirmeden uygulamanın amaçlandığı şekilde çalışmasını sağlar. \n\n <b>SMS Gönderme (Manifest.permission.SEND_SMS)</b>\nCodeCatcher, yanıtları otomatikleştirebilir veya belirlenen kurallara göre SMS mesajlarını yönlendirebilir. Bu, gerekli yanıtların kullanıcı müdahalesi olmadan otomatik olarak gönderilmesini sağlar. \n\n <b>Bildirim Gönderme (Manifest.permission.POST_NOTIFICATIONS)</b>\nKullanıcıya önemli olaylar hakkında, örneğin bir SMS alındığında, yönlendirildiğinde veya SMS otomasyon sürecinde bir hata meydana geldiğinde bildirimde bulunur. Bu, kullanıcının uygulama etkinliklerinden haberdar olmasını sağlar. \n\n <b>Kesin Alarm Zamanlaması (AlarmManager.canScheduleExactAlarms)</b>\nCodeCatcher, belirli zamanlarda SMS gönderme gibi eylemler için hassas zamanlamaya ihtiyaç duyabilir. Bu, görevlerin kullanıcı tarafından tanımlanan kurallara uygun olarak güvenilir bir şekilde yürütülmesini sağlar. ]]></string>
 
     <!-- history -->
     <string name="history_load_more">Daha Fazla Göster</string>

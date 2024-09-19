@@ -1,6 +1,7 @@
 package co.ec.cnsyn.codecatcher.pages.help
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.compose.foundation.Image
@@ -84,6 +85,7 @@ fun Help(
         ) {
             when (helpType) {
                 "service_notification" -> HelpServiceNotification(helpModel)
+                "permission" -> PermissionHelp(helpModel)
             }
         }
 
@@ -122,7 +124,7 @@ fun HelpServiceNotification(helpModel: HelpViewModel) {
                     onClick = {
                         helpModel.openChannelSettings()
                     }) {
-                    Text(text = "Open Settings")
+                    Text(text = translate("help_open_settings"))
                 }
             }
 
@@ -130,6 +132,46 @@ fun HelpServiceNotification(helpModel: HelpViewModel) {
     }
 
 
+}
+
+@Composable
+fun PermissionHelp(helpModel: HelpViewModel){
+    Column(
+        modifier = Modifier
+            .padding(8.dp)
+    ) {
+
+        SkewSquare(
+            cut = SkewSquareCut.TopStart,
+            skew = 30,
+            fill = MaterialTheme.colorScheme.secondaryContainer
+        )
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight(),
+            color = MaterialTheme.colorScheme.secondaryContainer
+        ) {
+            Column(modifier = Modifier.padding(8.dp)) {
+                Text(
+                    text = htmlToAnnotatedString(stringResource(R.string.help_permission_content)),
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        textAlign = TextAlign.Justify
+                    )
+                )
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+
+                    onClick = {
+                        helpModel.openPermissionSettings()
+                    }) {
+                    Text(text = translate("help_open_settings"))
+                }
+
+            }
+
+        }
+    }
 }
 
 @Preview(showBackground = true)

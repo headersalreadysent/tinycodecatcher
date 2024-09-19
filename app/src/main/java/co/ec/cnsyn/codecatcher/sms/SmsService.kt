@@ -77,11 +77,11 @@ class SmsService : Service() {
                 if (!alarmManager.canScheduleExactAlarms()) {
                     // If your app does not have the permission, guide the user to the settings
                     AppLogger.d("Setup service request alarm", "service")
-                    val scheduleIntent = Intent().apply {
-                        action = Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
-                        data = android.net.Uri.parse("package:${context.packageName}")
-                    }
-                    context.startActivity(scheduleIntent)
+                    alarmManager.set(
+                        AlarmManager.RTC_WAKEUP,
+                        SystemClock.elapsedRealtime() + 1000 * timeout,
+                        pendingIntent
+                    )
                 } else {
                     AppLogger.d("Setup service schedule", "service")
                     alarmManager.setExact(
@@ -91,7 +91,6 @@ class SmsService : Service() {
                     )
                 }
             } else {
-
                 AppLogger.d("Setup service old version", "service")
                 alarmManager.setExact(
                     AlarmManager.ELAPSED_REALTIME_WAKEUP,

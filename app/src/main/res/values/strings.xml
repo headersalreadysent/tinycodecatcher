@@ -7,6 +7,7 @@
     <string name="dashboard_permission_RECEIVE_SMS">SMS Read</string>
     <string name="dashboard_permission_POST_NOTIFICATIONS">Notification</string>
     <string name="dashboard_permission_SEND_SMS">SMS Send</string>
+    <string name="dashboard_permission_SET_ALARM">Set Timer</string>
     <string name="dashboard_permission_needs_some_permission">Code Catcher need some permissions:</string>
     <string name="dashboard_stat_catcher_count">Catcher Count</string>
     <string name="dashboard_stat_code_count">Code Count</string>
@@ -122,10 +123,22 @@
     <string name="action_TTSAction_tts_content">_sender_ verification code is _code_</string>
 
     <!-- help -->
+    <string name="help_open_settings">Open Settings</string>
     <string name="help_service_notification_title">Service Notification</string>
     <string name="help_service_notification_content"><![CDATA[
 This service is running in the background to ensure continuous operation. You can manage the visibility of this notification by adjusting the settings of the notification channel.
 \n\nJust open settings and make <b>Show Notification</b> checkbox disabled. This will not affect any other notifications.
+    ]]></string>
+
+    <string name="help_permission_title">Permissions</string>
+    <string name="help_permission_content"><![CDATA[
+<b>Receive SMS (Manifest.permission.RECEIVE_SMS)</b>\nCodeCatcher listens for incoming SMS messages to automatically filter them and perform actions like SMS forwarding or copying to the clipboard. This allows the app to function as intended without requiring the user to manually interact with each SMS.
+\n\n
+<b>Send SMS (Manifest.permission.SEND_SMS)</b>\nCodeCatcher can automate responses or forward SMS messages based on predefined rules. This ensures seamless automation when sending necessary responses without requiring user intervention.
+\n\n
+<b>Post Notifications (Manifest.permission.POST_NOTIFICATIONS)</b>\nTo alert the user when important events occur, such as an SMS being received, forwarded, or an error occurring in the SMS automation process. This keeps the user informed of app activity.
+\n\n
+<b>Exact Alarm Scheduling (AlarmManager.canScheduleExactAlarms)</b>\nCodeCatcher may require precise scheduling to perform actions like sending SMS at specific times. This ensures that tasks can be executed reliably and in accordance with user-defined rules.
     ]]></string>
 
     <!-- history -->
