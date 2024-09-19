@@ -20,6 +20,8 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,6 +41,11 @@ fun History(model: HistoryViewModel = viewModel()) {
         modifier = Modifier
             .fillMaxSize()
             .navigationBarsPadding()
+
+            .semantics {
+                contentDescription="history page"
+
+            }
     ) {
         val count by model.count.observeAsState(0)
         val history by model.history.observeAsState(listOf())

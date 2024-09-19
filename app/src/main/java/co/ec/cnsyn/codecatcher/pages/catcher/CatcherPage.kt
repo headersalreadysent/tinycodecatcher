@@ -60,6 +60,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -110,7 +112,12 @@ fun CatcherPage(model: CatcherPageViewModel = viewModel(), catcherId: Int? = nul
 
 
     Box(
-        modifier = Modifier.fillMaxSize(), Alignment.BottomCenter
+        modifier = Modifier
+            .fillMaxSize()
+            .semantics {
+                contentDescription="catchers page"
+            },
+        Alignment.BottomCenter
     ) {
 
         val catchers by model.catchers.observeAsState(listOf())

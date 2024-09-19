@@ -24,6 +24,8 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import co.ec.cnsyn.codecatcher.CodeCatcherPreview
@@ -42,7 +44,10 @@ fun About() {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(bottom = 160.dp),
+            .padding(bottom = 160.dp)
+            .semantics {
+                contentDescription="about page"
+            },
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween
     ) {

@@ -32,6 +32,8 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -51,7 +53,11 @@ fun Help(
     helpModel: HelpViewModel = viewModel()
 ) {
 
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(modifier = Modifier
+        .fillMaxSize()
+        .semantics {
+            contentDescription = "help show page"
+        }) {
         SkewSquare(
             skew = 30,
             fill = MaterialTheme.colorScheme.primary
@@ -135,7 +141,7 @@ fun HelpServiceNotification(helpModel: HelpViewModel) {
 }
 
 @Composable
-fun PermissionHelp(helpModel: HelpViewModel){
+fun PermissionHelp(helpModel: HelpViewModel) {
     Column(
         modifier = Modifier
             .padding(8.dp)

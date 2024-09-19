@@ -63,6 +63,8 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -100,13 +102,19 @@ import kotlin.math.absoluteValue
 
 @Composable
 fun Add(model: AddViewModel = viewModel()) {
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .semantics {
+            contentDescription = "catcher add page"
+        }
+    ) {
         val isKeyboardVisible by rememberKeyboardVisibility()
         val scrollState = rememberScrollState()
         var completeRatio by remember { mutableFloatStateOf(0F) }
 
         LinearProgressIndicator(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .align(Alignment.TopStart)
                 .zIndex(3F)
                 .height(8.dp),
@@ -184,8 +192,10 @@ fun Add(model: AddViewModel = viewModel()) {
                             { catcherId ->
                                 navigator.navigate("catchers/$catcherId")
                                 scope.launch {
-                                    snackbar.showSnackbar(savedMessage,
-                                        duration = SnackbarDuration.Long)
+                                    snackbar.showSnackbar(
+                                        savedMessage,
+                                        duration = SnackbarDuration.Long
+                                    )
                                 }
                             }
                         )
@@ -487,7 +497,7 @@ fun StepActions(
 fun StepTest(
     olderMessages: List<String>,
     selectedRegex: Regex? = null,
-    scrollToEnd: () -> Unit = {  }
+    scrollToEnd: () -> Unit = { }
 ) {
     Card(
         modifier = Modifier

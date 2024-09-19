@@ -62,6 +62,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.ColorUtils
@@ -120,11 +122,6 @@ class MainActivity : ComponentActivity() {
                 CodeCatcherApp(
                     startDestination = destination,
                     destinationParam = destinationParam
-                )
-                HorizontalDivider(
-                    modifier = Modifier.height(0.dp),
-                    color = Color.Transparent,
-                    thickness = 0.dp
                 )
             }
         }
@@ -208,7 +205,11 @@ fun CodeCatcherApp(
         }
         Scaffold(
             modifier = Modifier
-                .fillMaxSize(),
+                .fillMaxSize()
+                .semantics {
+                    contentDescription="application scaffold"
+                }
+            ,
             snackbarHost = {
                 SnackbarHost(hostState = snackbarHostState)
             },
