@@ -19,5 +19,13 @@ GROUP BY a.id
     """)
     fun actionCountStats(): List<ActionCountStat>
 
+    @Query("""
+SELECT count(a.id) as count
+FROM catcheraction ca LEFT JOIN `action` a ON ca.actionId=a.id 
+WHERE a.`key`='sms' AND  ca.status=1 
+GROUP BY a.id LIMIT 1
+    """)
+    fun hasSmsAction() : Int
+
 
 }

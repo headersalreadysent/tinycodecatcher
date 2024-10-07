@@ -29,7 +29,7 @@ fun Long.timeString(): String {
 
 fun Int.formatTime(): String {
     val days = this / 86400
-    val hours = this / 3600
+    val hours = (this - days * 86400) / 3600
     val minutes = (this % 3600) / 60
     val secs = this % 60
     val builder = StringBuilder()

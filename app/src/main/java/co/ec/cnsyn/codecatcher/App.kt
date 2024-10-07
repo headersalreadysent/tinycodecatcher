@@ -4,6 +4,8 @@ import co.ec.cnsyn.codecatcher.database.AppDatabase
 import android.app.Application
 import android.content.Context
 import co.ec.cnsyn.codecatcher.database.DB
+import co.ec.cnsyn.codecatcher.helpers.Settings
+import co.ec.cnsyn.codecatcher.helpers.unix
 import co.ec.cnsyn.codecatcher.sms.SmsService
 
 class App : Application() {
@@ -29,6 +31,14 @@ class App : Application() {
         super.onCreate()
         instance = this
         Thread.setDefaultUncaughtExceptionHandler(ExceptionHandler(applicationContext))
+        val settings = Settings(this)
+        //mark first start
+        val first = settings.getInt("firstStart", 0);
+        val now = unix().toInt()
+        if (first == 0) {
+            settings.putInt("firstStart", now);
+        }
+        settings.putInt("lastStart", now);
 
 
         SmsService.setupService(applicationContext)

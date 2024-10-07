@@ -28,3 +28,5 @@ object EventBus {
 data class SmsCaught(var sms: SmsData)
 
 data class SettingsChange(var name: String, var value: Any?=null)
+
+data class CatcherSaved(var id:Int)

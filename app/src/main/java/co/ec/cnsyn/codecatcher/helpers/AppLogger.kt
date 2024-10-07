@@ -53,7 +53,7 @@ object AppLogger {
         Log.e(tag, message, throwable)
 
         if (!customTag.isNullOrEmpty()) {
-            appendLogToFile("${getCurrentTime()}#$customTag#$message-${throwable?.message}")
+            appendLogToFile("${getCurrentTime()}#$customTag#$message-${throwable?.message ?: throwable.toString()}")
         }
     }
 

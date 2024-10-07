@@ -12,6 +12,8 @@ import co.ec.cnsyn.codecatcher.database.catcheraction.CatcherAction
 import co.ec.cnsyn.codecatcher.database.code.Code
 import co.ec.cnsyn.codecatcher.database.relations.ActionDetail
 import co.ec.cnsyn.codecatcher.helpers.AppLogger
+import co.ec.cnsyn.codecatcher.helpers.CatcherSaved
+import co.ec.cnsyn.codecatcher.helpers.EventBus
 import co.ec.cnsyn.codecatcher.helpers.async
 import co.ec.cnsyn.codecatcher.helpers.unix
 import co.ec.cnsyn.codecatcher.values.actionList
@@ -71,6 +73,10 @@ open class CatcherPageViewModel : ViewModel() {
                 return@async DB.get().catcherAction().insert(catcherAction)
             }
         }, {
+            viewModelScope.launch {
+                AppLogger.d("permission update")
+                EventBus.publish(CatcherSaved(catcherId))
+            }
             reloadOneCatcher(catcherId)
         })
 

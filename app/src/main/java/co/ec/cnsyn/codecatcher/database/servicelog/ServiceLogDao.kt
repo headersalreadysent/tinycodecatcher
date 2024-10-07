@@ -26,6 +26,9 @@ interface ServiceLogDao : BaseDao<ServiceLog> {
     @Query("DELETE from servicelog WHERE id > 0")
     fun clean()
 
+    @Query("SELECT sum(heartbeatCount) as count FROM  servicelog")
+    fun totalRunTime(): Int
+
     companion object {
         /**
          * add receiver to database

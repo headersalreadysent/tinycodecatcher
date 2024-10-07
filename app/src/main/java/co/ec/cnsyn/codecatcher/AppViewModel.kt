@@ -16,6 +16,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.ec.cnsyn.codecatcher.database.DB
+import co.ec.cnsyn.codecatcher.helpers.AppLogger
+import co.ec.cnsyn.codecatcher.helpers.CatcherSaved
+import co.ec.cnsyn.codecatcher.helpers.EventBus
+import co.ec.cnsyn.codecatcher.helpers.Settings
 import co.ec.cnsyn.codecatcher.helpers.async
 import co.ec.cnsyn.codecatcher.helpers.translate
 import kotlinx.coroutines.delay
@@ -30,13 +34,14 @@ open class AppViewModel : ViewModel() {
 
     private var debugRunning = false
 
-    var hasExactTimePermission = MutableLiveData(true)
 
     init {
-        calculatePermissions()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            val alarmManager = App.context().getSystemService(Context.ALARM_SERVICE) as AlarmManager
-            hasExactTimePermission.value = alarmManager.canScheduleExactAlarms()
+        viewModelScope.launch {
+            EventBus.subscribe<CatcherSaved> {
+                calculatePermissions()
+            }
+            delay(3000)
+            calculatePermissions()
         }
     }
 
@@ -45,7 +50,8 @@ open class AppViewModel : ViewModel() {
         val permission: String?,
         val icon: ImageVector,
         val text: String,
-        val click:  (() -> Unit)? = null
+        val detail: String,
+        val click: (() -> Unit)? = null
     )
 
 
@@ -63,7 +69,8 @@ open class AppViewModel : ViewModel() {
                 PermissionInfo(
                     Manifest.permission.RECEIVE_SMS,
                     Icons.AutoMirrored.Filled.Message,
-                    translate("dashboard_permission_RECEIVE_SMS")
+                    translate("dashboard_permission_RECEIVE_SMS"),
+                    translate("dashboard_permission_RECEIVE_SMS_help")
                 )
             )
         }
@@ -77,43 +84,78 @@ open class AppViewModel : ViewModel() {
                 PermissionInfo(
                     Manifest.permission.POST_NOTIFICATIONS,
                     Icons.Default.Notifications,
-                    translate("dashboard_permission_POST_NOTIFICATIONS")
+                    translate("dashboard_permission_POST_NOTIFICATIONS"),
+                    translate("dashboard_permission_POST_NOTIFICATIONS_help")
                 )
             )
         }
-        if (context.checkSelfPermission(Manifest.permission.SEND_SMS)
-            != PackageManager.PERMISSION_GRANTED
-        ) {
-            //send sms permission
-            permissions.add(
-                PermissionInfo(
-                    Manifest.permission.SEND_SMS,
-                    Icons.AutoMirrored.Filled.Send,
-                    translate("dashboard_permission_SEND_SMS")
-                )
-            )
-        }
-        val alarmManager = App.context().getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
-            !alarmManager.canScheduleExactAlarms()
-        ) {
-            //send sms permission
-            permissions.add(
-                PermissionInfo(
-                    null,
-                    Icons.Filled.Alarm,
-                    translate("dashboard_permission_SET_ALARM")
+
+
+        async({
+            return@async DB.get().service().totalRunTime()
+        }, {
+            val settings = Settings.get()
+            val diff = settings.getInt("lastStart", 0) - settings.getInt("firstStart", 0)
+            if (diff > 86400 * 5 && it < diff * .8F) {
+                //if five day old app and run is less then 4 day
+                val alarmManager =
+                    App.context().getSystemService(Context.ALARM_SERVICE) as AlarmManager
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
+                    !alarmManager.canScheduleExactAlarms()
                 ) {
-                    val scheduleIntent = Intent().apply {
-                        action = android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
-                        data = android.net.Uri.parse("package:${context.packageName}")
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                    val perms = requiredPerms.value?.toMutableList() ?: mutableListOf()
+                    val isAdded = perms.find { it.permission == Manifest.permission.SEND_SMS }
+                    if (isAdded == null) {
+                        //send sms permission
+                        perms.add(
+                            PermissionInfo(
+                                null,
+                                Icons.Filled.Alarm,
+                                translate("dashboard_permission_SET_ALARM"),
+                                translate("dashboard_permission_SET_ALARM_help")
+                            ) {
+                                val scheduleIntent = Intent().apply {
+                                    action =
+                                        android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+                                    data = android.net.Uri.parse("package:${context.packageName}")
+                                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                                }
+                                context.startActivity(scheduleIntent)
+                            }
+                        )
                     }
-                    context.startActivity(scheduleIntent)
+                    requiredPerms.value = perms
                 }
-            )
-        }
+            }
+        })
+
         requiredPerms.value = permissions.toList()
+        async({
+            return@async DB.get().action().hasSmsAction()
+        }, {
+            if (it > 0) {
+                //has sms action lets ask sms send
+                if (context.checkSelfPermission(Manifest.permission.SEND_SMS)
+                    != PackageManager.PERMISSION_GRANTED
+                ) {
+                    val perms = requiredPerms.value?.toMutableList() ?: mutableListOf()
+                    val isAdded = perms.find { it.permission == Manifest.permission.SEND_SMS }
+                    if (isAdded == null) {
+                        //send sms permission
+                        perms.add(
+                            PermissionInfo(
+                                Manifest.permission.SEND_SMS,
+                                Icons.AutoMirrored.Filled.Send,
+                                translate("dashboard_permission_SEND_SMS"),
+                                translate("dashboard_permission_SEND_SMS_help")
+                            )
+                        )
+                    }
+                    requiredPerms.value = perms
+                }
+            }
+        })
+
 
     }
 

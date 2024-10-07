@@ -8,6 +8,22 @@
     <string name="dashboard_permission_POST_NOTIFICATIONS">Notification</string>
     <string name="dashboard_permission_SEND_SMS">SMS Send</string>
     <string name="dashboard_permission_SET_ALARM">Set Timer</string>
+
+    <string name="dashboard_permission_RECEIVE_SMS_help"><![CDATA[
+CodeCatcher listens for incoming SMS messages to automatically filter them and perform actions like SMS forwarding or copying to the clipboard. This allows the app to function as intended without requiring the user to manually interact with each SMS.
+]]></string>
+
+    <string name="dashboard_permission_POST_NOTIFICATIONS_help"><![CDATA[
+To alert the user when important events occur, such as an SMS being received, forwarded, or an error occurring in the SMS automation process. This keeps the user informed of app activity.
+]]></string>
+
+    <string name="dashboard_permission_SEND_SMS_help"><![CDATA[
+CodeCatcher can automate responses or forward SMS messages based on predefined rules. This ensures seamless automation when sending necessary responses without requiring user intervention.
+]]></string>
+
+    <string name="dashboard_permission_SET_ALARM_help"><![CDATA[
+CodeCatcher may require precise scheduling to perform actions like sending SMS at specific times. This ensures that tasks can be executed reliably and in accordance with user-defined rules.
+    ]]></string>
     <string name="dashboard_permission_needs_some_permission">Code Catcher need some permissions:</string>
     <string name="dashboard_stat_catcher_count">Catcher Count</string>
     <string name="dashboard_stat_code_count">Code Count</string>
@@ -140,6 +156,9 @@ This service is running in the background to ensure continuous operation. You ca
 \n\n
 <b>Exact Alarm Scheduling (AlarmManager.canScheduleExactAlarms)</b>\nCodeCatcher may require precise scheduling to perform actions like sending SMS at specific times. This ensures that tasks can be executed reliably and in accordance with user-defined rules.
     ]]></string>
+
+
+
 
     <!-- history -->
     <string name="history_load_more">Load More</string>

@@ -2,14 +2,19 @@ package co.ec.cnsyn.codecatcher.pages.add
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import co.ec.cnsyn.codecatcher.database.DB
 import co.ec.cnsyn.codecatcher.database.action.Action
 import co.ec.cnsyn.codecatcher.database.catcher.Catcher
 import co.ec.cnsyn.codecatcher.database.regex.Regex
 import co.ec.cnsyn.codecatcher.database.relations.ActionDetail
+import co.ec.cnsyn.codecatcher.helpers.AppLogger
+import co.ec.cnsyn.codecatcher.helpers.CatcherSaved
+import co.ec.cnsyn.codecatcher.helpers.EventBus
 import co.ec.cnsyn.codecatcher.helpers.async
 import co.ec.cnsyn.codecatcher.values.actionList
 import co.ec.cnsyn.codecatcher.values.regexList
+import kotlinx.coroutines.launch
 
 open class AddViewModel : ViewModel() {
 
@@ -48,8 +53,12 @@ open class AddViewModel : ViewModel() {
                 DB.get().catcherAction().insert(it.action)
             }
             return@async catcherId.toInt()
-        },{
-            then(it)
+        },{ id ->
+            viewModelScope.launch {
+                AppLogger.d("permission update")
+                EventBus.publish(CatcherSaved(id))
+            }
+            then(id)
         },err)
     }
 

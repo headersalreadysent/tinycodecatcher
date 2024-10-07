@@ -64,6 +64,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.ColorUtils
@@ -82,6 +83,7 @@ import co.ec.cnsyn.codecatcher.database.DB
 import co.ec.cnsyn.codecatcher.helpers.AppLogger
 import co.ec.cnsyn.codecatcher.helpers.MockSettings
 import co.ec.cnsyn.codecatcher.helpers.Settings
+import co.ec.cnsyn.codecatcher.helpers.htmlToAnnotatedString
 import co.ec.cnsyn.codecatcher.helpers.unix
 import co.ec.cnsyn.codecatcher.pages.about.About
 import co.ec.cnsyn.codecatcher.pages.add.Add
@@ -207,9 +209,8 @@ fun CodeCatcherApp(
             modifier = Modifier
                 .fillMaxSize()
                 .semantics {
-                    contentDescription="application scaffold"
-                }
-            ,
+                    contentDescription = "application scaffold"
+                },
             snackbarHost = {
                 SnackbarHost(hostState = snackbarHostState)
             },
@@ -349,17 +350,20 @@ fun PermissionArea(
                 .padding(bottom = 30.dp),
             horizontalAlignment = Alignment.End
         ) {
-            Row(modifier = Modifier.fillMaxWidth(),
+            Row(
+                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.End,
-                verticalAlignment = Alignment.CenterVertically) {
-                val navigator= LocalNavigation.current
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                val navigator = LocalNavigation.current
                 Text(
                     text = stringResource(id = R.string.dashboard_permission_needs_some_permission),
                     modifier = Modifier.padding(vertical = 8.dp),
                     style = MaterialTheme.typography.titleMedium
                 )
-                Icon(Icons.AutoMirrored.Filled.HelpCenter,
-                    contentDescription ="why need permissions",
+                Icon(
+                    Icons.AutoMirrored.Filled.HelpCenter,
+                    contentDescription = "why need permissions",
                     modifier = Modifier
                         .padding(start = 8.dp)
                         .clickable {
@@ -368,66 +372,72 @@ fun PermissionArea(
                     tint = MaterialTheme.colorScheme.primary
                 )
             }
+            var first = permission.first()
+            first.let { perm ->
 
-            LazyRow(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End,
-            ) {
-                items(permission.size) {
-                    val perm = permission[it]
-                    var permState: PermissionState? = null
-                    perm.permission?.let {
-                        permState = rememberPermissionState(
-                            permission = perm.permission,
-                            onPermissionResult = {
-                                then(perm.permission)
-                            }
-                        )
-                    }
-
-                    Button(
-                        onClick = {
-                            if(permState==null){
-                                perm.click?.let {
-                                    it()
-                                }
-                            } else {
-                                permState?.launchPermissionRequest()
-                            }
-                        },
-                        contentPadding = PaddingValues(
-                            horizontal = 8.dp,
-                            vertical = 4.dp
-                        ),
-                        modifier = Modifier.padding(start = 4.dp),
-                        shape = RoundedCornerShape(5.dp)
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                perm.icon, contentDescription = perm.permission,
-                                modifier = Modifier
-                                    .background(
-                                        MaterialTheme.colorScheme.primaryContainer,
-                                        CircleShape
-                                    )
-                                    .scale(.8F),
-                                tint = MaterialTheme.colorScheme.primary
-
-                            )
-                            Text(
-                                text = perm.text,
-                                modifier = Modifier.padding(start = 5.dp),
-                                maxLines = 2
-                            )
-
+                var permState: PermissionState? = null
+                perm.permission?.let {
+                    permState = rememberPermissionState(
+                        permission = perm.permission,
+                        onPermissionResult = {
+                            then(perm.permission)
                         }
+                    )
+                }
+
+                Button(
+                    onClick = {
+                        if (permState == null) {
+                            perm.click?.let {
+                                it()
+                            }
+                        } else {
+                            permState?.launchPermissionRequest()
+                        }
+                    },
+                    contentPadding = PaddingValues(
+                        horizontal = 8.dp,
+                        vertical = 4.dp
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 4.dp),
+                    shape = RoundedCornerShape(5.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            perm.icon, contentDescription = perm.permission,
+                            modifier = Modifier
+                                .background(
+                                    MaterialTheme.colorScheme.primaryContainer,
+                                    CircleShape
+                                )
+                                .scale(.8F),
+                            tint = MaterialTheme.colorScheme.primary
+
+                        )
+                        Text(
+                            text = perm.text,
+                            modifier = Modifier.padding(start = 5.dp),
+                            maxLines = 2
+                        )
+
                     }
                 }
 
-
+                Text(
+                    text = htmlToAnnotatedString(perm.detail),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 5.dp),
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        textAlign = TextAlign.Justify
+                    )
+                )
             }
+
         }
 
     }
