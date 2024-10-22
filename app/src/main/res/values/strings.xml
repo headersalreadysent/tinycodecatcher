@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">CodeCatcher</string>
-
+    <string name="app_description">Do you ever need to quickly copy SMS codes for websites or forward them to friends or family? Do you want to listen codes instead of reading from phone? CodeCatcher has your back, making all your SMS actions a breeze. Codecatcher automatize your device by your settings. Let your device work for you!
+This handy little app automatically filters your incoming messages and does exactly what you need with them—no more manual copying or forwarding. Codecatcher listens SMS messages and if a any own your filter matches, run your actions.</string>
     <string name="global_calendar_title">Last %1$s Day Graph</string>
 
     <!-- dashboard page -->

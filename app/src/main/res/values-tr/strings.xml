@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">CodeCatcher</string>
+    <string name="app_description">Web siteleri için SMS kodlarını hızlıca kopyalamanız veya arkadaşlarınıza ve ailenize iletmeniz mi gerekiyor? Ya da belki de kodları telefondan okumak yerine dinlemek mi istiyorsunuz? CodeCatcher, tüm SMS işlemlerinizi zahmetsiz hale getirerek size yardımcı oluyor. CodeCatcher ile cihazınız, ayarlarınıza göre otomatik çalışır ve sizin yerinize görev yapar!
+
+Bu kullanışlı uygulama, gelen mesajları otomatik olarak filtreler ve tam olarak istediğiniz işlemleri yapar—artık manuel kopyalama veya iletme yok. CodeCatcher, SMS mesajlarını dinler ve eğer herhangi biri belirlediğiniz filtrelerle eşleşirse, seçtiğiniz işlemleri anında gerçekleştirir.</string>
+
     <string name="global_calendar_title">Son %1$s Gün Grafiği</string>
     <string name="dashboard_permission_RECEIVE_SMS">Sms Okuma</string>
     <string name="dashboard_permission_POST_NOTIFICATIONS">Bildirim</string>

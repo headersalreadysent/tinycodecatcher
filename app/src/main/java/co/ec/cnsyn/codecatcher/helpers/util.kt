@@ -42,7 +42,11 @@ fun <T : Any?> async(
                 //send to main thread with error
                 err(e)
             }
-            AppLogger.e("Async error",e,"async")
+            if (e is NullPointerException){
+                AppLogger.e("Async error ${e.stackTrace}",e,"async")
+            } else {
+                AppLogger.e("Async error",e,"async")
+            }
         }
     }
 }
