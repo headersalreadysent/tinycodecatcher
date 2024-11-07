@@ -1,0 +1,95 @@
+name: Build and Release CodeCatcher
+
+on:
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Set up jdk
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'adopt'
+          java-version: '17'
+
+      - name: Setup some android tools
+        run: sudo apt-get update && sudo apt-get install -y aapt apksigner
+
+      - name: Cache gradle dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.gradle/caches
+          key: codecatcher-${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            codecatcher-${{ runner.os }}-gradle-
+
+      - name: Build apk
+        run: ./gradlew assembleRelease
+
+      - name: Decode keystore
+        env:
+          JKS_BASE64: ${{ secrets.JKS_BASE64 }}
+        run: |
+          echo "$JKS_BASE64" | base64 --decode > certificate.jks
+
+      - name: Sign apk with key
+        env:
+          JKS_PASSWORD: ${{ secrets.JKS_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          UNSIGNED_APK_PATH="app/build/outputs/apk/release/app-release.apk"
+          SIGNED_APK_PATH="app/build/outputs/apk/release/app-release-signed.apk"
+          
+          apksigner sign \
+            --ks certificate.jks \
+            --ks-key-alias "$KEY_ALIAS" \
+            --ks-pass "pass:$JKS_PASSWORD" \
+            --key-pass "pass:$KEY_PASSWORD" \
+            --out $SIGNED_APK_PATH \
+            $UNSIGNED_APK_PATH
+
+      - name: Verify apk
+        run: |
+          apksigner verify --print-certs "app/build/outputs/apk/release/app-release-signed.apk"          
+
+      - name: Rename APK as app name
+        run: |
+          mv app/build/outputs/apk/release/app-release-signed.apk "app/build/outputs/apk/release/CodeCatcher.apk"
+
+      - name: Create a tag
+        run: |
+          VERSION_NAME=$(aapt dump badging app/build/outputs/apk/release/CodeCatcher.apk | grep versionName | awk -F"'" '{print $6}')
+          echo "Version Name: $VERSION_NAME"
+          TAG="v${VERSION_NAME}"
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git tag $TAG
+          git push origin $TAG
+
+      - name: Get latest tag
+        id: get_tag
+        run: |
+          # Fetch the latest tag from Git
+          LATEST_TAG=$(git describe --tags --abbrev=0)
+          echo "Latest Tag: $LATEST_TAG"
+          echo "latest_tag=$LATEST_TAG" >> $GITHUB_OUTPUT  
+
+      - name: Create release
+        id: create_release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.get_tag.outputs.latest_tag }}
+          files: "app/build/outputs/apk/release/CodeCatcher.apk"
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
