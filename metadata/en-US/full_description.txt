@@ -1,0 +1,24 @@
+Codecatcher: Automate Your Phone With Sms
+
+Do you ever need to quickly copy SMS codes for websites or forward them to friends or family? Do you want to listen codes instead of reading from phone? CodeCatcher has your back, making all your SMS actions a breeze. Codecatcher automatize your device by your settings. Let your device work for you!
+This handy little app automatically filters your incoming messages and does exactly what you need with them—no more manual copying or forwarding. Codecatcher listens SMS messages and if a any own your filter matches, run your actions.
+
+With Codecatcher you can set up limitless different filter for different senders and different formats. Can be set different actions for each filter. You can send forward shipment codes to your family members. Listen your 2 factor authentication codes.
+
+What CodeCatcher Can Do:
+* Show History: Codecatcher can be show your filtered code history by sender and date to see all of them in one screen.
+* Little Stats: You can clearly see latest sender history or specific filter history from app.
+* Quick Notifications: Get your SMS codes right in your notification bar. You can even customize the notifications so you can spot the code at a glance.
+* Auto-Forward SMS: Want to send an SMS code to someone? CodeCatcher can automatically forward it to any phone number. It uses your carrier’s SMS service, so the recipient doesn’t need any special app. It’s a super easy way to share codes with others.
+* Text-to-Speech (TTS): Need to hear your SMS codes instead of reading them? CodeCatcher can read them out loud using your phone’s built-in TTS. Perfect when you’re on the go or driving!
+* Copy to Clipboard: CodeCatcher can automatically copy your SMS codes to the clipboard so you can paste them wherever you need, saving you time.
+
+Codecatcher knows you want privacy!
+* Full Offline: CodeCatcher works completely offline. Your messages and data stay on your phone—nothing is stored or shared anywhere or anyone.
+* No Data Collection: We don’t collect any data or track how you use the app. Everything stays private, and SMS forwarding happens only with your permission. We love hearing back. We don't want some fancy graphs. Just comment on store.
+
+Why Use CodeCatcher?
+CodeCatcher is your go-to tool for taking the hassle out of managing SMS codes. It’s small, simple, and designed to make your life easier.
+
+Dark Mode Available
+Codecatcher can be used in dark. Also dynamic theme is available.
