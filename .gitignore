@@ -19,7 +19,6 @@ local.properties
 /app/release/output-metadata.json
 /app/release/app-release/*
 /app/release/*.apk
-/certificate/certificate.jks
+/certificate/*
 /app/release/app-release.aab
-/certificate/local.jks
 /.idea/other.xml

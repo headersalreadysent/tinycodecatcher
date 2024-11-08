@@ -13,27 +13,18 @@ android {
         applicationId = "co.ec.cnsyn.codecatcher"
         minSdk = 24
         targetSdk = 34
-        versionCode = 108
-        versionName = "1.0.108"
+        versionCode = 109
+        versionName = "1.0.109"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
     }
-    signingConfigs {
-        create("local") {
-            keyAlias = "localRelease"
-            keyPassword = "codecatcher"
-            storeFile = file("../certificate/local.jks")
-            storePassword = "codecatcher"
-        }
-    }
     buildTypes {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
-            signingConfig = signingConfigs.getByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
