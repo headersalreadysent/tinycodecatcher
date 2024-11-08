@@ -17,6 +17,9 @@ local.properties
 /app/release/baselineProfiles/1/app-release.dm
 /app/release/app-release.apk
 /app/release/output-metadata.json
+/app/release/app-release/*
+/app/release/*.apk
 /certificate/certificate.jks
 /app/release/app-release.aab
 /certificate/local.jks
+/.idea/other.xml
