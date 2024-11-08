@@ -22,7 +22,7 @@ android {
         }
     }
     signingConfigs {
-        create("release") {
+        create("local") {
             keyAlias = "localRelease"
             keyPassword = "codecatcher"
             storeFile = file("../certificate/local.jks")

@@ -28,7 +28,9 @@ jobs:
       - name: Cache gradle dependencies
         uses: actions/cache@v4
         with:
-          path: ~/.gradle/caches
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
           key: codecatcher-${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             codecatcher-${{ runner.os }}-gradle-
