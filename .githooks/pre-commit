@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# Get the current commit count
+commit_count=$(git rev-list --count HEAD)
+
+# Extract the current versionName prefix from build.gradle.kts
+current_version_prefix=$(sed -nE 's/^[[:space:]]*versionName = "([0-9]+\.[0-9]+)\.[0-9]+"/\1/p' app/build.gradle.kts)
+
+
+# Update the versionCode and versionName in build.gradle.kts
+sed -i -E "s/(versionCode = )([0-9]+)/\1$((commit_count + 1))/" app/build.gradle.kts
+sed -i -E "s/(versionName = \")([0-9]+\.[0-9]+)(\.[0-9]+)\"/\1${current_version_prefix}.$((commit_count + 1))\"/" app/build.gradle.kts
+
+# Add the updated build.gradle.kts to the commit
+git add app/build.gradle.kts
