@@ -50,7 +50,7 @@ You can install CodeCatcher from [F-Droid](https://f-droid.org/) or build the ap
 
 1. Clone the repository:
    ```bash
-   git clone https://gitlab.com/yourusername/codecatcher.git
+   git clone https://github.com/headersalreadysent/tinycodecatcher.git
    ```
 
 2. Build the APK:
@@ -60,7 +60,7 @@ You can install CodeCatcher from [F-Droid](https://f-droid.org/) or build the ap
 
 3. Install the APK on your Android device:
    ```bash
-   adb install app/build/outputs/apk/release/app-release.apk
+   adb install app/build/outputs/apk/release/app-release-unsigned.apk
    ```
 
 ## How to Use
