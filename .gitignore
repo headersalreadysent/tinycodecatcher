@@ -19,3 +19,4 @@ local.properties
 /app/release/output-metadata.json
 /certificate/certificate.jks
 /app/release/app-release.aab
+/certificate/local.jks
