@@ -3,10 +3,8 @@ name: Build and Release CodeCatcher
 on:
   push:
     branches:
-      - master
+      - development
 
-permissions:
-  contents: write
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -64,34 +62,3 @@ jobs:
       - name: Verify apk
         run: |
           apksigner verify --print-certs "app/build/outputs/apk/release/app-release-signed.apk"          
-
-      - name: Rename APK as app name
-        run: |
-          mv app/build/outputs/apk/release/app-release-signed.apk "app/build/outputs/apk/release/CodeCatcher.apk"
-
-      - name: Create a tag
-        run: |
-          VERSION_NAME=$(aapt dump badging app/build/outputs/apk/release/CodeCatcher.apk | grep versionName | awk -F"'" '{print $6}')
-          echo "Version Name: $VERSION_NAME"
-          TAG="v${VERSION_NAME}"
-          git config user.name "GitHub Actions"
-          git config user.email "actions@github.com"
-          git tag $TAG
-          git push origin $TAG
-
-      - name: Get latest tag
-        id: get_tag
-        run: |
-          # Fetch the latest tag from Git
-          LATEST_TAG=$(git describe --tags --abbrev=0)
-          echo "Latest Tag: $LATEST_TAG"
-          echo "latest_tag=$LATEST_TAG" >> $GITHUB_OUTPUT  
-
-      - name: Create release
-        id: create_release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ steps.get_tag.outputs.latest_tag }}
-          files: "app/build/outputs/apk/release/CodeCatcher.apk"
-        env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN }}
