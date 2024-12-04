@@ -1,0 +1,28 @@
+CodeCatcher: SMS ile Telefonunuzu Otomatikleştirin
+
+Web siteleri için SMS kodlarını hızlı bir şekilde kopyalamaya veya bunları arkadaşlarınıza veya ailenize iletmeye mi ihtiyacınız var? Telefonunuzdan okumak yerine kodları dinlemek ister misiniz? CodeCatcher, tüm SMS işlemlerinizi kolaylaştırarak size destek olur. CodeCatcher, ayarlarınızla cihazınızı otomatikleştirir. Cihazınız sizin için çalışsın!
+
+Bu kullanışlı küçük uygulama, gelen mesajlarınızı otomatik olarak filtreler ve tam olarak ihtiyacınız olanı yapar. Artık elle kopyalama veya yönlendirmenize gerek kalmaz. CodeCatcher, gelen SMS mesajlarını dinleyerek ayarladığınız filtrelere uyan aksiyonları çalıştırır.
+
+CodeCatcher ile farklı göndericiler ve farklı yakalayıcılar için sınırsız filtre ayarlayabilirsiniz. Her filtre için farklı eylemler belirlenebilir. Aile üyelerinize doğrulama kodlarını iletebilirsiniz. İki faktörlü kimlik doğrulama kodlarınızı sadece dinleyebilirsiniz.
+
+CodeCatcher Neler Yapabilir:
+
+Geçmişi Göster: CodeCatcher, filtrelenmiş kod geçmişinizi gönderen ve tarihe göre göstererek hepsini tek ekranda görebilmenizi sağlar.
+Küçük İstatistikler: Uygulama üzerinden en son gönderen geçmişini veya belirli filtre geçmişini net bir şekilde görebilirsiniz.
+Hızlı Bildirimler: SMS kodlarınızı doğrudan bildirim çubuğunuzda görün. Bildirimleri özelleştirerek kodu veya metni görevilirsiniz.
+SMS'yi Otomatik İlet: Bir SMS kodunu bir arkadaşınıza mıgöndermek istiyorsunuz? CodeCatcher, bunu herhangi bir telefon numarasına otomatik olarak iletebilir. Kendi operatörünüzün SMS hizmetini kullanır, böylece alıcının özel bir uygulama indirmesine gerek yoktur. Başkalarıyla kod paylaşmanın süper kolay bir yoludur.
+Metinden Sese (TTS): SMS kodlarınızı okumak yerine duymak mı istiyorsunuz? CodeCatcher, telefonunuzun yerleşik TTS özelliğini kullanarak kodları yüksek sesle okuyabilir. Seyahat ederken veya sürerken mükemmel!
+Pano'ya Kopyala: CodeCatcher, SMS kodlarınızı otomatik olarak panoya kopyalayarak ihtiyacınız olan her yere yapıştırmanızı sağlar, böylece zaman kazanırsınız.
+
+CodeCatcher, gizliliğinizi önemsiyor!
+
+Tam Çevrimdışı: CodeCatcher tamamen çevrimdışı çalışır. Mesajlarınız ve verileriniz telefonunuzda kalır ve hiçbir şey telefonunuz haricinde depolanmaz veya herhangi bir yerde paylaşılmaz.
+Veri Toplama Yok: Hiçbir veri toplamıyoruz ve uygulamayı nasıl kullandığınızı takip etmiyoruz. Her şey özel kalır ve SMS iletimi yalnızca sizin izninizle gerçekleşir.
+Geri dönüşlerinizi duymayı seviyoruz. Şatafatlı grafikler istemiyoruz.
+
+Neden CodeCatcher Kullanmalısınız?
+CodeCatcher, SMS kodlarını yönetmekteki zahmeti ortadan kaldırmak için en iyi aracınızdır. Küçük, basit ve hayatınızı kolaylaştırmak için tasarlanmıştır.
+
+Karanlık Mod Mevcut
+CodeCatcher karanlık modda kullanılabilir. Ayrıca dinamik tema da mevcuttur.
