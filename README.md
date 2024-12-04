@@ -27,13 +27,14 @@ CodeCatcher requires the following permissions:
 
 - **SMS Permissions**: To read and process incoming SMS messages.
 - **Send SMS**: To forward SMS or send automated replies.
-- **Read Phone State**: To detect incoming messages and trigger actions.
-
-These permissions are necessary for the core functionality of the app, ensuring that CodeCatcher can perform actions like filtering, forwarding, and automation based on your needs.
+- **Post Notifications**: To alert the user when important events occur, such as an SMS being received, forwarded, or an error occurring in the SMS automation process. This keeps the user informed of app activity.
+- **Exact Alarm Scheduling**: CodeCatcher may require precise scheduling to perform actions like sending SMS at specific times. This ensures that tasks can be executed reliably and in accordance with user-defined rules.
 
 ## Releases
 
 You can download APK from releases page. You can test apk signs.
+
+[<img src="https://f-droid.org/badge/get-it-on.png" alt="Get it on F-Droid" height="80">](https://f-droid.org/packages/co.ec.cnsyn.codecatcher)
 
 ```bash
 apksigner verify --print-certs CodeCatcher.apk 
