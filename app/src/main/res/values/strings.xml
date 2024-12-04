@@ -45,6 +45,10 @@ CodeCatcher may require precise scheduling to perform actions like sending SMS a
     <string name="dashboard_see_history">See All</string>
 
 
+    <string name="dashboard_give_star">Do you like CodeCatcher?\n
+    Give Star on Github</string>
+
+
     <!-- catchers page -->
     <string name="catchers_top_card_sender">Sender</string>
     <string name="catchers_top_card_everybody">All Senders</string>
