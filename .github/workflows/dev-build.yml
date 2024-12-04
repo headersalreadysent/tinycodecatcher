@@ -61,4 +61,26 @@ jobs:
 
       - name: Verify apk
         run: |
-          apksigner verify --print-certs "app/build/outputs/apk/release/app-release-signed.apk"          
+          apksigner verify --print-certs "app/build/outputs/apk/release/app-release-signed.apk"     
+          cp app/build/outputs/apk/release/app-release-signed.apk app/build/outputs/apk/release/CodeCatcher-dev.apk
+
+      - name: Get the current date
+        id: date
+        run: echo "tag_date=$(date +'%Y%m%d%H%M%S')" >> $GITHUB_ENV
+
+      - name: Create new tag
+        id: create_tag
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git tag "development-$GITHUB_ENV-tag_date"
+          git push origin --tags
+
+      - name: Create release
+        id: create_release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: "development-${{ env.tag_date }}"
+          files: "app/build/outputs/apk/release/CodeCatcher-dev.apk"
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
