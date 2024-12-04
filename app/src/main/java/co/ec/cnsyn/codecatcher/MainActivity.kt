@@ -8,33 +8,35 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.HelpCenter
 import androidx.compose.material.icons.filled.AddCircle
-import androidx.compose.material.icons.filled.Alarm
+import androidx.compose.material.icons.filled.Commit
 import androidx.compose.material.icons.filled.Dashboard
 import androidx.compose.material.icons.filled.DeveloperMode
 import androidx.compose.material.icons.filled.Key
 import androidx.compose.material.icons.filled.Phishing
-import androidx.compose.material.icons.filled.QuestionMark
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.twotone.Star
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
@@ -61,12 +63,15 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.graphics.ColorUtils
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -98,7 +103,6 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import kotlinx.coroutines.delay
 
 
 class MainActivity : ComponentActivity() {
@@ -143,6 +147,14 @@ class MainActivity : ComponentActivity() {
             SmsService.setupService(applicationContext)
         }, 5000L)
 
+        handler.postDelayed({
+            val settings=Settings(this)
+            var runCount=settings.getInt("runCount", 0)
+            runCount++
+            settings.putInt("runCount",runCount)
+            AppLogger.d("Run count $runCount")
+        }, 2000L)
+
 
     }
 }
@@ -179,6 +191,7 @@ fun CodeCatcherApp(
         val navController = LocalNavigation.current
         val snackbarHostState = LocalSnackbar.current
         val settings = LocalSettings.current
+        var run10 by remember { mutableStateOf(false) }
 
         LaunchedEffect(permissions) {
             if (permissions.isEmpty()) {
@@ -194,6 +207,11 @@ fun CodeCatcherApp(
 
         DisposableEffect(Unit) {
             appModel.calculatePermissions()
+            if(
+                !settings.getBoolean("giveStarClicked",false) &&
+                settings.getInt("runCount")%10==0){
+                run10=true
+            }
             onDispose {
 
             }
@@ -329,11 +347,76 @@ fun CodeCatcherApp(
                 }
             }
         }
+        if(run10){
+            SkewBottomSheet(onDismissRequest = {
+                run10 = false
+            }, cut = SkewSquareCut.TopEnd) {
+                GiveStarArea()
+            }
+        }
+
 
 
     }
 
 
+}
+
+@Composable
+fun GiveStarArea(){
+    val uriHandler = LocalUriHandler.current
+    val settings = LocalSettings.current
+    Column(modifier = Modifier
+        .fillMaxWidth()
+        .padding(horizontal = 12.dp, vertical = 20.dp)
+        .clickable(indication = null,
+            interactionSource = remember { MutableInteractionSource() }
+        ) {
+            uriHandler.openUri("https://github.com/headersalreadysent/tinycodecatcher")
+            settings.putBoolean("giveStarClicked",true)
+
+        },
+        horizontalAlignment = Alignment.CenterHorizontally) {
+        Row(modifier = Modifier.padding(10.dp)
+            .border(1.dp,MaterialTheme.colorScheme.onSurfaceVariant,RoundedCornerShape(4.dp))
+            .padding(vertical = 2.dp, horizontal = 10.dp),
+            verticalAlignment = Alignment.CenterVertically) {
+
+            Icon(Icons.TwoTone.Star, contentDescription = "github star",
+                tint = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.size(18.dp))
+            Text(text = "Star", modifier = Modifier.padding(start = 8.dp),
+
+                fontSize = 12.sp,)
+            Text(text = "+1", modifier = Modifier.padding(start = 4.dp)
+                .background(MaterialTheme.colorScheme.surfaceVariant, CircleShape)
+                .height(20.dp)
+                .aspectRatio(1F),
+                fontSize = 10.sp,
+                textAlign = TextAlign.Center)
+        }
+        Text(text = stringResource(id = R.string.dashboard_give_star),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(
+                    bottom = 15.dp,
+                    top = 10.dp
+                ),
+            style = MaterialTheme.typography.bodyMedium.copy(
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.onSurface
+            ))
+        Row {
+
+            Icon(Icons.Default.Commit, contentDescription = "",
+                modifier = Modifier.size(12.dp))
+            Text(text = "headersalreadysent/tinycodecatcher",
+                color = MaterialTheme.colorScheme.onSurface,
+                style = TextStyle.Default.copy(
+                    fontSize = 10.sp
+                ))
+        }
+    }
 }
 
 @OptIn(ExperimentalPermissionsApi::class)

@@ -42,7 +42,8 @@ CodeCatcher, belirli zamanlarda SMS gönderme gibi eylemler için hassas zamanla
     <string name="dashboard_about">CodeCatcher Hakkında</string>
 
     <string name="dashboard_see_history">Tümünü Göster</string>
-
+    <string name="dashboard_give_star">CodeCatcher\'ı Beğendiniz mi?\n
+    Github\'da yıldız verin</string>
     <!-- catchers -->
     <string name="catchers_top_card_sender">Gönderen</string>
     <string name="catchers_top_card_everybody">Tüm Göndericiler</string>
