@@ -66,17 +66,17 @@ jobs:
 
       - name: Get the current date
         id: date
-        run: |
-          echo "tag_date=$(date +'%Y%m%d%H%M%S')" >> $GITHUB_ENV          
+        run: |      
           echo "latest_tag=development-$(date +'%Y%m%d%H%M%S')" >> $GITHUB_OUTPUT
 
       - name: Create new tag
         id: create_tag
         run: |
+          TAG="development-$(date +'%Y%m%d%H%M%S')"
           git config user.name "GitHub Actions"
-          git config user.email "actions@github.com"
-          git tag "development-$GITHUB_ENV-tag_date"
-          git push origin --tags
+          git config user.email "actions@github.com"          
+          git tag $TAG
+          git push origin $TAG
 
       - name: Create release
         id: create_release
