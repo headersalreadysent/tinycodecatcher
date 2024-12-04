@@ -72,7 +72,7 @@ jobs:
       - name: Create new tag
         id: create_tag
         run: |
-          TAG="development-$(date +'%Y%m%d%H%M%S')"
+          TAG="${{ steps.set_tag.outputs.latest_tag }}"
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"          
           git tag $TAG
