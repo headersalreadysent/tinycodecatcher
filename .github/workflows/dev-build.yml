@@ -66,7 +66,9 @@ jobs:
 
       - name: Get the current date
         id: date
-        run: echo "tag_date=$(date +'%Y%m%d%H%M%S')" >> $GITHUB_ENV
+        run: |
+          echo "tag_date=$(date +'%Y%m%d%H%M%S')" >> $GITHUB_ENV          
+          echo "latest_tag=development-$(date +'%Y%m%d%H%M%S')" >> $GITHUB_OUTPUT
 
       - name: Create new tag
         id: create_tag
@@ -80,7 +82,7 @@ jobs:
         id: create_release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: "development-${{ env.tag_date }}"
+          tag_name: ${{ steps.get_tag.outputs.latest_tag }}
           files: "app/build/outputs/apk/release/CodeCatcher-dev.apk"
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
