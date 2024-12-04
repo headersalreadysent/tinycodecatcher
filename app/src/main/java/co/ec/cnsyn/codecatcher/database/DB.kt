@@ -43,7 +43,7 @@ object DB {
                 get().regex().insertAll(*regexes.toTypedArray())
                 get().action().insertAll(*actionList().toTypedArray())
 
-                if (BuildConfig.DEBUG && false) {
+                if (BuildConfig.DEBUG) {
                     //if debug generate some records to testing
                     val catchers = List(regexes.size) {
                         Catcher(
@@ -71,9 +71,6 @@ object DB {
 
                     get().catcher().insertAll(*catchers.toTypedArray())
                     get().catcherAction().insertAll(*catchersAction.toTypedArray())
-
-
-                    generateFakeData()
                 } else {
                     //generate only one
                     get().regex().getAllItems().find { it.key == "6digit" }?.let {
@@ -104,53 +101,6 @@ object DB {
 
     }
 
-    private fun generateFakeData() {
-        val smsTemplates = mapOf(
-            "BankAlert" to "Dear customer, your bank account has been updated. Your verification code is XXXX.",
-            "CargoTrack" to "Your cargo is on the way! Track your shipment at https://tracking.example.com?code=XXXXX.",
-            "OnlineShop" to "Thank you for your purchase! Your verification code is XXX. Visit our website for details.",
-            "DeliveryInfo" to "Your delivery is scheduled for today. Verify with code XXXX at https://delivery.example.com.",
-            "CreditAlert" to "Alert: A transaction has been made on your credit card. Your code is XXXXX.",
-            "ServiceUpdate" to "Important update: Service changes will be implemented on [Date]. Use code XXXX for updates.",
-            "AccountNoti" to "Notification: There has been a change in your account settings. Verify with code XXXXXX.",
-            "PackageTrack" to "Your package is in transit! Track it here with: https://package.example.com/verify/XXXX",
-            "OrderConfirm" to "Order Confirmation: Your order has been received. Verify with code XXXX.",
-            "PromoAlert" to "Special Offer: Get 10% off with code XXXXX! Use it at checkout on our website.",
-            "ServiceAlert" to "Service Alert: Scheduled maintenance on tomorrow. Use code XXX for more info on https://service.alert.com/user/XXX",
-            "Transaction" to "Transaction Alert: A payment of 20$ has been processed. Verify with code XXXX.",
-            "Appointment" to "Appointment Reminder: Your appointment on tomorrow at 15.00. Verify with code XXX.",
-            "ShippingInfo" to "Shipping Information: Your order has been shipped. Track it here: https://shipping.world-info.com?code=XXXXX.",
-            "BankNotification" to "Bank Notification: Your account balance changed. Verify with code XXXX.",
-            "AlertService" to "Alert: Your account triggered an alert. Verify with code XXXXXX.",
-            "ReceiptMsg" to "Receipt: Your recent transaction completed. Use code XXX for details in your account.",
-            "DeliveryUpdate" to "Delivery Update: Your delivery status changed. Verify with code XXXX on https://update.adress-detail.com.",
-            "SupportTeam" to "Support Team: We received your request. Verify with code XXXXXX. We'll get back to you shortly.",
-        )
-        val codes = mutableListOf<Code>()
-        var newDate = 0
-        var date = unix()
-        val regexSize = regexList().size
-        for (i in 1..150) {
-            if (newDate == 0) {
-                newDate = Random.nextInt(2, 6)
-                date -= 86400
-            }
-            val (sender, message, code) = getRandomTemplateWithCode(smsTemplates)
-            codes.add(
-                Code(
-                    date = date,
-                    catcherId = Random.nextInt(1, regexSize + 1),
-                    sender = sender,
-                    sms = message,
-                    code = code
-                )
-            )
-            newDate--
-        }
-        get().code().insertAll(*codes.toTypedArray())
-        //update counts
-        get().catcher().fixCatchersCounts()
-    }
 
     private fun randomAction(n: Int, range: IntRange): List<Int> {
 
