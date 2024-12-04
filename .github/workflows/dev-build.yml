@@ -64,8 +64,8 @@ jobs:
           apksigner verify --print-certs "app/build/outputs/apk/release/app-release-signed.apk"     
           cp app/build/outputs/apk/release/app-release-signed.apk app/build/outputs/apk/release/CodeCatcher-dev.apk
 
-      - name: Get the current date
-        id: date
+      - name: Generate a tag name
+        id: set_tag
         run: |      
           echo "latest_tag=development-$(date +'%Y%m%d%H%M%S')" >> $GITHUB_OUTPUT
 
