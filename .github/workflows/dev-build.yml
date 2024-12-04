@@ -82,7 +82,7 @@ jobs:
         id: create_release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ steps.get_tag.outputs.latest_tag }}
+          tag_name: ${{ steps.set_tag.outputs.latest_tag }}
           files: "app/build/outputs/apk/release/CodeCatcher-dev.apk"
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
