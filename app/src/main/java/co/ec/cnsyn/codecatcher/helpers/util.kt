@@ -15,6 +15,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import co.ec.cnsyn.codecatcher.App
+import co.ec.cnsyn.codecatcher.ExceptionHandler
 import kotlin.concurrent.thread
 
 
@@ -43,10 +44,11 @@ fun <T : Any?> async(
                 err(e)
             }
             if (e is NullPointerException){
-                AppLogger.e("Async error ${e.stackTrace}",e,"async")
+                AppLogger.e("Async error ${e.message}",e,"async")
             } else {
                 AppLogger.e("Async error",e,"async")
             }
+            ExceptionHandler.record(e)
         }
     }
 }

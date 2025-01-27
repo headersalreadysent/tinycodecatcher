@@ -140,5 +140,20 @@ class ExceptionHandler(private val context: Context) : Thread.UncaughtExceptionH
             logFile.writeText("")
         }
 
+        fun record(throwable: Throwable) {
+            val logDir = getLogDirectory(App.context())
+            val fileName = "crash_report_${System.currentTimeMillis() / 1000L}.txt"
+
+            val file = File(logDir, fileName)
+            FileOutputStream(file).use { fos ->
+                PrintWriter(fos).use { writer ->
+                    val sw = StringWriter()
+                    val pw = PrintWriter(sw)
+                    throwable.printStackTrace(pw)
+                    writer.println(sw.toString())
+                }
+            }
+        }
+
     }
 }
