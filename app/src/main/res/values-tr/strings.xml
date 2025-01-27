@@ -159,6 +159,9 @@ Bu hizmet, kesintisiz çalışmayı sağlamak için arka planda çalışıyor. B
     <string name="regexlist_5digit_desc">5 basamaklı sayıları yakalar.</string>
     <string name="regexlist_6digit">6 basamaklı sayı</string>
     <string name="regexlist_6digit_desc">6 basamaklı sayıları yakalar.</string>
+
+    <string name="regexlist_6digit_with_dash">Tire ile ayrılmış 6 basamaklı</string>
+    <string name="regexlist_6digit_with_dash_desc">Tire ile ayrılmış 6 basakmaklı sayılar Örn:123–456</string>
     <string name="regexlist_url">Url</string>
     <string name="regexlist_url_desc">Geçerli bağlantıları yakalar.</string>
     <string name="regexlist_any">Her şey</string>

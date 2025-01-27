@@ -7,6 +7,7 @@ import co.ec.cnsyn.codecatcher.App
 import co.ec.cnsyn.codecatcher.database.DB
 import co.ec.cnsyn.codecatcher.database.code.Code
 import co.ec.cnsyn.codecatcher.database.relations.CatcherWithRegex
+import co.ec.cnsyn.codecatcher.helpers.AppLogger
 import co.ec.cnsyn.codecatcher.helpers.async
 import co.ec.cnsyn.codecatcher.sms.actions.BaseAction
 import co.ec.cnsyn.codecatcher.sms.actions.ClipboardAction
@@ -20,6 +21,7 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.logging.Logger
 
 class ActionRunner {
 
@@ -43,8 +45,9 @@ class ActionRunner {
     ) {
         //load all searchers
         async({ DB.get().catcher().getActiveCatchersWithRegexes() }, { catchers ->
+            val catcherList=catchers.sortedByDescending { it.regex.regex.length }
             messages.forEach { sms ->
-                testCatchers(sms, catchers, match)
+                testCatchers(sms, catcherList, match)
             }
             then()
         })
@@ -87,7 +90,7 @@ class ActionRunner {
     ): Boolean {
         //make pattern
         val searchPattern = catcher.regex.regex.toPattern().toRegex()
-
+        AppLogger.d("regex test ${catcher.regex.regex} run on ${sms.body} => ${searchPattern.containsMatchIn(sms.body)}")
         if (searchPattern.containsMatchIn(sms.body)) {
             match(sms)
             val code = try {

@@ -176,6 +176,8 @@ This service is running in the background to ensure continuous operation. You ca
     <string name="regexlist_5digit_desc">Catches 5 digit numeric codes.</string>
     <string name="regexlist_6digit">6 digit numeric</string>
     <string name="regexlist_6digit_desc">Catches 6 digit numeric codes.</string>
+    <string name="regexlist_6digit_with_dash">6 digit with dash</string>
+    <string name="regexlist_6digit_with_dash_desc">Catches 6 digit numeric codes with dash. EX:123–456</string>
     <string name="regexlist_url">Url</string>
     <string name="regexlist_url_desc">Catches valid urls.</string>
     <string name="regexlist_any">Anything</string>

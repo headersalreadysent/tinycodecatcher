@@ -18,6 +18,10 @@ private var regexes = listOf(
         key = "6digit",
     ),
     Regex(
+        regex = "\\b[0-9]{3}-[0-9]{3}\\b",
+        key = "6digit_with_dash",
+    ),
+    Regex(
         regex = "\\bhttps?://([a-zA-Z0-9_-]+\\.)+[a-zA-Z]{2,}(/[a-zA-Z0-9#%&?=._-]*)?\\b",
         key = "url"
     ),

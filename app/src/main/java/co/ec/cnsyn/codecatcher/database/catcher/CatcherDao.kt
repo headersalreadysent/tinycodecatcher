@@ -33,7 +33,7 @@ interface CatcherDao : BaseDao<Catcher> {
     @Query("""
         UPDATE catcher 
         SET catchCount = (SELECT count(id) AS count 
-        FROM code WHERE code.catcherId = catcher.id)
+        FROM code WHERE code.catcherId = catcher.id) 
     """)
     fun fixCatchersCounts()
 
