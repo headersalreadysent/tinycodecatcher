@@ -13,8 +13,8 @@ android {
         applicationId = "co.ec.cnsyn.codecatcher"
         minSdk = 24
         targetSdk = 34
-        versionCode = 128
-        versionName = "1.0.128"
+        versionCode = 129
+        versionName = "1.0.129"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

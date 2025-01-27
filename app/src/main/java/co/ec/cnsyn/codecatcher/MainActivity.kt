@@ -207,9 +207,11 @@ fun CodeCatcherApp(
 
         DisposableEffect(Unit) {
             appModel.calculatePermissions()
+            val runCount=settings.getInt("runCount")
             if(
                 !settings.getBoolean("giveStarClicked",false) &&
-                settings.getInt("runCount")%10==0){
+                runCount>0 &&
+                runCount%10==0){
                 run10=true
             }
             onDispose {
