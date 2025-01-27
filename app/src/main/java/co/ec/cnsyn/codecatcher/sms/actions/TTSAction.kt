@@ -36,10 +36,11 @@ class TTSAction : BaseAction {
 
     private var mode: Int = 0
     private var volume: Int = 0
+    private var volumeChanged: Boolean = false
 
     @OptIn(DelicateCoroutinesApi::class)
     override fun run(catcher: CatcherWithRegex, action: CatcherWithActions, sms: SmsData): Boolean {
-
+        volumeChanged = false
         val context = App.context()
         val actionParams = action.params()
         val setupVolume =
@@ -135,24 +136,37 @@ class TTSAction : BaseAction {
     }
 
     private fun openSound() {
-        val audioManager = App.context().getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        //store settings
-        mode = audioManager.ringerMode
-        volume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
-        //open sound
-        audioManager.ringerMode = AudioManager.RINGER_MODE_NORMAL
-        val maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
-        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, (maxVolume * .7).toInt(), 0)
+        try {
+
+            val audioManager = App.context().getSystemService(Context.AUDIO_SERVICE) as AudioManager
+            //store settings
+            mode = audioManager.ringerMode
+            volume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
+            //open sound
+            audioManager.ringerMode = AudioManager.RINGER_MODE_NORMAL
+            val maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
+            audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, (maxVolume * .7).toInt(), 0)
+            volumeChanged = true
+        } catch (e: Throwable) {
+            AppLogger.e("volume cant be changed", e)
+        }
     }
 
 
     private fun restoreVolume() {
-        val audioManager = App.context().getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        //restore
-        mode = audioManager.ringerMode
-        volume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
-        audioManager.ringerMode = mode
-        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, volume, 0)
+        if(volumeChanged){
+            try {
+                val audioManager = App.context().getSystemService(Context.AUDIO_SERVICE) as AudioManager
+                //restore
+                mode = audioManager.ringerMode
+                volume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
+                audioManager.ringerMode = mode
+                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, volume, 0)
+            } catch (e:Throwable){
+                AppLogger.e("volume cant be changed", e)
+            }
+        }
+
 
     }
 
